@@ -1,0 +1,80 @@
+# Override for local development only — DO NOT use in staging/production
+#
+# Automatically merged by Docker Compose when running `docker compose up`.
+# Adds dev UIs, reduces memory footprint, and labels all services for development.
+
+services:
+  postgres:
+    labels:
+      environment: development
+
+  redis:
+    labels:
+      environment: development
+
+  zookeeper:
+    labels:
+      environment: development
+
+  kafka:
+    labels:
+      environment: development
+
+  kafka-ui:
+    labels:
+      environment: development
+
+  elasticsearch:
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms256m -Xmx256m
+    labels:
+      environment: development
+
+  kibana:
+    labels:
+      environment: development
+
+  qdrant:
+    labels:
+      environment: development
+
+  minio:
+    labels:
+      environment: development
+
+  clickhouse:
+    mem_limit: 512m
+    labels:
+      environment: development
+
+  adminer:
+    image: adminer:latest
+    restart: unless-stopped
+    ports:
+      - "${ADMINER_PORT:-8888}:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ADMINER_DEFAULT_SERVER: postgres
+    networks:
+      - nova-network
+    labels:
+      environment: development
+
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    restart: unless-stopped
+    ports:
+      - "${REDIS_COMMANDER_PORT:-8889}:8081"
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      REDIS_HOSTS: local:redis:6379
+    networks:
+      - nova-network
+    labels:
+      environment: development
