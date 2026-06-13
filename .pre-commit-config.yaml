@@ -1,0 +1,32 @@
+# Install: pre-commit install
+# Requires: pip install pre-commit  OR  brew install pre-commit
+# Also requires: gofmt (Go toolchain), golangci-lint
+
+default_language_version:
+  golang: "1.22"
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+        args: ["--maxkb=1000"]
+      - id: check-merge-conflict
+
+  - repo: local
+    hooks:
+      - id: go-fmt
+        name: gofmt
+        entry: gofmt -l -w
+        language: system
+        types: [go]
+
+      - id: golangci-lint
+        name: golangci-lint
+        entry: scripts/lint-go.sh
+        language: system
+        pass_filenames: false
+        files: \.go$

@@ -1,0 +1,104 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Build outputs
+bin/
+dist/
+build/
+out/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+coverage/
+coverage.out
+*.coverprofile
+
+# Go
+go.work.sum
+
+# Frontend
+.next/
+.nuxt/
+.turbo/
+*.tsbuildinfo
+.eslintcache
+.parcel-cache
+storybook-static/
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+
+# IDE & local tooling
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Cursor local state (keep rules tracked separately if needed)
+.cursor/
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Logs & temp
+*.log
+logs/
+tmp/
+temp/
+.cache/
+
+# Docker
+.docker/
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+*.tfvars
+!*.tfvars.example
+
+# Data & local volumes
+data/
+volumes/
+*.db
+*.sqlite
+
+# Test & debug
+__debug_bin
+debug/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+
+# Airflow / Spark local
+airflow.db
+spark-warehouse/
+metastore_db/
+
+# MinIO / object storage local
+minio-data/
+
+# Generated
+**/generated/
+*.pb.go
+
+# Package managers
+pnpm-lock.yaml
+yarn.lock
+package-lock.json
+
+TASKS.md
+/husky
