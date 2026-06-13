@@ -1,7 +1,11 @@
-.PHONY: help build test lint docker-build fmt setup-hooks hooks
+.PHONY: help build test lint docker-build fmt setup-hooks hooks dev-up dev-down dev-init dev-reset
 
 SHELL := bash
 .SHELLFLAGS := -eu -o pipefail -c
+
+COMPOSE_DIR := infrastructure/docker-compose
+ENV_FILE := .env
+COMPOSE := docker compose --env-file $(ENV_FILE) -f $(COMPOSE_DIR)/docker-compose.yml -f $(COMPOSE_DIR)/docker-compose.override.yml
 
 help: ## Show available targets
 	@echo "NovaCommerce monorepo"
@@ -35,3 +39,17 @@ fmt: ## Format all Go source files
 
 setup-hooks hooks: ## Install git pre-commit hooks
 	@bash scripts/setup-hooks.sh
+
+dev-up: ## Start local infrastructure (Docker Compose)
+	@test -f $(ENV_FILE) || (echo "Missing $(ENV_FILE). Run: cp .env.example .env" && exit 1)
+	@$(COMPOSE) up -d
+
+dev-down: ## Stop local infrastructure
+	@test -f $(ENV_FILE) || (echo "Missing $(ENV_FILE). Run: cp .env.example .env" && exit 1)
+	@$(COMPOSE) down
+
+dev-init: ## Bootstrap databases, topics, indices (run once after dev-up)
+	@bash $(COMPOSE_DIR)/scripts/dev-init.sh
+
+dev-reset: ## Destroy volumes and re-bootstrap local infrastructure
+	@bash $(COMPOSE_DIR)/scripts/dev-reset.sh
