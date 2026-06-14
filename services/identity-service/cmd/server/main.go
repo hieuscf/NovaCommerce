@@ -11,12 +11,7 @@ import (
 	"time"
 
 	"github.com/novacommerce/identity-service/config"
-	"github.com/novacommerce/identity-service/internal/application/service"
-	"github.com/novacommerce/identity-service/internal/infrastructure/cache"
-	"github.com/novacommerce/identity-service/internal/infrastructure/http/handler"
 	"github.com/novacommerce/identity-service/internal/infrastructure/http/middleware"
-	"github.com/novacommerce/identity-service/internal/infrastructure/http/router"
-	"github.com/novacommerce/identity-service/internal/infrastructure/persistence/postgres"
 	pkglogger "github.com/novacommerce/pkg/logger"
 )
 
@@ -47,33 +42,18 @@ func main() {
 		}
 	}()
 
-	pool, err := postgres.NewPool(ctx, cfg.Database, log)
-	if err != nil {
-		log.Error().Err(err).Msg("connect to PostgreSQL")
-		os.Exit(1)
-	}
-	defer pool.Close()
-
-	redisClient, err := cache.NewRedisClient(ctx, cfg.Redis, log)
-	if err != nil {
-		log.Error().Err(err).Msg("connect to Redis")
-		os.Exit(1)
-	}
-	defer func() {
-		if err := redisClient.Close(); err != nil {
-			log.Error().Err(err).Msg("close redis client")
-		}
-	}()
-
-	healthService := service.NewHealthService(pool, redisClient, cfg.App.Name)
-	healthHandler := handler.NewHealthHandler(healthService)
-
 	middleware.Init(log, cfg.HTTP.CORSAllowOrigins)
-	engine := router.NewRouter(cfg, healthHandler)
+
+	app, err := wireApp(ctx, cfg, log)
+	if err != nil {
+		log.Error().Err(err).Msg("wire application")
+		os.Exit(1)
+	}
+	defer app.close(log)
 
 	srv := &http.Server{
 		Addr:              fmt.Sprintf(":%d", cfg.App.Port),
-		Handler:           engine,
+		Handler:           app.engine,
 		ReadHeaderTimeout: 10 * time.Second,
 	}
 

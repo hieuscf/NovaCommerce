@@ -11,12 +11,13 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-type kafkaProducer struct {
+// KafkaProducer publishes messages to Kafka and can be closed on shutdown.
+type KafkaProducer struct {
 	writer *kafka.Writer
 }
 
 // NewKafkaProducer creates a KafkaProducer backed by segmentio/kafka-go.
-func NewKafkaProducer(brokers []string) (port.KafkaProducer, error) {
+func NewKafkaProducer(brokers []string) (*KafkaProducer, error) {
 	if len(brokers) == 0 {
 		return nil, fmt.Errorf("at least one kafka broker is required")
 	}
@@ -28,10 +29,12 @@ func NewKafkaProducer(brokers []string) (port.KafkaProducer, error) {
 		Async:        false,
 	}
 
-	return &kafkaProducer{writer: writer}, nil
+	return &KafkaProducer{writer: writer}, nil
 }
 
-func (p *kafkaProducer) Publish(ctx context.Context, topic string, key string, payload interface{}) error {
+var _ port.KafkaProducer = (*KafkaProducer)(nil)
+
+func (p *KafkaProducer) Publish(ctx context.Context, topic string, key string, payload interface{}) error {
 	value, err := json.Marshal(payload)
 	if err != nil {
 		return fmt.Errorf("kafkaProducer.Publish: %w", err)
@@ -53,7 +56,7 @@ func (p *kafkaProducer) Publish(ctx context.Context, topic string, key string, p
 }
 
 // Close closes the underlying Kafka writer.
-func (p *kafkaProducer) Close() error {
+func (p *KafkaProducer) Close() error {
 	if p == nil || p.writer == nil {
 		return nil
 	}
