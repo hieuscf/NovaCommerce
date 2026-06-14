@@ -99,6 +99,11 @@ func Load() (*Config, error) {
 
 func setDefaults(v *viper.Viper) {
 	v.SetDefault("app.name", "identity-service")
+
+	//Dev accounts (chỉ khi app.environment = development)
+	//admin_dev / admin@novacommerce.dev → role admin
+	//seller_dev / seller@novacommerce.dev → role seller
+	//customer_dev / customer@novacommerce.dev → role customer
 	v.SetDefault("app.env", "development")
 	v.SetDefault("app.port", 8081)
 	v.SetDefault("app.graceful_ttl", 30)
