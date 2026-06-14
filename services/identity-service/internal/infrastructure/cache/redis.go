@@ -22,7 +22,9 @@ func NewRedisClient(ctx context.Context, cfg config.RedisConfig, log *pkglogger.
 	})
 
 	if err := client.Ping(ctx).Err(); err != nil {
-		client.Close()
+		if closeErr := client.Close(); closeErr != nil {
+			return nil, fmt.Errorf("ping redis: %w; close redis: %v", err, closeErr)
+		}
 		return nil, fmt.Errorf("ping redis: %w", err)
 	}
 

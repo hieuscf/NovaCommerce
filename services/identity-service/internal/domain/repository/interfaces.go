@@ -14,25 +14,6 @@ type UserFilter struct {
 	Offset int
 }
 
-// UserRepository persists and retrieves users.
-type UserRepository interface {
-	Create(ctx context.Context, user *entity.User) error
-	FindByID(ctx context.Context, id uuid.UUID) (*entity.User, error)
-	FindByEmail(ctx context.Context, email string) (*entity.User, error)
-	FindByUsername(ctx context.Context, username string) (*entity.User, error)
-	Update(ctx context.Context, user *entity.User) error
-	SoftDelete(ctx context.Context, id uuid.UUID) error
-	List(ctx context.Context, filter UserFilter) ([]*entity.User, error)
-}
-
-// RefreshTokenRepository manages refresh token persistence.
-type RefreshTokenRepository interface {
-	Create(ctx context.Context, token *entity.RefreshToken) error
-	FindByTokenHash(ctx context.Context, hash string) (*entity.RefreshToken, error)
-	RevokeByID(ctx context.Context, id uuid.UUID) error
-	RevokeAllByUserID(ctx context.Context, userID uuid.UUID) error
-}
-
 // RoleRepository manages role persistence.
 type RoleRepository interface {
 	Create(ctx context.Context, role *entity.Role) error

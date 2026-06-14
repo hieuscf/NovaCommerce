@@ -4,7 +4,10 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 )
+
+const bcryptCost = 12
 
 // UserStatus represents the lifecycle state of a user account.
 type UserStatus string
@@ -21,13 +24,36 @@ type User struct {
 	Username     string     `db:"username"`
 	Email        string     `db:"email"`
 	PasswordHash string     `db:"password_hash"`
-	Phone        *string    `db:"phone"`
-	FullName     *string    `db:"full_name"`
-	AvatarURL    *string    `db:"avatar_url"`
+	Phone        string     `db:"phone"`
+	FullName     string     `db:"full_name"`
+	AvatarURL    string     `db:"avatar_url"`
 	Status       UserStatus `db:"status"`
 	LastLoginAt  *time.Time `db:"last_login_at"`
 	CreatedAt    time.Time  `db:"created_at"`
 	UpdatedAt    time.Time  `db:"updated_at"`
+}
+
+// SetPassword hashes plain with bcrypt (cost 12) and stores it in PasswordHash.
+func (u *User) SetPassword(plain string) error {
+	hash, err := bcrypt.GenerateFromPassword([]byte(plain), bcryptCost)
+	if err != nil {
+		return err
+	}
+	u.PasswordHash = string(hash)
+	return nil
+}
+
+// CheckPassword reports whether plain matches the stored bcrypt hash.
+func (u *User) CheckPassword(plain string) bool {
+	if u.PasswordHash == "" {
+		return false
+	}
+	return bcrypt.CompareHashAndPassword([]byte(u.PasswordHash), []byte(plain)) == nil
+}
+
+// IsActive reports whether the account is in active status.
+func (u *User) IsActive() bool {
+	return u.Status == UserStatusActive
 }
 
 // Role defines a named set of permissions.
@@ -57,17 +83,6 @@ type UserRole struct {
 type RolePermission struct {
 	RoleID       uuid.UUID `db:"role_id"`
 	PermissionID uuid.UUID `db:"permission_id"`
-}
-
-// RefreshToken stores a hashed refresh token for a user session.
-type RefreshToken struct {
-	ID         uuid.UUID `db:"id"`
-	UserID     uuid.UUID `db:"user_id"`
-	TokenHash  string    `db:"token_hash"`
-	DeviceInfo *string   `db:"device_info"`
-	IsRevoked  bool      `db:"is_revoked"`
-	ExpiresAt  time.Time `db:"expires_at"`
-	CreatedAt  time.Time `db:"created_at"`
 }
 
 // OAuthAccount links an external OAuth provider to a user.

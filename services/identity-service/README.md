@@ -2,13 +2,13 @@
 
 Core microservice for **authentication, authorization, and user management** in the NovaCommerce platform. Every client request that requires identity eventually flows through this service — either directly for auth endpoints, or indirectly via JWT verification at the API Gateway.
 
-| Attribute | Value |
-|-----------|-------|
-| HTTP port | `8081` |
-| Database | PostgreSQL (`identity_db`) |
-| Cache | Redis |
-| Messaging (planned) | Kafka topic `user-events` |
-| Module | `github.com/novacommerce/identity-service` |
+| Attribute           | Value                                      |
+| ------------------- | ------------------------------------------ |
+| HTTP port           | `8081`                                     |
+| Database            | PostgreSQL (`identity_db`)                 |
+| Cache               | Redis                                      |
+| Messaging (planned) | Kafka topic `user-events`                  |
+| Module              | `github.com/novacommerce/identity-service` |
 
 ---
 
@@ -16,20 +16,20 @@ Core microservice for **authentication, authorization, and user management** in 
 
 The service is in **bootstrap phase**: infrastructure wiring, health checks, database schema, and domain contracts are in place. Business logic (auth APIs, repositories, JWT, OAuth, Kafka) is **not yet implemented**.
 
-| Area | Status |
-|------|--------|
-| HTTP server + graceful shutdown | Implemented |
-| Config (YAML + env) | Implemented |
-| PostgreSQL pool (`pgx`) + Redis client | Implemented |
-| OpenTelemetry (traces + metrics) | Implemented |
-| `GET /health` | Implemented |
-| SQL migrations (`001`–`005`) | Implemented |
-| Domain entities + repository interfaces | Defined |
-| Postgres repository implementations | Not started |
-| `/api/v1/*` routes | Group created, no routes registered |
-| JWT signing/verification | Config only (`JWT_*` env vars) |
-| OAuth provider integration | Schema only |
-| Kafka publishing | Config only (`KAFKA_*` env vars) |
+| Area                                    | Status                              |
+| --------------------------------------- | ----------------------------------- |
+| HTTP server + graceful shutdown         | Implemented                         |
+| Config (YAML + env)                     | Implemented                         |
+| PostgreSQL pool (`pgx`) + Redis client  | Implemented                         |
+| OpenTelemetry (traces + metrics)        | Implemented                         |
+| `GET /health`                           | Implemented                         |
+| SQL migrations (`001`–`005`)            | Implemented                         |
+| Domain entities + repository interfaces | Defined                             |
+| Postgres repository implementations     | Not started                         |
+| `/api/v1/*` routes                      | Group created, no routes registered |
+| JWT signing/verification                | Config only (`JWT_*` env vars)      |
+| OAuth provider integration              | Schema only                         |
+| Kafka publishing                        | Config only (`KAFKA_*` env vars)    |
 
 When reading this README, sections marked **(planned)** describe target architecture from `docs/PROJECT_CONTEXT.md` and `docs/ARCHITECTURE.md`, not current Go code.
 
@@ -167,28 +167,28 @@ services/identity-service/
 
 ### Key files explained
 
-| File | Responsibility |
-|------|----------------|
-| `cmd/server/main.go` | Loads config, initializes telemetry, connects Postgres + Redis, wires `HealthService` → `HealthHandler` → `router.NewRouter`, starts `http.Server` on `:8081`, handles `SIGINT`/`SIGTERM` graceful shutdown (`APP_GRACEFUL_TTL` seconds). |
-| `cmd/server/telemetry.go` | Registers OTLP gRPC exporters for traces and metrics; sets W3C `TraceContext` + `Baggage` propagators. Shutdown with 5s timeout on exit. |
-| `config/config.go` | Loads `.env` (best-effort), reads `config/config.yaml`, applies env overrides via `AutomaticEnv` with `.` → `_` replacer (`APP_PORT` → `app.port`). |
-| `internal/infrastructure/persistence/postgres/db.go` | Creates `pgxpool.Pool` with configurable max/min connections and `otelpgx` tracing. Fails fast if DSN empty or ping fails. |
-| `internal/infrastructure/cache/redis.go` | Creates `go-redis` client; fails fast if addr empty or ping fails. |
-| `internal/domain/repository/interfaces.go` | Contracts for persistence — **no implementations yet**. Implement under `internal/infrastructure/persistence/postgres/`. |
-| `internal/infrastructure/http/router/router.go` | Registers `GET /health`; creates empty `/api/v1` group for future auth routes. Sets `gin.ReleaseMode` when `APP_ENV != development`. |
+| File                                                 | Responsibility                                                                                                                                                                                                                            |
+| ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `cmd/server/main.go`                                 | Loads config, initializes telemetry, connects Postgres + Redis, wires `HealthService` → `HealthHandler` → `router.NewRouter`, starts `http.Server` on `:8081`, handles `SIGINT`/`SIGTERM` graceful shutdown (`APP_GRACEFUL_TTL` seconds). |
+| `cmd/server/telemetry.go`                            | Registers OTLP gRPC exporters for traces and metrics; sets W3C `TraceContext` + `Baggage` propagators. Shutdown with 5s timeout on exit.                                                                                                  |
+| `config/config.go`                                   | Loads `.env` (best-effort), reads `config/config.yaml`, applies env overrides via `AutomaticEnv` with `.` → `_` replacer (`APP_PORT` → `app.port`).                                                                                       |
+| `internal/infrastructure/persistence/postgres/db.go` | Creates `pgxpool.Pool` with configurable max/min connections and `otelpgx` tracing. Fails fast if DSN empty or ping fails.                                                                                                                |
+| `internal/infrastructure/cache/redis.go`             | Creates `go-redis` client; fails fast if addr empty or ping fails.                                                                                                                                                                        |
+| `internal/domain/repository/interfaces.go`           | Contracts for persistence — **no implementations yet**. Implement under `internal/infrastructure/persistence/postgres/`.                                                                                                                  |
+| `internal/infrastructure/http/router/router.go`      | Registers `GET /health`; creates empty `/api/v1` group for future auth routes. Sets `gin.ReleaseMode` when `APP_ENV != development`.                                                                                                      |
 
 ### Monorepo shared packages (`pkg/`)
 
-| Package | Used today | Available for future use |
-|---------|------------|--------------------------|
-| `pkg/logger` | Structured logging (zerolog) | — |
-| `pkg/errors` | Panic recovery error type | — |
-| `pkg/response` | Standardized error responses | Success envelopes for API handlers |
-| `pkg/database` | — | `RunMigrations()` wrapper around golang-migrate |
-| `pkg/kafka` | — | Event publishing to `user-events` |
-| `pkg/middleware` | — | Shared gateway-style middleware |
-| `pkg/validator` | — | Request validation |
-| `pkg/pagination` | — | List endpoints |
+| Package          | Used today                   | Available for future use                        |
+| ---------------- | ---------------------------- | ----------------------------------------------- |
+| `pkg/logger`     | Structured logging (zerolog) | —                                               |
+| `pkg/errors`     | Panic recovery error type    | —                                               |
+| `pkg/response`   | Standardized error responses | Success envelopes for API handlers              |
+| `pkg/database`   | —                            | `RunMigrations()` wrapper around golang-migrate |
+| `pkg/kafka`      | —                            | Event publishing to `user-events`               |
+| `pkg/middleware` | —                            | Shared gateway-style middleware                 |
+| `pkg/validator`  | —                            | Request validation                              |
+| `pkg/pagination` | —                            | List endpoints                                  |
 
 ---
 
@@ -226,15 +226,15 @@ Source: `internal/infrastructure/http/handler/health_handler.go`, `internal/appl
 
 From `docs/ARCHITECTURE.md`, Kong routes `/api/v1/auth/*` → Identity Service `:8081`:
 
-| Endpoint | Purpose |
-|----------|---------|
-| `POST /api/v1/auth/register` | Create user account |
-| `POST /api/v1/auth/login` | Email/password login → JWT + refresh token |
-| `POST /api/v1/auth/refresh` | Rotate access token using refresh token |
-| `POST /api/v1/auth/logout` | Revoke refresh token |
+| Endpoint                             | Purpose                                               |
+| ------------------------------------ | ----------------------------------------------------- |
+| `POST /api/v1/auth/register`         | Create user account                                   |
+| `POST /api/v1/auth/login`            | Email/password login → JWT + refresh token            |
+| `POST /api/v1/auth/refresh`          | Rotate access token using refresh token               |
+| `POST /api/v1/auth/logout`           | Revoke refresh token                                  |
 | `POST /api/v1/auth/oauth/{provider}` | OAuth2 social login (Google, Facebook, GitHub, Apple) |
-| `GET /api/v1/auth/me` | Current user profile |
-| `POST /api/v1/auth/password/reset` | Password reset flow |
+| `GET /api/v1/auth/me`                | Current user profile                                  |
+| `POST /api/v1/auth/password/reset`   | Password reset flow                                   |
 
 The router placeholder is already prepared:
 
@@ -253,12 +253,12 @@ Config and database schema are ready; Go implementation is pending.
 
 Configured in `config.Config.JWT` (loaded but **not used** at runtime):
 
-| Setting | Env var | Default | Purpose |
-|---------|---------|---------|---------|
-| Private key path | `JWT_PRIVATE_KEY_PATH` | `./keys/private.pem` | RS256 signing |
-| Public key path | `JWT_PUBLIC_KEY_PATH` | `./keys/public.pem` | RS256 verification |
-| Access TTL | `JWT_ACCESS_TTL` | `15` (minutes) | Short-lived access token |
-| Refresh TTL | `JWT_REFRESH_TTL` | `7` (days) | Refresh token lifetime |
+| Setting          | Env var                | Default              | Purpose                  |
+| ---------------- | ---------------------- | -------------------- | ------------------------ |
+| Private key path | `JWT_PRIVATE_KEY_PATH` | `./keys/private.pem` | RS256 signing            |
+| Public key path  | `JWT_PUBLIC_KEY_PATH`  | `./keys/public.pem`  | RS256 verification       |
+| Access TTL       | `JWT_ACCESS_TTL`       | `15` (minutes)       | Short-lived access token |
+| Refresh TTL      | `JWT_REFRESH_TTL`      | `7` (days)           | Refresh token lifetime   |
 
 The `keys/` directory does not exist yet. Generate RSA key pair before implementing JWT (referenced in `.env.example` as task SVC-IS-003).
 
@@ -293,13 +293,13 @@ Table `oauth_accounts` (`003_create_oauth_accounts.up.sql`):
 
 Five system roles seeded in migration `005` (always applied):
 
-| Role | Description |
-|------|-------------|
-| `customer` | End user — browse and purchase |
-| `seller` | Merchant — manage products and orders |
-| `admin` | Full system access |
-| `analyst` | Read-only analytics dashboards |
-| `partner` | External partner with scoped API access |
+| Role       | Description                             |
+| ---------- | --------------------------------------- |
+| `customer` | End user — browse and purchase          |
+| `seller`   | Merchant — manage products and orders   |
+| `admin`    | Full system access                      |
+| `analyst`  | Read-only analytics dashboards          |
+| `partner`  | External partner with scoped API access |
 
 Tables: `roles`, `permissions`, `user_roles`, `role_permissions`. Permissions use `resource:action` naming (e.g. `product:create`).
 
@@ -326,29 +326,29 @@ cp .env.example .env
 
 ### Environment variables
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `APP_NAME` | `identity-service` | Service name in logs and health response |
-| `APP_ENV` | `development` | `development` \| `staging` \| `production` — controls Gin mode |
-| `APP_PORT` | `8081` | HTTP listen port |
-| `APP_GRACEFUL_TTL` | `30` | Graceful shutdown timeout (seconds) |
-| `APP_LOG_LEVEL` | `info` | Log level (`debug`, `info`, `warn`, `error`) |
-| `DATABASE_DSN` | see `config.yaml` | PostgreSQL connection string |
-| `DATABASE_MAX_OPEN_CONNS` | `25` | Pool max connections |
-| `DATABASE_MAX_IDLE_CONNS` | `5` | Pool min idle connections |
-| `DATABASE_CONN_MAX_LIFETIME` | `300` | Connection max lifetime (seconds) |
-| `REDIS_ADDR` | `localhost:6379` | Redis host:port |
-| `REDIS_PASSWORD` | `""` | Redis password |
-| `REDIS_DB` | `0` | Redis database index |
-| `KAFKA_BROKERS` | `localhost:9092` | Kafka broker list *(not wired)* |
-| `KAFKA_GROUP_ID` | `identity-service` | Consumer group *(not wired)* |
-| `JWT_PRIVATE_KEY_PATH` | `./keys/private.pem` | RS256 private key *(not wired)* |
-| `JWT_PUBLIC_KEY_PATH` | `./keys/public.pem` | RS256 public key *(not wired)* |
-| `JWT_ACCESS_TTL` | `15` | Access token TTL in minutes |
-| `JWT_REFRESH_TTL` | `7` | Refresh token TTL in days |
-| `TELEMETRY_OTLP_ENDPOINT` | `localhost:4317` | OTLP collector gRPC endpoint |
-| `TELEMETRY_SERVICE_NAME` | `identity-service` | OpenTelemetry service name |
-| `HTTP_CORS_ALLOW_ORIGINS` | `*` | CORS allowed origins (comma-separated if multiple) |
+| Variable                     | Default              | Description                                                    |
+| ---------------------------- | -------------------- | -------------------------------------------------------------- |
+| `APP_NAME`                   | `identity-service`   | Service name in logs and health response                       |
+| `APP_ENV`                    | `development`        | `development` \| `staging` \| `production` — controls Gin mode |
+| `APP_PORT`                   | `8081`               | HTTP listen port                                               |
+| `APP_GRACEFUL_TTL`           | `30`                 | Graceful shutdown timeout (seconds)                            |
+| `APP_LOG_LEVEL`              | `info`               | Log level (`debug`, `info`, `warn`, `error`)                   |
+| `DATABASE_DSN`               | see `config.yaml`    | PostgreSQL connection string                                   |
+| `DATABASE_MAX_OPEN_CONNS`    | `25`                 | Pool max connections                                           |
+| `DATABASE_MAX_IDLE_CONNS`    | `5`                  | Pool min idle connections                                      |
+| `DATABASE_CONN_MAX_LIFETIME` | `300`                | Connection max lifetime (seconds)                              |
+| `REDIS_ADDR`                 | `localhost:6379`     | Redis host:port                                                |
+| `REDIS_PASSWORD`             | `""`                 | Redis password                                                 |
+| `REDIS_DB`                   | `0`                  | Redis database index                                           |
+| `KAFKA_BROKERS`              | `localhost:9092`     | Kafka broker list _(not wired)_                                |
+| `KAFKA_GROUP_ID`             | `identity-service`   | Consumer group _(not wired)_                                   |
+| `JWT_PRIVATE_KEY_PATH`       | `./keys/private.pem` | RS256 private key _(not wired)_                                |
+| `JWT_PUBLIC_KEY_PATH`        | `./keys/public.pem`  | RS256 public key _(not wired)_                                 |
+| `JWT_ACCESS_TTL`             | `15`                 | Access token TTL in minutes                                    |
+| `JWT_REFRESH_TTL`            | `7`                  | Refresh token TTL in days                                      |
+| `TELEMETRY_OTLP_ENDPOINT`    | `localhost:4317`     | OTLP collector gRPC endpoint                                   |
+| `TELEMETRY_SERVICE_NAME`     | `identity-service`   | OpenTelemetry service name                                     |
+| `HTTP_CORS_ALLOW_ORIGINS`    | `*`                  | CORS allowed origins (comma-separated if multiple)             |
 
 ### Port alignment note
 
@@ -420,10 +420,10 @@ curl -s http://localhost:8081/health | jq
 
 ### Development accounts (after migration 005)
 
-| Username | Email | Password | Role |
-|----------|-------|----------|------|
-| `admin_dev` | `admin@novacommerce.dev` | `Admin@123456` | `admin` |
-| `seller_dev` | `seller@novacommerce.dev` | `Seller@123456` | `seller` |
+| Username       | Email                       | Password          | Role       |
+| -------------- | --------------------------- | ----------------- | ---------- |
+| `admin_dev`    | `admin@novacommerce.dev`    | `Admin@123456`    | `admin`    |
+| `seller_dev`   | `seller@novacommerce.dev`   | `Seller@123456`   | `seller`   |
 | `customer_dev` | `customer@novacommerce.dev` | `Customer@123456` | `customer` |
 
 **Development only.** Bcrypt hashes are embedded in SQL (cost=12). Never use these credentials outside local environments.
@@ -440,13 +440,13 @@ The monorepo also provides `pkg/database.RunMigrations()` for programmatic migra
 
 ### Schema overview
 
-| Migration | Creates |
-|-----------|---------|
-| `001_create_users` | `user_status` enum, `users` table, `update_updated_at_column()` trigger |
-| `002_create_roles_permissions` | `roles`, `permissions`, `user_roles`, `role_permissions` |
-| `003_create_oauth_accounts` | `oauth_provider` enum, `oauth_accounts` table |
-| `004_create_refresh_tokens` | `token_status` enum, `refresh_tokens` table |
-| `005_seed_default_roles` | 5 system roles + conditional dev users |
+| Migration                      | Creates                                                                 |
+| ------------------------------ | ----------------------------------------------------------------------- |
+| `001_create_users`             | `user_status` enum, `users` table, `update_updated_at_column()` trigger |
+| `002_create_roles_permissions` | `roles`, `permissions`, `user_roles`, `role_permissions`                |
+| `003_create_oauth_accounts`    | `oauth_provider` enum, `oauth_accounts` table                           |
+| `004_create_refresh_tokens`    | `token_status` enum, `refresh_tokens` table                             |
+| `005_seed_default_roles`       | 5 system roles + conditional dev users                                  |
 
 ### Entities
 
@@ -458,14 +458,14 @@ See [docs/ERD.md](../../docs/ERD.md#1-identity-service-postgresql) for the platf
 
 Go entities in `internal/domain/entity/user.go` predate the final migration schema. Align before implementing repositories:
 
-| Field | Go entity | SQL migration |
-|-------|-----------|---------------|
-| User status values | Missing `pending_verification` | Default status in DB |
-| `User.FullName` | `*string` | `NOT NULL` |
-| `Role` | Missing `display_name`, `is_system`, `updated_at` | Present in `002` |
-| `Permission` | Missing `name`, `created_at` | Present in `002` |
-| `RefreshToken` | `IsRevoked bool` | `status` enum + `revoked_at` |
-| `OAuthAccount` | Missing `provider_email`, `raw_profile`, `updated_at` | Present in `003` |
+| Field              | Go entity                                             | SQL migration                |
+| ------------------ | ----------------------------------------------------- | ---------------------------- |
+| User status values | Missing `pending_verification`                        | Default status in DB         |
+| `User.FullName`    | `*string`                                             | `NOT NULL`                   |
+| `Role`             | Missing `display_name`, `is_system`, `updated_at`     | Present in `002`             |
+| `Permission`       | Missing `name`, `created_at`                          | Present in `002`             |
+| `RefreshToken`     | `IsRevoked bool`                                      | `status` enum + `revoked_at` |
+| `OAuthAccount`     | Missing `provider_email`, `raw_profile`, `updated_at` | Present in `003`             |
 
 ### Migration commands
 
@@ -496,11 +496,11 @@ Uses `pkg/logger` (zerolog):
 
 ### Distributed tracing
 
-| Layer | Instrumentation |
-|-------|-----------------|
-| HTTP | `otelgin.Middleware` on every Gin request |
-| PostgreSQL | `otelpgx.NewTracer()` on `pgxpool` connections |
-| Propagation | W3C TraceContext + Baggage |
+| Layer       | Instrumentation                                |
+| ----------- | ---------------------------------------------- |
+| HTTP        | `otelgin.Middleware` on every Gin request      |
+| PostgreSQL  | `otelpgx.NewTracer()` on `pgxpool` connections |
+| Propagation | W3C TraceContext + Baggage                     |
 
 Traces export via **OTLP gRPC** to `TELEMETRY_OTLP_ENDPOINT` (default `localhost:4317`, insecure). Ensure an OTLP collector (e.g. Grafana Alloy, OpenTelemetry Collector) is running locally if you want to inspect traces.
 
@@ -530,9 +530,9 @@ docker build \
   .
 ```
 
-| Stage | Base image | Output |
-|-------|------------|--------|
-| Builder | `golang:1.23-alpine` | Static binary `identity-service` |
+| Stage   | Base image                                  | Output                                        |
+| ------- | ------------------------------------------- | --------------------------------------------- |
+| Builder | `golang:1.23-alpine`                        | Static binary `identity-service`              |
 | Runtime | `gcr.io/distroless/static-debian12:nonroot` | Binary + `config/config.yaml` + `migrations/` |
 
 - Exposes port `8081`
@@ -651,9 +651,9 @@ Downstream services (Catalog, Commerce) consume these for cache invalidation and
 
 ## Kafka (planned)
 
-| Direction | Topic | Events |
-|-----------|-------|--------|
-| Publish | `user-events` | `USER_REGISTERED`, `USER_UPDATED` |
+| Direction | Topic         | Events                            |
+| --------- | ------------- | --------------------------------- |
+| Publish   | `user-events` | `USER_REGISTERED`, `USER_UPDATED` |
 
 `KAFKA_BROKERS` and `KAFKA_GROUP_ID` are configured but no producer/consumer code exists in this service yet.
 
@@ -661,12 +661,12 @@ Downstream services (Catalog, Commerce) consume these for cache invalidation and
 
 ## Related Documentation
 
-| Document | Content |
-|----------|---------|
-| [PROJECT_CONTEXT — §4.1 Identity Service](../../docs/PROJECT_CONTEXT.md#41-identity-service) | Platform role, entities, Kafka topic |
-| [ARCHITECTURE — API Gateway routes](../../docs/ARCHITECTURE.md) | Kong routing `/api/v1/auth/*` → `:8081` |
-| [ERD — Identity Service](../../docs/ERD.md#1-identity-service-postgresql) | Entity relationship diagram |
-| [migrations/README.md](./migrations/README.md) | golang-migrate naming and run commands |
+| Document                                                                                     | Content                                 |
+| -------------------------------------------------------------------------------------------- | --------------------------------------- |
+| [PROJECT_CONTEXT — §4.1 Identity Service](../../docs/PROJECT_CONTEXT.md#41-identity-service) | Platform role, entities, Kafka topic    |
+| [ARCHITECTURE — API Gateway routes](../../docs/ARCHITECTURE.md)                              | Kong routing `/api/v1/auth/*` → `:8081` |
+| [ERD — Identity Service](../../docs/ERD.md#1-identity-service-postgresql)                    | Entity relationship diagram             |
+| [migrations/README.md](./migrations/README.md)                                               | golang-migrate naming and run commands  |
 
 ---
 

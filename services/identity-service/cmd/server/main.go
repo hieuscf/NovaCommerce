@@ -59,7 +59,11 @@ func main() {
 		log.Error().Err(err).Msg("connect to Redis")
 		os.Exit(1)
 	}
-	defer redisClient.Close()
+	defer func() {
+		if err := redisClient.Close(); err != nil {
+			log.Error().Err(err).Msg("close redis client")
+		}
+	}()
 
 	healthService := service.NewHealthService(pool, redisClient, cfg.App.Name)
 	healthHandler := handler.NewHealthHandler(healthService)
