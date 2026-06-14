@@ -102,3 +102,6 @@ package-lock.json
 
 TASKS.md
 /husky
+/.github
+.golangci.yml
+.pre-commit-config.yaml
