@@ -30,6 +30,7 @@ type Config struct {
 		PrivateKeyPath string `mapstructure:"private_key_path"`
 		PublicKeyPath  string `mapstructure:"public_key_path"`
 		AccessTTL      int    `mapstructure:"access_ttl"`
+		AccessTokenTTL int    `mapstructure:"access_token_ttl"`
 		RefreshTTL     int    `mapstructure:"refresh_ttl"`
 	} `mapstructure:"jwt"`
 
@@ -93,6 +94,12 @@ func Load() (*Config, error) {
 	if len(cfg.HTTP.CORSAllowOrigins) == 0 {
 		cfg.HTTP.CORSAllowOrigins = []string{"*"}
 	}
+	if cfg.JWT.AccessTokenTTL == 0 {
+		cfg.JWT.AccessTokenTTL = cfg.JWT.AccessTTL
+	}
+	if cfg.JWT.AccessTokenTTL == 0 {
+		cfg.JWT.AccessTokenTTL = 15
+	}
 
 	return &cfg, nil
 }
@@ -114,6 +121,7 @@ func setDefaults(v *viper.Viper) {
 	v.SetDefault("database.conn_max_lifetime", 300)
 
 	v.SetDefault("jwt.access_ttl", 15)
+	v.SetDefault("jwt.access_token_ttl", 15)
 	v.SetDefault("jwt.refresh_ttl", 7)
 
 	v.SetDefault("telemetry.service_name", "identity-service")

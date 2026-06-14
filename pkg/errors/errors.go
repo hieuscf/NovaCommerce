@@ -104,6 +104,12 @@ func IsAppError(err error) (*AppError, bool) {
 	return appErr, ok
 }
 
+// IsNotFound reports whether err is a NOT_FOUND AppError.
+func IsNotFound(err error) bool {
+	appErr, ok := IsAppError(err)
+	return ok && appErr.Code == ErrCodeNotFound
+}
+
 // HTTPStatus returns the HTTP status code for an error, defaulting to 500.
 func HTTPStatus(err error) int {
 	if appErr, ok := IsAppError(err); ok {
