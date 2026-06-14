@@ -1,0 +1,36 @@
+app:
+  name: identity-service
+  env: development
+  port: 8081
+  graceful_ttl: 30
+  log_level: info
+
+database:
+  dsn: postgres://nova:nova_dev_password@localhost:5433/identity_db?sslmode=disable
+  max_open_conns: 25
+  max_idle_conns: 5
+  conn_max_lifetime: 300
+
+redis:
+  addr: localhost:6379
+  password: ""
+  db: 0
+
+kafka:
+  brokers:
+    - localhost:9092
+  group_id: identity-service
+
+jwt:
+  private_key_path: ./keys/private.pem
+  public_key_path: ./keys/public.pem
+  access_ttl: 15
+  refresh_ttl: 7
+
+telemetry:
+  otlp_endpoint: localhost:4317
+  service_name: identity-service
+
+http:
+  cors_allow_origins:
+    - "*"
