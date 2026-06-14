@@ -7,12 +7,11 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
-	"net/mail"
-	"regexp"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/novacommerce/identity-service/internal/application/port"
+	authvalidator "github.com/novacommerce/identity-service/internal/application/validator"
 	"github.com/novacommerce/identity-service/internal/domain/entity"
 	"github.com/novacommerce/identity-service/internal/domain/repository"
 	apperrors "github.com/novacommerce/pkg/errors"
@@ -23,10 +22,7 @@ const (
 	eventUserRegistered  = "USER_REGISTERED"
 	accessTokenExpiresIn = int64(15 * 60) // 15 minutes in seconds
 	refreshTokenTTL      = 7 * 24 * time.Hour
-	minPasswordLength    = 8
 )
-
-var usernamePattern = regexp.MustCompile(`^[a-zA-Z0-9]{3,30}$`)
 
 // AuthUseCase defines authentication and account lifecycle operations.
 type AuthUseCase interface {
@@ -80,7 +76,7 @@ type userRegisteredEvent struct {
 }
 
 func (uc *authUseCase) Register(ctx context.Context, input RegisterInput) (*RegisterOutput, error) {
-	if err := validateRegisterInput(input); err != nil {
+	if err := authvalidator.ValidateRegisterInput(input.Username, input.Email, input.Password, input.FullName); err != nil {
 		return nil, err
 	}
 
@@ -122,6 +118,9 @@ func (uc *authUseCase) Register(ctx context.Context, input RegisterInput) (*Regi
 }
 
 func (uc *authUseCase) Login(ctx context.Context, input LoginInput) (*LoginOutput, error) {
+	if err := authvalidator.ValidateLoginInput(input.Identifier, input.Password); err != nil {
+		return nil, err
+	}
 	if err := uc.rateLimit(ctx, "login:"+input.Identifier); err != nil {
 		return nil, err
 	}
@@ -203,8 +202,8 @@ func (uc *authUseCase) GetMe(ctx context.Context, userID uuid.UUID) (*UserOutput
 }
 
 func (uc *authUseCase) ChangePassword(ctx context.Context, userID uuid.UUID, input ChangePasswordInput) error {
-	if len(input.NewPassword) < minPasswordLength {
-		return apperrors.NewValidation("new password must be at least 8 characters", nil)
+	if err := authvalidator.ValidateChangePasswordInput(input.CurrentPassword, input.NewPassword); err != nil {
+		return err
 	}
 
 	user, err := uc.userRepo.FindByID(ctx, userID)
@@ -232,7 +231,7 @@ func (uc *authUseCase) ChangePassword(ctx context.Context, userID uuid.UUID, inp
 }
 
 func (uc *authUseCase) ForgotPassword(ctx context.Context, email string) error {
-	if err := validateEmail(email); err != nil {
+	if err := authvalidator.ValidateEmail(email); err != nil {
 		return err
 	}
 	if err := uc.rateLimit(ctx, "forgot:"+email); err != nil {
@@ -276,8 +275,8 @@ func (uc *authUseCase) ForgotPassword(ctx context.Context, email string) error {
 }
 
 func (uc *authUseCase) ResetPassword(ctx context.Context, input ResetPasswordInput) error {
-	if len(input.NewPassword) < minPasswordLength {
-		return apperrors.NewValidation("new password must be at least 8 characters", nil)
+	if err := authvalidator.ValidateResetPasswordInput(input.Token, input.NewPassword); err != nil {
+		return err
 	}
 
 	tokenHash := hashToken(input.Token)
@@ -415,29 +414,6 @@ func (uc *authUseCase) rateLimit(ctx context.Context, key string) error {
 			return err
 		}
 		return fmt.Errorf("authUseCase: %w", err)
-	}
-	return nil
-}
-
-func validateRegisterInput(input RegisterInput) error {
-	if err := validateEmail(input.Email); err != nil {
-		return err
-	}
-	if len(input.Password) < minPasswordLength {
-		return apperrors.NewValidation("password must be at least 8 characters", nil)
-	}
-	if !usernamePattern.MatchString(input.Username) {
-		return apperrors.NewValidation("username must be alphanumeric and 3-30 characters", nil)
-	}
-	if input.FullName == "" {
-		return apperrors.NewValidation("full name is required", nil)
-	}
-	return nil
-}
-
-func validateEmail(email string) error {
-	if _, err := mail.ParseAddress(email); err != nil {
-		return apperrors.NewValidation("invalid email format", nil)
 	}
 	return nil
 }
