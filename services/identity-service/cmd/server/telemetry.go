@@ -19,14 +19,14 @@ import (
 func initTelemetry(ctx context.Context, cfg *config.Config, version string) (func(context.Context) error, error) {
 	serviceName := cfg.Telemetry.ServiceName
 	if serviceName == "" {
-		serviceName = cfg.App.Name
+		serviceName = cfg.Server.Name
 	}
 
 	res, err := resource.New(ctx,
 		resource.WithAttributes(
 			semconv.ServiceName(serviceName),
 			semconv.ServiceVersion(version),
-			semconv.DeploymentEnvironment(cfg.App.Env),
+			semconv.DeploymentEnvironment(cfg.Server.Env),
 		),
 	)
 	if err != nil {

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/novacommerce/identity-service/config"
 	apperrors "github.com/novacommerce/pkg/errors"
 	"github.com/redis/go-redis/v9"
 )
@@ -73,26 +74,26 @@ func RateLimiter(cfg RateLimiterConfig) gin.HandlerFunc {
 	}
 }
 
-// LoginRateLimiter limits login attempts to 5 per 15 minutes per IP.
-func LoginRateLimiter(redisClient *redis.Client) gin.HandlerFunc {
+// LoginRateLimiter limits login attempts per configured window and IP.
+func LoginRateLimiter(redisClient *redis.Client, rl config.RateLimitConfig) gin.HandlerFunc {
 	return RateLimiter(RateLimiterConfig{
 		Redis:  redisClient,
 		Key:    "login",
-		Limit:  5,
-		Window: 15 * time.Minute,
+		Limit:  rl.LoginMaxAttempts,
+		Window: rl.LoginWindow,
 		KeyFunc: func(c *gin.Context) string {
 			return fmt.Sprintf("rate:login:%s", c.ClientIP())
 		},
 	})
 }
 
-// RegisterRateLimiter limits registration attempts to 10 per hour per IP.
-func RegisterRateLimiter(redisClient *redis.Client) gin.HandlerFunc {
+// RegisterRateLimiter limits registration attempts per configured window and IP.
+func RegisterRateLimiter(redisClient *redis.Client, rl config.RateLimitConfig) gin.HandlerFunc {
 	return RateLimiter(RateLimiterConfig{
 		Redis:  redisClient,
 		Key:    "register",
-		Limit:  10,
-		Window: time.Hour,
+		Limit:  rl.RegisterMaxAttempts,
+		Window: rl.RegisterWindow,
 		KeyFunc: func(c *gin.Context) string {
 			return fmt.Sprintf("rate:register:%s", c.ClientIP())
 		},

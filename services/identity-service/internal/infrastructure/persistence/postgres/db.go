@@ -13,24 +13,25 @@ import (
 
 // NewPool creates a PostgreSQL connection pool with OpenTelemetry tracing.
 func NewPool(ctx context.Context, cfg config.DatabaseConfig, log *pkglogger.Logger) (*pgxpool.Pool, error) {
-	if cfg.DSN == "" {
+	dsn := cfg.BuildDSN()
+	if dsn == "" {
 		return nil, fmt.Errorf("database DSN is required")
 	}
 
-	maxOpen := cfg.MaxOpenConns
+	maxOpen := cfg.MaxConns
 	if maxOpen <= 0 {
 		maxOpen = 25
 	}
-	maxIdle := cfg.MaxIdleConns
+	maxIdle := cfg.MinConns
 	if maxIdle <= 0 {
 		maxIdle = 5
 	}
-	connMaxLifetime := time.Duration(cfg.ConnMaxLifetime) * time.Second
+	connMaxLifetime := cfg.ConnMaxLifetime
 	if connMaxLifetime <= 0 {
 		connMaxLifetime = 300 * time.Second
 	}
 
-	poolConfig, err := pgxpool.ParseConfig(cfg.DSN)
+	poolConfig, err := pgxpool.ParseConfig(dsn)
 	if err != nil {
 		return nil, fmt.Errorf("parse database config: %w", err)
 	}

@@ -1,0 +1,3642 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>server: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/novacommerce/identity-service/cmd/server/main.go (0.0%)</option>
+				
+				<option value="file1">github.com/novacommerce/identity-service/cmd/server/telemetry.go (0.0%)</option>
+				
+				<option value="file2">github.com/novacommerce/identity-service/cmd/server/wire.go (0.0%)</option>
+				
+				<option value="file3">github.com/novacommerce/identity-service/config/config.go (0.0%)</option>
+				
+				<option value="file4">github.com/novacommerce/identity-service/internal/application/service/health.go (0.0%)</option>
+				
+				<option value="file5">github.com/novacommerce/identity-service/internal/application/usecase/auth_usecase.go (80.1%)</option>
+				
+				<option value="file6">github.com/novacommerce/identity-service/internal/application/usecase/mocks/auth_mocks.go (0.0%)</option>
+				
+				<option value="file7">github.com/novacommerce/identity-service/internal/application/validator/auth_validator.go (71.4%)</option>
+				
+				<option value="file8">github.com/novacommerce/identity-service/internal/domain/entity/password_reset.go (0.0%)</option>
+				
+				<option value="file9">github.com/novacommerce/identity-service/internal/domain/entity/refresh_token.go (0.0%)</option>
+				
+				<option value="file10">github.com/novacommerce/identity-service/internal/domain/entity/user.go (0.0%)</option>
+				
+				<option value="file11">github.com/novacommerce/identity-service/internal/infrastructure/cache/rate_limiter.go (0.0%)</option>
+				
+				<option value="file12">github.com/novacommerce/identity-service/internal/infrastructure/cache/redis.go (0.0%)</option>
+				
+				<option value="file13">github.com/novacommerce/identity-service/internal/infrastructure/email/email_service.go (0.0%)</option>
+				
+				<option value="file14">github.com/novacommerce/identity-service/internal/infrastructure/http/handler/auth_handler.go (77.2%)</option>
+				
+				<option value="file15">github.com/novacommerce/identity-service/internal/infrastructure/http/handler/health_handler.go (0.0%)</option>
+				
+				<option value="file16">github.com/novacommerce/identity-service/internal/infrastructure/http/handler/response.go (85.7%)</option>
+				
+				<option value="file17">github.com/novacommerce/identity-service/internal/infrastructure/http/middleware/auth.go (0.0%)</option>
+				
+				<option value="file18">github.com/novacommerce/identity-service/internal/infrastructure/http/middleware/middleware.go (0.0%)</option>
+				
+				<option value="file19">github.com/novacommerce/identity-service/internal/infrastructure/http/middleware/rate_limiter.go (0.0%)</option>
+				
+				<option value="file20">github.com/novacommerce/identity-service/internal/infrastructure/http/middleware/security.go (0.0%)</option>
+				
+				<option value="file21">github.com/novacommerce/identity-service/internal/infrastructure/http/router/docs.go (0.0%)</option>
+				
+				<option value="file22">github.com/novacommerce/identity-service/internal/infrastructure/http/router/router.go (0.0%)</option>
+				
+				<option value="file23">github.com/novacommerce/identity-service/internal/infrastructure/jwt/jwt_service.go (0.0%)</option>
+				
+				<option value="file24">github.com/novacommerce/identity-service/internal/infrastructure/messaging/kafka_producer.go (0.0%)</option>
+				
+				<option value="file25">github.com/novacommerce/identity-service/internal/infrastructure/persistence/postgres/db.go (0.0%)</option>
+				
+				<option value="file26">github.com/novacommerce/identity-service/internal/infrastructure/persistence/postgres/password_reset_postgres_repo.go (0.0%)</option>
+				
+				<option value="file27">github.com/novacommerce/identity-service/internal/infrastructure/persistence/postgres/refresh_token_postgres_repo.go (0.0%)</option>
+				
+				<option value="file28">github.com/novacommerce/identity-service/internal/infrastructure/persistence/postgres/user_postgres_repo.go (0.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">no coverage</span>
+				<span class="cov1">low coverage</span>
+				<span class="cov2">*</span>
+				<span class="cov3">*</span>
+				<span class="cov4">*</span>
+				<span class="cov5">*</span>
+				<span class="cov6">*</span>
+				<span class="cov7">*</span>
+				<span class="cov8">*</span>
+				<span class="cov9">*</span>
+				<span class="cov10">high coverage</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package main
+
+import (
+        "context"
+        "errors"
+        "fmt"
+        "net/http"
+        "os"
+        "os/signal"
+        "syscall"
+        "time"
+
+        "github.com/novacommerce/identity-service/config"
+        "github.com/novacommerce/identity-service/internal/infrastructure/http/middleware"
+        pkglogger "github.com/novacommerce/pkg/logger"
+)
+
+// Version is injected at build time via -ldflags.
+var Version = "1.0.0"
+
+func main() <span class="cov0" title="0">{
+        ctx := context.Background()
+
+        cfg, err := config.Load()
+        if err != nil </span><span class="cov0" title="0">{
+                fmt.Fprintf(os.Stderr, "load config: %v\n", err)
+                os.Exit(1)
+        }</span>
+
+        <span class="cov0" title="0">log := pkglogger.New(cfg.Server.Name, cfg.Server.Env, cfg.Server.LogLevel)
+
+        shutdownTelemetry, err := initTelemetry(ctx, cfg, Version)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Error().Err(err).Msg("init telemetry")
+                os.Exit(1)
+        }</span>
+        <span class="cov0" title="0">defer func() </span><span class="cov0" title="0">{
+                shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+                defer cancel()
+                if err := shutdownTelemetry(shutdownCtx); err != nil </span><span class="cov0" title="0">{
+                        log.Error().Err(err).Msg("shutdown telemetry")
+                }</span>
+        }()
+
+        <span class="cov0" title="0">middleware.Init(log, cfg.HTTP.CORSAllowOrigins)
+
+        app, err := wireApp(ctx, cfg, log)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Error().Err(err).Msg("wire application")
+                os.Exit(1)
+        }</span>
+        <span class="cov0" title="0">defer app.close(log)
+
+        srv := &amp;http.Server{
+                Addr:              fmt.Sprintf(":%d", cfg.Server.Port),
+                Handler:           app.engine,
+                ReadTimeout:       cfg.Server.ReadTimeout,
+                WriteTimeout:      cfg.Server.WriteTimeout,
+                IdleTimeout:       cfg.Server.IdleTimeout,
+                ReadHeaderTimeout: 10 * time.Second,
+        }
+
+        go func() </span><span class="cov0" title="0">{
+                log.Info().Int("port", cfg.Server.Port).Str("version", Version).Msg("starting HTTP server")
+                if err := srv.ListenAndServe(); err != nil &amp;&amp; !errors.Is(err, http.ErrServerClosed) </span><span class="cov0" title="0">{
+                        log.Error().Err(err).Msg("HTTP server failed")
+                        os.Exit(1)
+                }</span>
+        }()
+
+        <span class="cov0" title="0">quit := make(chan os.Signal, 1)
+        signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+        &lt;-quit
+
+        log.Info().Msg("shutting down server")
+
+        shutdownCtx, cancel := context.WithTimeout(context.Background(), time.Duration(cfg.Server.GracefulTTL)*time.Second)
+        defer cancel()
+
+        if err := srv.Shutdown(shutdownCtx); err != nil </span><span class="cov0" title="0">{
+                log.Error().Err(err).Msg("graceful shutdown failed")
+                os.Exit(1)
+        }</span>
+
+        <span class="cov0" title="0">log.Info().Msg("server stopped")</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package main
+
+import (
+        "context"
+        "fmt"
+        "time"
+
+        "github.com/novacommerce/identity-service/config"
+        "go.opentelemetry.io/otel"
+        "go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
+        "go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
+        "go.opentelemetry.io/otel/propagation"
+        "go.opentelemetry.io/otel/sdk/metric"
+        "go.opentelemetry.io/otel/sdk/resource"
+        sdktrace "go.opentelemetry.io/otel/sdk/trace"
+        semconv "go.opentelemetry.io/otel/semconv/v1.24.0"
+)
+
+func initTelemetry(ctx context.Context, cfg *config.Config, version string) (func(context.Context) error, error) <span class="cov0" title="0">{
+        serviceName := cfg.Telemetry.ServiceName
+        if serviceName == "" </span><span class="cov0" title="0">{
+                serviceName = cfg.Server.Name
+        }</span>
+
+        <span class="cov0" title="0">res, err := resource.New(ctx,
+                resource.WithAttributes(
+                        semconv.ServiceName(serviceName),
+                        semconv.ServiceVersion(version),
+                        semconv.DeploymentEnvironment(cfg.Server.Env),
+                ),
+        )
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("create otel resource: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">traceExporter, err := otlptracegrpc.New(ctx,
+                otlptracegrpc.WithEndpoint(cfg.Telemetry.OTLPEndpoint),
+                otlptracegrpc.WithInsecure(),
+        )
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("create trace exporter: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">traceProvider := sdktrace.NewTracerProvider(
+                sdktrace.WithBatcher(traceExporter),
+                sdktrace.WithResource(res),
+        )
+        otel.SetTracerProvider(traceProvider)
+
+        metricExporter, err := otlpmetricgrpc.New(ctx,
+                otlpmetricgrpc.WithEndpoint(cfg.Telemetry.OTLPEndpoint),
+                otlpmetricgrpc.WithInsecure(),
+        )
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("create metric exporter: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">meterProvider := metric.NewMeterProvider(
+                metric.WithReader(metric.NewPeriodicReader(metricExporter, metric.WithInterval(15*time.Second))),
+                metric.WithResource(res),
+        )
+        otel.SetMeterProvider(meterProvider)
+
+        otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(
+                propagation.TraceContext{},
+                propagation.Baggage{},
+        ))
+
+        shutdown := func(shutdownCtx context.Context) error </span><span class="cov0" title="0">{
+                var shutdownErr error
+                if err := traceProvider.Shutdown(shutdownCtx); err != nil </span><span class="cov0" title="0">{
+                        shutdownErr = fmt.Errorf("shutdown trace provider: %w", err)
+                }</span>
+                <span class="cov0" title="0">if err := meterProvider.Shutdown(shutdownCtx); err != nil </span><span class="cov0" title="0">{
+                        if shutdownErr != nil </span><span class="cov0" title="0">{
+                                return fmt.Errorf("%v; shutdown meter provider: %w", shutdownErr, err)
+                        }</span>
+                        <span class="cov0" title="0">return fmt.Errorf("shutdown meter provider: %w", err)</span>
+                }
+                <span class="cov0" title="0">return shutdownErr</span>
+        }
+
+        <span class="cov0" title="0">return shutdown, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package main
+
+import (
+        "context"
+        "fmt"
+
+        "github.com/gin-gonic/gin"
+        "github.com/jackc/pgx/v5/pgxpool"
+        "github.com/novacommerce/identity-service/config"
+        "github.com/novacommerce/identity-service/internal/application/service"
+        "github.com/novacommerce/identity-service/internal/application/usecase"
+        "github.com/novacommerce/identity-service/internal/infrastructure/cache"
+        "github.com/novacommerce/identity-service/internal/infrastructure/email"
+        "github.com/novacommerce/identity-service/internal/infrastructure/http/handler"
+        "github.com/novacommerce/identity-service/internal/infrastructure/http/router"
+        infrajwt "github.com/novacommerce/identity-service/internal/infrastructure/jwt"
+        "github.com/novacommerce/identity-service/internal/infrastructure/messaging"
+        "github.com/novacommerce/identity-service/internal/infrastructure/persistence/postgres"
+        pkglogger "github.com/novacommerce/pkg/logger"
+        "github.com/redis/go-redis/v9"
+)
+
+type wiredApp struct {
+        engine        *gin.Engine
+        pool          *pgxpool.Pool
+        redisClient   *redis.Client
+        kafkaProducer *messaging.KafkaProducer
+}
+
+func wireApp(ctx context.Context, cfg *config.Config, log *pkglogger.Logger) (*wiredApp, error) <span class="cov0" title="0">{
+        pool, err := postgres.NewPool(ctx, cfg.Database, log)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("connect to PostgreSQL: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">redisClient, err := cache.NewRedisClient(ctx, cfg.Redis, log)
+        if err != nil </span><span class="cov0" title="0">{
+                pool.Close()
+                return nil, fmt.Errorf("connect to Redis: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">kafkaProducer, err := messaging.NewKafkaProducer(cfg.Kafka.Brokers)
+        if err != nil </span><span class="cov0" title="0">{
+                pool.Close()
+                _ = redisClient.Close()
+                return nil, fmt.Errorf("init kafka producer: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">userRepo := postgres.NewUserPostgresRepo(pool)
+        refreshTokenRepo := postgres.NewRefreshTokenPostgresRepo(pool)
+        passwordResetRepo := postgres.NewPasswordResetPostgresRepo(pool)
+
+        jwtService, err := infrajwt.NewJWTService(*cfg)
+        if err != nil </span><span class="cov0" title="0">{
+                pool.Close()
+                _ = redisClient.Close()
+                _ = kafkaProducer.Close()
+                return nil, fmt.Errorf("init jwt service: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">emailService := email.NewLogEmailService(log)
+        useCaseRateLimiter := cache.NewUseCaseRateLimiter(redisClient, cfg.RateLimit.LoginMaxAttempts, cfg.RateLimit.LoginWindow)
+
+        authUseCase := usecase.NewAuthUseCase(
+                userRepo,
+                refreshTokenRepo,
+                passwordResetRepo,
+                jwtService,
+                emailService,
+                kafkaProducer,
+                useCaseRateLimiter,
+        )
+
+        healthService := service.NewHealthService(pool, redisClient, cfg.Server.Name)
+        healthHandler := handler.NewHealthHandler(healthService)
+        authHandler := handler.NewAuthHandler(authUseCase)
+
+        engine := router.SetupRouter(&amp;router.Dependencies{
+                Config:        cfg,
+                RedisClient:   redisClient,
+                JWTService:    jwtService,
+                HealthHandler: healthHandler,
+                AuthHandler:   authHandler,
+        })
+
+        return &amp;wiredApp{
+                engine:        engine,
+                pool:          pool,
+                redisClient:   redisClient,
+                kafkaProducer: kafkaProducer,
+        }, nil</span>
+}
+
+func (a *wiredApp) close(log *pkglogger.Logger) <span class="cov0" title="0">{
+        if a.kafkaProducer != nil </span><span class="cov0" title="0">{
+                if err := a.kafkaProducer.Close(); err != nil </span><span class="cov0" title="0">{
+                        log.Error().Err(err).Msg("close kafka producer")
+                }</span>
+        }
+        <span class="cov0" title="0">if a.redisClient != nil </span><span class="cov0" title="0">{
+                if err := a.redisClient.Close(); err != nil </span><span class="cov0" title="0">{
+                        log.Error().Err(err).Msg("close redis client")
+                }</span>
+        }
+        <span class="cov0" title="0">if a.pool != nil </span><span class="cov0" title="0">{
+                a.pool.Close()
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package config
+
+import (
+        "fmt"
+        "net/url"
+        "strings"
+        "time"
+
+        "github.com/spf13/viper"
+        "github.com/subosito/gotenv"
+)
+
+// Config holds all identity-service configuration.
+type Config struct {
+        Server    ServerConfig    `mapstructure:"server"`
+        Database  DatabaseConfig  `mapstructure:"database"`
+        Redis     RedisConfig     `mapstructure:"redis"`
+        Kafka     KafkaConfig     `mapstructure:"kafka"`
+        JWT       JWTConfig       `mapstructure:"jwt"`
+        Email     EmailConfig     `mapstructure:"email"`
+        RateLimit RateLimitConfig `mapstructure:"rate_limit"`
+        Telemetry TelemetryConfig `mapstructure:"telemetry"`
+        HTTP      HTTPConfig      `mapstructure:"http"`
+}
+
+// ServerConfig holds HTTP server settings.
+type ServerConfig struct {
+        Name         string        `mapstructure:"name"`
+        Env          string        `mapstructure:"env"`
+        Port         int           `mapstructure:"port"`
+        GracefulTTL  int           `mapstructure:"graceful_ttl"`
+        LogLevel     string        `mapstructure:"log_level"`
+        ReadTimeout  time.Duration `mapstructure:"read_timeout"`
+        WriteTimeout time.Duration `mapstructure:"write_timeout"`
+        IdleTimeout  time.Duration `mapstructure:"idle_timeout"`
+}
+
+// DatabaseConfig holds PostgreSQL connection settings.
+type DatabaseConfig struct {
+        Host            string        `mapstructure:"host"`
+        Port            int           `mapstructure:"port"`
+        User            string        `mapstructure:"user"`
+        Password        string        `mapstructure:"password"`
+        Name            string        `mapstructure:"name"`
+        SSLMode         string        `mapstructure:"ssl_mode"`
+        MaxConns        int           `mapstructure:"max_conns"`
+        MinConns        int           `mapstructure:"min_conns"`
+        ConnTimeout     time.Duration `mapstructure:"conn_timeout"`
+        ConnMaxLifetime time.Duration `mapstructure:"conn_max_lifetime"`
+        DSN             string        `mapstructure:"dsn"`
+}
+
+// DSN returns a PostgreSQL connection string.
+func (c DatabaseConfig) BuildDSN() string <span class="cov0" title="0">{
+        if c.DSN != "" </span><span class="cov0" title="0">{
+                return c.DSN
+        }</span>
+
+        <span class="cov0" title="0">user := url.QueryEscape(c.User)
+        password := url.QueryEscape(c.Password)
+        sslMode := c.SSLMode
+        if sslMode == "" </span><span class="cov0" title="0">{
+                sslMode = "disable"
+        }</span>
+
+        <span class="cov0" title="0">return fmt.Sprintf(
+                "postgres://%s:%s@%s:%d/%s?sslmode=%s",
+                user,
+                password,
+                c.Host,
+                c.Port,
+                c.Name,
+                sslMode,
+        )</span>
+}
+
+// RedisConfig holds Redis client settings.
+type RedisConfig struct {
+        Host     string `mapstructure:"host"`
+        Port     int    `mapstructure:"port"`
+        Password string `mapstructure:"password"`
+        DB       int    `mapstructure:"db"`
+        PoolSize int    `mapstructure:"pool_size"`
+        Addr     string `mapstructure:"addr"`
+}
+
+// BuildAddr returns host:port for the Redis client.
+func (c RedisConfig) BuildAddr() string <span class="cov0" title="0">{
+        if c.Addr != "" </span><span class="cov0" title="0">{
+                return c.Addr
+        }</span>
+        <span class="cov0" title="0">return fmt.Sprintf("%s:%d", c.Host, c.Port)</span>
+}
+
+// KafkaConfig holds Kafka producer settings.
+type KafkaConfig struct {
+        Brokers  []string `mapstructure:"brokers"`
+        ClientID string   `mapstructure:"client_id"`
+        GroupID  string   `mapstructure:"group_id"`
+}
+
+// JWTConfig holds JWT signing settings.
+type JWTConfig struct {
+        PrivateKeyPath string        `mapstructure:"private_key_path"`
+        PublicKeyPath  string        `mapstructure:"public_key_path"`
+        AccessTokenTTL time.Duration `mapstructure:"access_token_ttl"`
+        RefreshTTL     time.Duration `mapstructure:"refresh_ttl"`
+        Issuer         string        `mapstructure:"issuer"`
+}
+
+// EmailConfig holds outbound email settings.
+type EmailConfig struct {
+        From             string `mapstructure:"from"`
+        SendGridAPIKey   string `mapstructure:"sendgrid_api_key"`
+}
+
+// RateLimitConfig holds HTTP rate limit settings.
+type RateLimitConfig struct {
+        LoginMaxAttempts    int           `mapstructure:"login_max_attempts"`
+        LoginWindow         time.Duration `mapstructure:"login_window"`
+        RegisterMaxAttempts int           `mapstructure:"register_max_attempts"`
+        RegisterWindow      time.Duration `mapstructure:"register_window"`
+}
+
+// TelemetryConfig holds OpenTelemetry settings.
+type TelemetryConfig struct {
+        OTLPEndpoint string `mapstructure:"otlp_endpoint"`
+        ServiceName  string `mapstructure:"service_name"`
+}
+
+// HTTPConfig holds HTTP middleware settings.
+type HTTPConfig struct {
+        CORSAllowOrigins []string `mapstructure:"cors_allow_origins"`
+}
+
+// Load reads configuration from config.yaml with environment variable overrides.
+func Load() (*Config, error) <span class="cov0" title="0">{
+        _ = gotenv.Load(".env")
+
+        v := viper.New()
+        v.SetConfigName("config")
+        v.SetConfigType("yaml")
+        v.AddConfigPath("./config")
+        v.AddConfigPath(".")
+
+        setDefaults(v)
+        bindEnv(v)
+        v.AutomaticEnv()
+
+        if err := v.ReadInConfig(); err != nil </span><span class="cov0" title="0">{
+                if _, ok := err.(viper.ConfigFileNotFoundError); !ok </span><span class="cov0" title="0">{
+                        return nil, fmt.Errorf("read config file: %w", err)
+                }</span>
+        }
+
+        <span class="cov0" title="0">cfg := &amp;Config{
+                Server: ServerConfig{
+                        Name:         v.GetString("server.name"),
+                        Env:          v.GetString("server.env"),
+                        Port:         v.GetInt("server.port"),
+                        GracefulTTL:  v.GetInt("server.graceful_ttl"),
+                        LogLevel:     v.GetString("server.log_level"),
+                        ReadTimeout:  v.GetDuration("server.read_timeout"),
+                        WriteTimeout: v.GetDuration("server.write_timeout"),
+                        IdleTimeout:  v.GetDuration("server.idle_timeout"),
+                },
+                Database: DatabaseConfig{
+                        Host:            v.GetString("database.host"),
+                        Port:            v.GetInt("database.port"),
+                        User:            v.GetString("database.user"),
+                        Password:        v.GetString("database.password"),
+                        Name:            v.GetString("database.name"),
+                        SSLMode:         v.GetString("database.ssl_mode"),
+                        MaxConns:        v.GetInt("database.max_conns"),
+                        MinConns:        v.GetInt("database.min_conns"),
+                        ConnTimeout:     v.GetDuration("database.conn_timeout"),
+                        ConnMaxLifetime: v.GetDuration("database.conn_max_lifetime"),
+                        DSN:             v.GetString("database.dsn"),
+                },
+                Redis: RedisConfig{
+                        Host:     v.GetString("redis.host"),
+                        Port:     v.GetInt("redis.port"),
+                        Password: v.GetString("redis.password"),
+                        DB:       v.GetInt("redis.db"),
+                        PoolSize: v.GetInt("redis.pool_size"),
+                        Addr:     v.GetString("redis.addr"),
+                },
+                Kafka: KafkaConfig{
+                        Brokers:  v.GetStringSlice("kafka.brokers"),
+                        ClientID: v.GetString("kafka.client_id"),
+                        GroupID:  v.GetString("kafka.group_id"),
+                },
+                JWT: JWTConfig{
+                        PrivateKeyPath: v.GetString("jwt.private_key_path"),
+                        PublicKeyPath:  v.GetString("jwt.public_key_path"),
+                        AccessTokenTTL: v.GetDuration("jwt.access_token_ttl"),
+                        RefreshTTL:     v.GetDuration("jwt.refresh_ttl"),
+                        Issuer:         v.GetString("jwt.issuer"),
+                },
+                Email: EmailConfig{
+                        From:           v.GetString("email.from"),
+                        SendGridAPIKey: v.GetString("email.sendgrid_api_key"),
+                },
+                RateLimit: RateLimitConfig{
+                        LoginMaxAttempts:    v.GetInt("rate_limit.login_max_attempts"),
+                        LoginWindow:         v.GetDuration("rate_limit.login_window"),
+                        RegisterMaxAttempts: v.GetInt("rate_limit.register_max_attempts"),
+                        RegisterWindow:      v.GetDuration("rate_limit.register_window"),
+                },
+                Telemetry: TelemetryConfig{
+                        OTLPEndpoint: v.GetString("telemetry.otlp_endpoint"),
+                        ServiceName:  v.GetString("telemetry.service_name"),
+                },
+                HTTP: HTTPConfig{
+                        CORSAllowOrigins: v.GetStringSlice("http.cors_allow_origins"),
+                },
+        }
+
+        applyLegacyEnvFallback(v, cfg)
+        normalize(&amp;cfg.Server, &amp;cfg.Database, &amp;cfg.Redis, &amp;cfg.Kafka, &amp;cfg.JWT, &amp;cfg.RateLimit, &amp;cfg.Telemetry, &amp;cfg.HTTP)
+
+        return cfg, nil</span>
+}
+
+func setDefaults(v *viper.Viper) <span class="cov0" title="0">{
+        v.SetDefault("server.name", "identity-service")
+        v.SetDefault("server.env", "development")
+        v.SetDefault("server.port", 8081)
+        v.SetDefault("server.graceful_ttl", 30)
+        v.SetDefault("server.log_level", "info")
+        v.SetDefault("server.read_timeout", "30s")
+        v.SetDefault("server.write_timeout", "30s")
+        v.SetDefault("server.idle_timeout", "120s")
+
+        v.SetDefault("database.host", "localhost")
+        v.SetDefault("database.port", 5432)
+        v.SetDefault("database.user", "nova_identity")
+        v.SetDefault("database.password", "secret")
+        v.SetDefault("database.name", "identity_db")
+        v.SetDefault("database.ssl_mode", "disable")
+        v.SetDefault("database.max_conns", 25)
+        v.SetDefault("database.min_conns", 5)
+        v.SetDefault("database.conn_timeout", "5s")
+        v.SetDefault("database.conn_max_lifetime", "300s")
+
+        v.SetDefault("redis.host", "localhost")
+        v.SetDefault("redis.port", 6379)
+        v.SetDefault("redis.password", "")
+        v.SetDefault("redis.db", 0)
+        v.SetDefault("redis.pool_size", 10)
+
+        v.SetDefault("kafka.brokers", []string{"localhost:9092"})
+        v.SetDefault("kafka.client_id", "identity-service")
+        v.SetDefault("kafka.group_id", "identity-service")
+
+        v.SetDefault("jwt.private_key_path", "./keys/private.pem")
+        v.SetDefault("jwt.public_key_path", "./keys/public.pem")
+        v.SetDefault("jwt.access_token_ttl", "15m")
+        v.SetDefault("jwt.refresh_ttl", "168h")
+        v.SetDefault("jwt.issuer", "novacommerce-identity")
+
+        v.SetDefault("email.from", "noreply@novacommerce.com")
+        v.SetDefault("email.sendgrid_api_key", "")
+
+        v.SetDefault("rate_limit.login_max_attempts", 5)
+        v.SetDefault("rate_limit.login_window", "15m")
+        v.SetDefault("rate_limit.register_max_attempts", 10)
+        v.SetDefault("rate_limit.register_window", "1h")
+
+        v.SetDefault("telemetry.otlp_endpoint", "localhost:4317")
+        v.SetDefault("telemetry.service_name", "identity-service")
+
+        v.SetDefault("http.cors_allow_origins", []string{"*"})
+}</span>
+
+func bindEnv(v *viper.Viper) <span class="cov0" title="0">{
+        replacer := strings.NewReplacer(".", "_")
+        v.SetEnvKeyReplacer(replacer)
+
+        envBindings := map[string][]string{
+                "server.name":         {"SERVER_NAME", "APP_NAME"},
+                "server.env":          {"SERVER_ENV", "APP_ENV"},
+                "server.port":         {"SERVER_PORT", "APP_PORT"},
+                "server.graceful_ttl": {"SERVER_GRACEFUL_TTL", "APP_GRACEFUL_TTL"},
+                "server.log_level":    {"SERVER_LOG_LEVEL", "APP_LOG_LEVEL"},
+                "server.read_timeout": {"SERVER_READ_TIMEOUT"},
+                "server.write_timeout": {"SERVER_WRITE_TIMEOUT"},
+                "server.idle_timeout":  {"SERVER_IDLE_TIMEOUT"},
+
+                "database.host":            {"DB_HOST"},
+                "database.port":            {"DB_PORT"},
+                "database.user":            {"DB_USER"},
+                "database.password":        {"DB_PASSWORD"},
+                "database.name":            {"DB_NAME"},
+                "database.ssl_mode":        {"DB_SSL_MODE"},
+                "database.max_conns":       {"DB_MAX_CONNS", "DATABASE_MAX_OPEN_CONNS"},
+                "database.min_conns":       {"DB_MIN_CONNS", "DATABASE_MAX_IDLE_CONNS"},
+                "database.conn_timeout":    {"DB_CONN_TIMEOUT"},
+                "database.conn_max_lifetime": {"DB_CONN_MAX_LIFETIME", "DATABASE_CONN_MAX_LIFETIME"},
+                "database.dsn":             {"DATABASE_DSN"},
+
+                "redis.host":      {"REDIS_HOST"},
+                "redis.port":      {"REDIS_PORT"},
+                "redis.password":  {"REDIS_PASSWORD"},
+                "redis.db":        {"REDIS_DB"},
+                "redis.pool_size": {"REDIS_POOL_SIZE"},
+                "redis.addr":      {"REDIS_ADDR"},
+
+                "kafka.brokers":   {"KAFKA_BROKERS"},
+                "kafka.client_id": {"KAFKA_CLIENT_ID"},
+                "kafka.group_id":  {"KAFKA_GROUP_ID"},
+
+                "jwt.private_key_path": {"JWT_PRIVATE_KEY_PATH"},
+                "jwt.public_key_path":  {"JWT_PUBLIC_KEY_PATH"},
+                "jwt.access_token_ttl": {"JWT_ACCESS_TOKEN_TTL", "JWT_ACCESS_TTL"},
+                "jwt.refresh_ttl":      {"JWT_REFRESH_TTL"},
+                "jwt.issuer":           {"JWT_ISSUER"},
+
+                "email.from":              {"EMAIL_FROM"},
+                "email.sendgrid_api_key":  {"EMAIL_SENDGRID_API_KEY"},
+
+                "rate_limit.login_max_attempts":    {"RATE_LIMIT_LOGIN_MAX"},
+                "rate_limit.login_window":          {"RATE_LIMIT_LOGIN_WINDOW"},
+                "rate_limit.register_max_attempts": {"RATE_LIMIT_REGISTER_MAX"},
+                "rate_limit.register_window":       {"RATE_LIMIT_REGISTER_WINDOW"},
+
+                "telemetry.otlp_endpoint": {"TELEMETRY_OTLP_ENDPOINT"},
+                "telemetry.service_name":  {"TELEMETRY_SERVICE_NAME"},
+
+                "http.cors_allow_origins": {"HTTP_CORS_ALLOW_ORIGINS"},
+        }
+
+        for key, envs := range envBindings </span><span class="cov0" title="0">{
+                for _, env := range envs </span><span class="cov0" title="0">{
+                        _ = v.BindEnv(key, env)
+                }</span>
+        }
+}
+
+func applyLegacyEnvFallback(v *viper.Viper, cfg *Config) <span class="cov0" title="0">{
+        if cfg.Database.DSN == "" &amp;&amp; v.GetString("database.dsn") == "" </span><span class="cov0" title="0">{
+                if legacyDSN := v.GetString("DATABASE_DSN"); legacyDSN != "" </span><span class="cov0" title="0">{
+                        cfg.Database.DSN = legacyDSN
+                }</span>
+        }
+        <span class="cov0" title="0">if cfg.Redis.Addr == "" &amp;&amp; v.GetString("redis.addr") == "" </span><span class="cov0" title="0">{
+                if legacyAddr := v.GetString("REDIS_ADDR"); legacyAddr != "" </span><span class="cov0" title="0">{
+                        cfg.Redis.Addr = legacyAddr
+                }</span>
+        }
+        <span class="cov0" title="0">if len(cfg.Kafka.Brokers) == 0 </span><span class="cov0" title="0">{
+                if brokers := v.GetString("KAFKA_BROKERS"); brokers != "" </span><span class="cov0" title="0">{
+                        cfg.Kafka.Brokers = strings.Split(brokers, ",")
+                }</span>
+        }
+}
+
+func normalize(
+        server *ServerConfig,
+        db *DatabaseConfig,
+        redis *RedisConfig,
+        kafka *KafkaConfig,
+        jwt *JWTConfig,
+        rateLimit *RateLimitConfig,
+        telemetry *TelemetryConfig,
+        http *HTTPConfig,
+) <span class="cov0" title="0">{
+        if server.LogLevel == "" </span><span class="cov0" title="0">{
+                server.LogLevel = "info"
+        }</span>
+        <span class="cov0" title="0">if server.ReadTimeout &lt;= 0 </span><span class="cov0" title="0">{
+                server.ReadTimeout = 30 * time.Second
+        }</span>
+        <span class="cov0" title="0">if server.WriteTimeout &lt;= 0 </span><span class="cov0" title="0">{
+                server.WriteTimeout = 30 * time.Second
+        }</span>
+        <span class="cov0" title="0">if server.IdleTimeout &lt;= 0 </span><span class="cov0" title="0">{
+                server.IdleTimeout = 120 * time.Second
+        }</span>
+        <span class="cov0" title="0">if db.MaxConns &lt;= 0 </span><span class="cov0" title="0">{
+                db.MaxConns = 25
+        }</span>
+        <span class="cov0" title="0">if db.MinConns &lt;= 0 </span><span class="cov0" title="0">{
+                db.MinConns = 5
+        }</span>
+        <span class="cov0" title="0">if db.ConnTimeout &lt;= 0 </span><span class="cov0" title="0">{
+                db.ConnTimeout = 5 * time.Second
+        }</span>
+        <span class="cov0" title="0">if db.ConnMaxLifetime &lt;= 0 </span><span class="cov0" title="0">{
+                db.ConnMaxLifetime = 300 * time.Second
+        }</span>
+        <span class="cov0" title="0">if redis.Port &lt;= 0 </span><span class="cov0" title="0">{
+                redis.Port = 6379
+        }</span>
+        <span class="cov0" title="0">if redis.PoolSize &lt;= 0 </span><span class="cov0" title="0">{
+                redis.PoolSize = 10
+        }</span>
+        <span class="cov0" title="0">if kafka.ClientID == "" </span><span class="cov0" title="0">{
+                kafka.ClientID = "identity-service"
+        }</span>
+        <span class="cov0" title="0">if jwt.AccessTokenTTL &lt;= 0 </span><span class="cov0" title="0">{
+                jwt.AccessTokenTTL = 15 * time.Minute
+        }</span>
+        <span class="cov0" title="0">if jwt.RefreshTTL &lt;= 0 </span><span class="cov0" title="0">{
+                jwt.RefreshTTL = 7 * 24 * time.Hour
+        }</span>
+        <span class="cov0" title="0">if jwt.Issuer == "" </span><span class="cov0" title="0">{
+                jwt.Issuer = "novacommerce-identity"
+        }</span>
+        <span class="cov0" title="0">if rateLimit.LoginMaxAttempts &lt;= 0 </span><span class="cov0" title="0">{
+                rateLimit.LoginMaxAttempts = 5
+        }</span>
+        <span class="cov0" title="0">if rateLimit.LoginWindow &lt;= 0 </span><span class="cov0" title="0">{
+                rateLimit.LoginWindow = 15 * time.Minute
+        }</span>
+        <span class="cov0" title="0">if rateLimit.RegisterMaxAttempts &lt;= 0 </span><span class="cov0" title="0">{
+                rateLimit.RegisterMaxAttempts = 10
+        }</span>
+        <span class="cov0" title="0">if rateLimit.RegisterWindow &lt;= 0 </span><span class="cov0" title="0">{
+                rateLimit.RegisterWindow = time.Hour
+        }</span>
+        <span class="cov0" title="0">if telemetry.ServiceName == "" </span><span class="cov0" title="0">{
+                telemetry.ServiceName = server.Name
+        }</span>
+        <span class="cov0" title="0">if len(http.CORSAllowOrigins) == 0 </span><span class="cov0" title="0">{
+                http.CORSAllowOrigins = []string{"*"}
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package service
+
+import (
+        "context"
+        "fmt"
+
+        "github.com/jackc/pgx/v5/pgxpool"
+        "github.com/redis/go-redis/v9"
+)
+
+const serviceVersion = "1.0.0"
+
+// HealthResult describes dependency check outcomes.
+type HealthResult struct {
+        Status  string            `json:"status"`
+        Service string            `json:"service"`
+        Version string            `json:"version"`
+        Checks  map[string]string `json:"checks"`
+}
+
+// HealthService performs connectivity checks for dependencies.
+type HealthService struct {
+        pool    *pgxpool.Pool
+        redis   *redis.Client
+        service string
+}
+
+// NewHealthService creates a HealthService.
+func NewHealthService(pool *pgxpool.Pool, redisClient *redis.Client, serviceName string) *HealthService <span class="cov0" title="0">{
+        return &amp;HealthService{
+                pool:    pool,
+                redis:   redisClient,
+                service: serviceName,
+        }
+}</span>
+
+// Check verifies database and Redis connectivity.
+func (s *HealthService) Check(ctx context.Context) (HealthResult, bool) <span class="cov0" title="0">{
+        checks := map[string]string{
+                "database": s.checkDatabase(ctx),
+                "redis":    s.checkRedis(ctx),
+        }
+
+        allFailed := true
+        for _, status := range checks </span><span class="cov0" title="0">{
+                if status == "ok" </span><span class="cov0" title="0">{
+                        allFailed = false
+                        break</span>
+                }
+        }
+
+        <span class="cov0" title="0">overallStatus := "ok"
+        if allFailed </span><span class="cov0" title="0">{
+                overallStatus = "unavailable"
+        }</span>
+
+        <span class="cov0" title="0">return HealthResult{
+                Status:  overallStatus,
+                Service: s.service,
+                Version: serviceVersion,
+                Checks:  checks,
+        }, allFailed</span>
+}
+
+func (s *HealthService) checkDatabase(ctx context.Context) string <span class="cov0" title="0">{
+        if s.pool == nil </span><span class="cov0" title="0">{
+                return "error: database pool is not initialized"
+        }</span>
+        <span class="cov0" title="0">if err := s.pool.Ping(ctx); err != nil </span><span class="cov0" title="0">{
+                return fmt.Sprintf("error: %v", err)
+        }</span>
+        <span class="cov0" title="0">return "ok"</span>
+}
+
+func (s *HealthService) checkRedis(ctx context.Context) string <span class="cov0" title="0">{
+        if s.redis == nil </span><span class="cov0" title="0">{
+                return "error: redis client is not initialized"
+        }</span>
+        <span class="cov0" title="0">if err := s.redis.Ping(ctx).Err(); err != nil </span><span class="cov0" title="0">{
+                return fmt.Sprintf("error: %v", err)
+        }</span>
+        <span class="cov0" title="0">return "ok"</span>
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package usecase
+
+import (
+        "context"
+        "crypto/rand"
+        "crypto/sha256"
+        "encoding/base64"
+        "encoding/hex"
+        "fmt"
+        "time"
+
+        "github.com/google/uuid"
+        "github.com/novacommerce/identity-service/internal/application/port"
+        authvalidator "github.com/novacommerce/identity-service/internal/application/validator"
+        "github.com/novacommerce/identity-service/internal/domain/entity"
+        "github.com/novacommerce/identity-service/internal/domain/repository"
+        apperrors "github.com/novacommerce/pkg/errors"
+)
+
+const (
+        topicUserEvents      = "user-events"
+        eventUserRegistered  = "USER_REGISTERED"
+        accessTokenExpiresIn = int64(15 * 60) // 15 minutes in seconds
+        refreshTokenTTL      = 7 * 24 * time.Hour
+)
+
+// AuthUseCase defines authentication and account lifecycle operations.
+type AuthUseCase interface {
+        Register(ctx context.Context, input RegisterInput) (*RegisterOutput, error)
+        Login(ctx context.Context, input LoginInput) (*LoginOutput, error)
+        RefreshToken(ctx context.Context, rawRefreshToken string) (*LoginOutput, error)
+        Logout(ctx context.Context, rawRefreshToken string) error
+        LogoutAll(ctx context.Context, userID uuid.UUID) error
+        GetMe(ctx context.Context, userID uuid.UUID) (*UserOutput, error)
+        ChangePassword(ctx context.Context, userID uuid.UUID, input ChangePasswordInput) error
+        ForgotPassword(ctx context.Context, email string) error
+        ResetPassword(ctx context.Context, input ResetPasswordInput) error
+}
+
+type authUseCase struct {
+        userRepo          repository.UserRepository
+        refreshTokenRepo  repository.RefreshTokenRepository
+        passwordResetRepo repository.PasswordResetTokenRepository
+        jwtService        port.JWTService
+        emailService      port.EmailService
+        kafkaProducer     port.KafkaProducer
+        rateLimiter       port.RateLimiter
+}
+
+// NewAuthUseCase creates an AuthUseCase with the given dependencies.
+func NewAuthUseCase(
+        userRepo repository.UserRepository,
+        refreshTokenRepo repository.RefreshTokenRepository,
+        passwordResetRepo repository.PasswordResetTokenRepository,
+        jwtService port.JWTService,
+        emailService port.EmailService,
+        kafkaProducer port.KafkaProducer,
+        rateLimiter port.RateLimiter,
+) AuthUseCase <span class="cov10" title="35">{
+        return &amp;authUseCase{
+                userRepo:          userRepo,
+                refreshTokenRepo:  refreshTokenRepo,
+                passwordResetRepo: passwordResetRepo,
+                jwtService:        jwtService,
+                emailService:      emailService,
+                kafkaProducer:     kafkaProducer,
+                rateLimiter:       rateLimiter,
+        }
+}</span>
+
+type userRegisteredEvent struct {
+        Type      string    `json:"type"`
+        UserID    uuid.UUID `json:"userID"`
+        Email     string    `json:"email"`
+        Timestamp time.Time `json:"timestamp"`
+}
+
+func (uc *authUseCase) Register(ctx context.Context, input RegisterInput) (*RegisterOutput, error) <span class="cov5" title="7">{
+        if err := authvalidator.ValidateRegisterInput(input.Username, input.Email, input.Password, input.FullName); err != nil </span><span class="cov2" title="2">{
+                return nil, err
+        }</span>
+
+        <span class="cov5" title="5">if err := uc.ensureEmailAvailable(ctx, input.Email); err != nil </span><span class="cov1" title="1">{
+                return nil, err
+        }</span>
+        <span class="cov4" title="4">if err := uc.ensureUsernameAvailable(ctx, input.Username); err != nil </span><span class="cov1" title="1">{
+                return nil, err
+        }</span>
+
+        <span class="cov3" title="3">user := &amp;entity.User{
+                ID:        uuid.New(),
+                Username:  input.Username,
+                Email:     input.Email,
+                FullName:  input.FullName,
+                Status:    entity.UserStatusActive,
+                CreatedAt: time.Now().UTC(),
+                UpdatedAt: time.Now().UTC(),
+        }
+        if err := user.SetPassword(input.Password); err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("authUseCase.Register: %w", err)
+        }</span>
+
+        <span class="cov3" title="3">if err := uc.userRepo.Create(ctx, user); err != nil </span><span class="cov1" title="1">{
+                return nil, wrapAuthError("Register", err)
+        }</span>
+
+        <span class="cov2" title="2">event := userRegisteredEvent{
+                Type:      eventUserRegistered,
+                UserID:    user.ID,
+                Email:     user.Email,
+                Timestamp: time.Now().UTC(),
+        }
+        if err := uc.kafkaProducer.Publish(ctx, topicUserEvents, user.ID.String(), event); err != nil </span><span class="cov1" title="1">{
+                return nil, fmt.Errorf("authUseCase.Register: %w", err)
+        }</span>
+
+        <span class="cov1" title="1">return &amp;RegisterOutput{User: mapUserToOutput(user)}, nil</span>
+}
+
+func (uc *authUseCase) Login(ctx context.Context, input LoginInput) (*LoginOutput, error) <span class="cov6" title="8">{
+        if err := authvalidator.ValidateLoginInput(input.Identifier, input.Password); err != nil </span><span class="cov1" title="1">{
+                return nil, err
+        }</span>
+        <span class="cov5" title="7">if err := uc.rateLimit(ctx, "login:"+input.Identifier); err != nil </span><span class="cov1" title="1">{
+                return nil, err
+        }</span>
+
+        <span class="cov5" title="6">user, err := uc.userRepo.FindByEmailOrUsername(ctx, input.Identifier)
+        if err != nil </span><span class="cov1" title="1">{
+                if isNotFound(err) </span><span class="cov1" title="1">{
+                        return nil, apperrors.NewUnauthorized("invalid credentials")
+                }</span>
+                <span class="cov0" title="0">return nil, wrapAuthError("Login", err)</span>
+        }
+
+        <span class="cov5" title="5">if !user.CheckPassword(input.Password) </span><span class="cov1" title="1">{
+                return nil, apperrors.NewUnauthorized("invalid credentials")
+        }</span>
+        <span class="cov4" title="4">if !user.IsActive() </span><span class="cov1" title="1">{
+                return nil, apperrors.NewUnauthorized("account is disabled")
+        }</span>
+
+        <span class="cov3" title="3">if err := uc.userRepo.UpdateLastLogin(ctx, user.ID); err != nil </span><span class="cov0" title="0">{
+                return nil, wrapAuthError("Login", err)
+        }</span>
+
+        <span class="cov3" title="3">return uc.issueLoginTokens(ctx, user, input.IPAddress, input.UserAgent, "")</span>
+}
+
+func (uc *authUseCase) RefreshToken(ctx context.Context, rawRefreshToken string) (*LoginOutput, error) <span class="cov5" title="5">{
+        _, user, err := uc.findValidRefreshToken(ctx, rawRefreshToken)
+        if err != nil </span><span class="cov4" title="4">{
+                return nil, err
+        }</span>
+
+        <span class="cov1" title="1">accessToken, err := uc.jwtService.GenerateAccessToken(user.ID, user.Email, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("authUseCase.RefreshToken: %w", err)
+        }</span>
+
+        <span class="cov1" title="1">return &amp;LoginOutput{
+                AccessToken:  accessToken,
+                RefreshToken: rawRefreshToken,
+                ExpiresIn:    accessTokenExpiresIn,
+                User:         mapUserToOutput(user),
+        }, nil</span>
+}
+
+func (uc *authUseCase) Logout(ctx context.Context, rawRefreshToken string) error <span class="cov2" title="2">{
+        tokenHash := hashToken(rawRefreshToken)
+
+        stored, err := uc.refreshTokenRepo.FindByTokenHash(ctx, tokenHash)
+        if err != nil </span><span class="cov1" title="1">{
+                if isNotFound(err) </span><span class="cov1" title="1">{
+                        return apperrors.NewUnauthorized("invalid refresh token")
+                }</span>
+                <span class="cov0" title="0">return wrapAuthError("Logout", err)</span>
+        }
+
+        <span class="cov1" title="1">if err := uc.refreshTokenRepo.RevokeByID(ctx, stored.ID); err != nil </span><span class="cov0" title="0">{
+                return wrapAuthError("Logout", err)
+        }</span>
+
+        <span class="cov1" title="1">return nil</span>
+}
+
+func (uc *authUseCase) LogoutAll(ctx context.Context, userID uuid.UUID) error <span class="cov1" title="1">{
+        if err := uc.refreshTokenRepo.RevokeAllByUserID(ctx, userID); err != nil </span><span class="cov0" title="0">{
+                return wrapAuthError("LogoutAll", err)
+        }</span>
+        <span class="cov1" title="1">return nil</span>
+}
+
+func (uc *authUseCase) GetMe(ctx context.Context, userID uuid.UUID) (*UserOutput, error) <span class="cov2" title="2">{
+        user, err := uc.userRepo.FindByID(ctx, userID)
+        if err != nil </span><span class="cov1" title="1">{
+                return nil, wrapAuthError("GetMe", err)
+        }</span>
+
+        <span class="cov1" title="1">output := mapUserToOutput(user)
+        return &amp;output, nil</span>
+}
+
+func (uc *authUseCase) ChangePassword(ctx context.Context, userID uuid.UUID, input ChangePasswordInput) error <span class="cov3" title="3">{
+        if err := authvalidator.ValidateChangePasswordInput(input.CurrentPassword, input.NewPassword); err != nil </span><span class="cov1" title="1">{
+                return err
+        }</span>
+
+        <span class="cov2" title="2">user, err := uc.userRepo.FindByID(ctx, userID)
+        if err != nil </span><span class="cov0" title="0">{
+                return wrapAuthError("ChangePassword", err)
+        }</span>
+
+        <span class="cov2" title="2">if !user.CheckPassword(input.CurrentPassword) </span><span class="cov1" title="1">{
+                return apperrors.NewUnauthorized("invalid credentials")
+        }</span>
+
+        <span class="cov1" title="1">if err := user.SetPassword(input.NewPassword); err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("authUseCase.ChangePassword: %w", err)
+        }</span>
+
+        <span class="cov1" title="1">if err := uc.userRepo.UpdatePassword(ctx, userID, user.PasswordHash); err != nil </span><span class="cov0" title="0">{
+                return wrapAuthError("ChangePassword", err)
+        }</span>
+
+        <span class="cov1" title="1">if err := uc.refreshTokenRepo.RevokeAllByUserID(ctx, userID); err != nil </span><span class="cov0" title="0">{
+                return wrapAuthError("ChangePassword", err)
+        }</span>
+
+        <span class="cov1" title="1">return nil</span>
+}
+
+func (uc *authUseCase) ForgotPassword(ctx context.Context, email string) error <span class="cov3" title="3">{
+        if err := authvalidator.ValidateEmail(email); err != nil </span><span class="cov1" title="1">{
+                return err
+        }</span>
+        <span class="cov2" title="2">if err := uc.rateLimit(ctx, "forgot:"+email); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov2" title="2">user, err := uc.userRepo.FindByEmail(ctx, email)
+        if err != nil </span><span class="cov1" title="1">{
+                if isNotFound(err) </span><span class="cov1" title="1">{
+                        return nil
+                }</span>
+                <span class="cov0" title="0">return wrapAuthError("ForgotPassword", err)</span>
+        }
+
+        <span class="cov1" title="1">rawToken, err := generateRawToken()
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("authUseCase.ForgotPassword: %w", err)
+        }</span>
+
+        <span class="cov1" title="1">if err := uc.passwordResetRepo.DeleteExpiredByUserID(ctx, user.ID); err != nil </span><span class="cov0" title="0">{
+                return wrapAuthError("ForgotPassword", err)
+        }</span>
+
+        <span class="cov1" title="1">now := time.Now().UTC()
+        resetToken := &amp;entity.PasswordResetToken{
+                ID:        uuid.New(),
+                UserID:    user.ID,
+                TokenHash: hashToken(rawToken),
+                ExpiresAt: now.Add(entity.PasswordResetTokenTTL),
+                CreatedAt: now,
+        }
+        if err := uc.passwordResetRepo.Create(ctx, resetToken); err != nil </span><span class="cov0" title="0">{
+                return wrapAuthError("ForgotPassword", err)
+        }</span>
+
+        <span class="cov1" title="1">if err := uc.emailService.SendPasswordReset(user.Email, rawToken); err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("authUseCase.ForgotPassword: %w", err)
+        }</span>
+
+        <span class="cov1" title="1">return nil</span>
+}
+
+func (uc *authUseCase) ResetPassword(ctx context.Context, input ResetPasswordInput) error <span class="cov4" title="4">{
+        if err := authvalidator.ValidateResetPasswordInput(input.Token, input.NewPassword); err != nil </span><span class="cov1" title="1">{
+                return err
+        }</span>
+
+        <span class="cov3" title="3">tokenHash := hashToken(input.Token)
+        stored, err := uc.passwordResetRepo.FindByTokenHash(ctx, tokenHash)
+        if err != nil </span><span class="cov0" title="0">{
+                if isNotFound(err) </span><span class="cov0" title="0">{
+                        return apperrors.NewUnauthorized("invalid or expired reset token")
+                }</span>
+                <span class="cov0" title="0">return wrapAuthError("ResetPassword", err)</span>
+        }
+        <span class="cov3" title="3">if !stored.IsValid() </span><span class="cov2" title="2">{
+                return apperrors.NewUnauthorized("invalid or expired reset token")
+        }</span>
+
+        <span class="cov1" title="1">user, err := uc.userRepo.FindByID(ctx, stored.UserID)
+        if err != nil </span><span class="cov0" title="0">{
+                return wrapAuthError("ResetPassword", err)
+        }</span>
+
+        <span class="cov1" title="1">if err := user.SetPassword(input.NewPassword); err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("authUseCase.ResetPassword: %w", err)
+        }</span>
+
+        <span class="cov1" title="1">if err := uc.userRepo.UpdatePassword(ctx, user.ID, user.PasswordHash); err != nil </span><span class="cov0" title="0">{
+                return wrapAuthError("ResetPassword", err)
+        }</span>
+
+        <span class="cov1" title="1">if err := uc.passwordResetRepo.MarkUsed(ctx, stored.ID); err != nil </span><span class="cov0" title="0">{
+                return wrapAuthError("ResetPassword", err)
+        }</span>
+
+        <span class="cov1" title="1">if err := uc.refreshTokenRepo.RevokeAllByUserID(ctx, user.ID); err != nil </span><span class="cov0" title="0">{
+                return wrapAuthError("ResetPassword", err)
+        }</span>
+
+        <span class="cov1" title="1">return nil</span>
+}
+
+func (uc *authUseCase) issueLoginTokens(
+        ctx context.Context,
+        user *entity.User,
+        ipAddress, userAgent, existingRefreshToken string,
+) (*LoginOutput, error) <span class="cov3" title="3">{
+        accessToken, err := uc.jwtService.GenerateAccessToken(user.ID, user.Email, nil)
+        if err != nil </span><span class="cov1" title="1">{
+                return nil, fmt.Errorf("authUseCase.Login: %w", err)
+        }</span>
+
+        <span class="cov2" title="2">rawRefreshToken := existingRefreshToken
+        if rawRefreshToken == "" </span><span class="cov2" title="2">{
+                rawRefreshToken, err = generateRawToken()
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, fmt.Errorf("authUseCase.Login: %w", err)
+                }</span>
+
+                <span class="cov2" title="2">now := time.Now().UTC()
+                refreshToken := &amp;entity.RefreshToken{
+                        ID:        uuid.New(),
+                        UserID:    user.ID,
+                        TokenHash: hashToken(rawRefreshToken),
+                        ExpiresAt: now.Add(refreshTokenTTL),
+                        IPAddress: ipAddress,
+                        UserAgent: userAgent,
+                        CreatedAt: now,
+                }
+                if err := uc.refreshTokenRepo.Create(ctx, refreshToken); err != nil </span><span class="cov0" title="0">{
+                        return nil, wrapAuthError("Login", err)
+                }</span>
+        }
+
+        <span class="cov2" title="2">return &amp;LoginOutput{
+                AccessToken:  accessToken,
+                RefreshToken: rawRefreshToken,
+                ExpiresIn:    accessTokenExpiresIn,
+                User:         mapUserToOutput(user),
+        }, nil</span>
+}
+
+func (uc *authUseCase) findValidRefreshToken(
+        ctx context.Context,
+        rawRefreshToken string,
+) (*entity.RefreshToken, *entity.User, error) <span class="cov5" title="5">{
+        tokenHash := hashToken(rawRefreshToken)
+
+        stored, err := uc.refreshTokenRepo.FindByTokenHash(ctx, tokenHash)
+        if err != nil </span><span class="cov1" title="1">{
+                if isNotFound(err) </span><span class="cov1" title="1">{
+                        return nil, nil, apperrors.NewUnauthorized("invalid refresh token")
+                }</span>
+                <span class="cov0" title="0">return nil, nil, wrapAuthError("RefreshToken", err)</span>
+        }
+        <span class="cov4" title="4">if !stored.IsValid() </span><span class="cov2" title="2">{
+                return nil, nil, apperrors.NewUnauthorized("invalid refresh token")
+        }</span>
+
+        <span class="cov2" title="2">user, err := uc.userRepo.FindByID(ctx, stored.UserID)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, nil, wrapAuthError("RefreshToken", err)
+        }</span>
+        <span class="cov2" title="2">if !user.IsActive() </span><span class="cov1" title="1">{
+                return nil, nil, apperrors.NewUnauthorized("account is disabled")
+        }</span>
+
+        <span class="cov1" title="1">return stored, user, nil</span>
+}
+
+func (uc *authUseCase) ensureEmailAvailable(ctx context.Context, email string) error <span class="cov5" title="5">{
+        _, err := uc.userRepo.FindByEmail(ctx, email)
+        if err == nil </span><span class="cov1" title="1">{
+                return apperrors.NewConflict("email already exists")
+        }</span>
+        <span class="cov4" title="4">if !isNotFound(err) </span><span class="cov0" title="0">{
+                return wrapAuthError("Register", err)
+        }</span>
+        <span class="cov4" title="4">return nil</span>
+}
+
+func (uc *authUseCase) ensureUsernameAvailable(ctx context.Context, username string) error <span class="cov4" title="4">{
+        _, err := uc.userRepo.FindByUsername(ctx, username)
+        if err == nil </span><span class="cov1" title="1">{
+                return apperrors.NewConflict("username already exists")
+        }</span>
+        <span class="cov3" title="3">if !isNotFound(err) </span><span class="cov0" title="0">{
+                return wrapAuthError("Register", err)
+        }</span>
+        <span class="cov3" title="3">return nil</span>
+}
+
+func (uc *authUseCase) rateLimit(ctx context.Context, key string) error <span class="cov6" title="9">{
+        if uc.rateLimiter == nil </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+        <span class="cov6" title="9">if err := uc.rateLimiter.Allow(ctx, key); err != nil </span><span class="cov1" title="1">{
+                if _, ok := apperrors.IsAppError(err); ok </span><span class="cov1" title="1">{
+                        return err
+                }</span>
+                <span class="cov0" title="0">return fmt.Errorf("authUseCase: %w", err)</span>
+        }
+        <span class="cov6" title="8">return nil</span>
+}
+
+func mapUserToOutput(user *entity.User) UserOutput <span class="cov5" title="5">{
+        return UserOutput{
+                ID:        user.ID.String(),
+                Username:  user.Username,
+                Email:     user.Email,
+                FullName:  user.FullName,
+                AvatarURL: user.AvatarURL,
+                Phone:     user.Phone,
+                Status:    string(user.Status),
+                CreatedAt: user.CreatedAt,
+        }
+}</span>
+
+func generateRawToken() (string, error) <span class="cov3" title="3">{
+        b := make([]byte, 32)
+        if _, err := rand.Read(b); err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov3" title="3">return base64.RawURLEncoding.EncodeToString(b), nil</span>
+}
+
+func hashToken(raw string) string <span class="cov7" title="13">{
+        sum := sha256.Sum256([]byte(raw))
+        return hex.EncodeToString(sum[:])
+}</span>
+
+func isNotFound(err error) bool <span class="cov7" title="11">{
+        appErr, ok := apperrors.IsAppError(err)
+        return ok &amp;&amp; appErr.Code == apperrors.ErrCodeNotFound
+}</span>
+
+func wrapAuthError(method string, err error) error <span class="cov2" title="2">{
+        if _, ok := apperrors.IsAppError(err); ok </span><span class="cov1" title="1">{
+                return err
+        }</span>
+        <span class="cov1" title="1">return fmt.Errorf("authUseCase.%s: %w", method, err)</span>
+}
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">//go:build unit
+
+package mocks
+
+import (
+        "context"
+
+        "github.com/google/uuid"
+        "github.com/novacommerce/identity-service/internal/application/port"
+        "github.com/novacommerce/identity-service/internal/domain/entity"
+        "github.com/novacommerce/identity-service/internal/domain/repository"
+        "github.com/stretchr/testify/mock"
+)
+
+type UserRepository struct {
+        mock.Mock
+}
+
+func (m *UserRepository) Create(ctx context.Context, user *entity.User) error <span class="cov0" title="0">{
+        args := m.Called(ctx, user)
+        return args.Error(0)
+}</span>
+
+func (m *UserRepository) FindByID(ctx context.Context, id uuid.UUID) (*entity.User, error) <span class="cov0" title="0">{
+        args := m.Called(ctx, id)
+        if args.Get(0) == nil </span><span class="cov0" title="0">{
+                return nil, args.Error(1)
+        }</span>
+        <span class="cov0" title="0">return args.Get(0).(*entity.User), args.Error(1)</span>
+}
+
+func (m *UserRepository) FindByEmail(ctx context.Context, email string) (*entity.User, error) <span class="cov0" title="0">{
+        args := m.Called(ctx, email)
+        if args.Get(0) == nil </span><span class="cov0" title="0">{
+                return nil, args.Error(1)
+        }</span>
+        <span class="cov0" title="0">return args.Get(0).(*entity.User), args.Error(1)</span>
+}
+
+func (m *UserRepository) FindByUsername(ctx context.Context, username string) (*entity.User, error) <span class="cov0" title="0">{
+        args := m.Called(ctx, username)
+        if args.Get(0) == nil </span><span class="cov0" title="0">{
+                return nil, args.Error(1)
+        }</span>
+        <span class="cov0" title="0">return args.Get(0).(*entity.User), args.Error(1)</span>
+}
+
+func (m *UserRepository) FindByEmailOrUsername(ctx context.Context, identifier string) (*entity.User, error) <span class="cov0" title="0">{
+        args := m.Called(ctx, identifier)
+        if args.Get(0) == nil </span><span class="cov0" title="0">{
+                return nil, args.Error(1)
+        }</span>
+        <span class="cov0" title="0">return args.Get(0).(*entity.User), args.Error(1)</span>
+}
+
+func (m *UserRepository) Update(ctx context.Context, user *entity.User) error <span class="cov0" title="0">{
+        args := m.Called(ctx, user)
+        return args.Error(0)
+}</span>
+
+func (m *UserRepository) UpdatePassword(ctx context.Context, userID uuid.UUID, passwordHash string) error <span class="cov0" title="0">{
+        args := m.Called(ctx, userID, passwordHash)
+        return args.Error(0)
+}</span>
+
+func (m *UserRepository) UpdateLastLogin(ctx context.Context, userID uuid.UUID) error <span class="cov0" title="0">{
+        args := m.Called(ctx, userID)
+        return args.Error(0)
+}</span>
+
+type RefreshTokenRepository struct {
+        mock.Mock
+}
+
+func (m *RefreshTokenRepository) Create(ctx context.Context, token *entity.RefreshToken) error <span class="cov0" title="0">{
+        args := m.Called(ctx, token)
+        return args.Error(0)
+}</span>
+
+func (m *RefreshTokenRepository) FindByTokenHash(ctx context.Context, hash string) (*entity.RefreshToken, error) <span class="cov0" title="0">{
+        args := m.Called(ctx, hash)
+        if args.Get(0) == nil </span><span class="cov0" title="0">{
+                return nil, args.Error(1)
+        }</span>
+        <span class="cov0" title="0">return args.Get(0).(*entity.RefreshToken), args.Error(1)</span>
+}
+
+func (m *RefreshTokenRepository) RevokeByID(ctx context.Context, id uuid.UUID) error <span class="cov0" title="0">{
+        args := m.Called(ctx, id)
+        return args.Error(0)
+}</span>
+
+func (m *RefreshTokenRepository) RevokeAllByUserID(ctx context.Context, userID uuid.UUID) error <span class="cov0" title="0">{
+        args := m.Called(ctx, userID)
+        return args.Error(0)
+}</span>
+
+func (m *RefreshTokenRepository) DeleteExpired(ctx context.Context) error <span class="cov0" title="0">{
+        args := m.Called(ctx)
+        return args.Error(0)
+}</span>
+
+type PasswordResetTokenRepository struct {
+        mock.Mock
+}
+
+func (m *PasswordResetTokenRepository) Create(ctx context.Context, token *entity.PasswordResetToken) error <span class="cov0" title="0">{
+        args := m.Called(ctx, token)
+        return args.Error(0)
+}</span>
+
+func (m *PasswordResetTokenRepository) FindByTokenHash(ctx context.Context, hash string) (*entity.PasswordResetToken, error) <span class="cov0" title="0">{
+        args := m.Called(ctx, hash)
+        if args.Get(0) == nil </span><span class="cov0" title="0">{
+                return nil, args.Error(1)
+        }</span>
+        <span class="cov0" title="0">return args.Get(0).(*entity.PasswordResetToken), args.Error(1)</span>
+}
+
+func (m *PasswordResetTokenRepository) MarkUsed(ctx context.Context, id uuid.UUID) error <span class="cov0" title="0">{
+        args := m.Called(ctx, id)
+        return args.Error(0)
+}</span>
+
+func (m *PasswordResetTokenRepository) DeleteExpiredByUserID(ctx context.Context, userID uuid.UUID) error <span class="cov0" title="0">{
+        args := m.Called(ctx, userID)
+        return args.Error(0)
+}</span>
+
+type JWTService struct {
+        mock.Mock
+}
+
+func (m *JWTService) GenerateAccessToken(userID uuid.UUID, email string, roles []string) (string, error) <span class="cov0" title="0">{
+        args := m.Called(userID, email, roles)
+        return args.String(0), args.Error(1)
+}</span>
+
+func (m *JWTService) ValidateAccessToken(token string) (*port.Claims, error) <span class="cov0" title="0">{
+        args := m.Called(token)
+        if args.Get(0) == nil </span><span class="cov0" title="0">{
+                return nil, args.Error(1)
+        }</span>
+        <span class="cov0" title="0">return args.Get(0).(*port.Claims), args.Error(1)</span>
+}
+
+type EmailService struct {
+        mock.Mock
+}
+
+func (m *EmailService) SendPasswordReset(to, resetToken string) error <span class="cov0" title="0">{
+        args := m.Called(to, resetToken)
+        return args.Error(0)
+}</span>
+
+func (m *EmailService) SendWelcome(to, username string) error <span class="cov0" title="0">{
+        args := m.Called(to, username)
+        return args.Error(0)
+}</span>
+
+type KafkaProducer struct {
+        mock.Mock
+}
+
+func (m *KafkaProducer) Publish(ctx context.Context, topic string, key string, payload interface{}) error <span class="cov0" title="0">{
+        args := m.Called(ctx, topic, key, payload)
+        return args.Error(0)
+}</span>
+
+type RateLimiter struct {
+        mock.Mock
+}
+
+func (m *RateLimiter) Allow(ctx context.Context, key string) error <span class="cov0" title="0">{
+        args := m.Called(ctx, key)
+        return args.Error(0)
+}</span>
+
+var (
+        _ repository.UserRepository               = (*UserRepository)(nil)
+        _ repository.RefreshTokenRepository       = (*RefreshTokenRepository)(nil)
+        _ repository.PasswordResetTokenRepository = (*PasswordResetTokenRepository)(nil)
+        _ port.JWTService                         = (*JWTService)(nil)
+        _ port.EmailService                       = (*EmailService)(nil)
+        _ port.KafkaProducer                      = (*KafkaProducer)(nil)
+        _ port.RateLimiter                        = (*RateLimiter)(nil)
+)
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">package validator
+
+import (
+        "errors"
+        "unicode"
+
+        "github.com/go-playground/validator/v10"
+        apperrors "github.com/novacommerce/pkg/errors"
+)
+
+var validate = validator.New()
+
+func init() <span class="cov1" title="1">{
+        if err := validate.RegisterValidation("password_strength", passwordStrength); err != nil </span><span class="cov0" title="0">{
+                panic("register password_strength validator: " + err.Error())</span>
+        }
+}
+
+type registerInput struct {
+        Username string `validate:"required,min=3,max=30,alphanum"`
+        Email    string `validate:"required,email,max=255"`
+        Password string `validate:"required,min=8,max=72,password_strength"`
+        FullName string `validate:"required,min=2,max=100"`
+}
+
+type loginInput struct {
+        Identifier string `validate:"required,min=3,max=255"`
+        Password   string `validate:"required,min=1"`
+}
+
+type changePasswordInput struct {
+        CurrentPassword string `validate:"required"`
+        NewPassword     string `validate:"required,min=8,max=72,password_strength"`
+}
+
+type resetPasswordInput struct {
+        Token       string `validate:"required,min=32"`
+        NewPassword string `validate:"required,min=8,max=72,password_strength"`
+}
+
+// ValidateRegisterInput validates registration fields.
+func ValidateRegisterInput(username, email, password, fullName string) error <span class="cov2" title="2">{
+        return validateStruct(registerInput{
+                Username: username,
+                Email:    email,
+                Password: password,
+                FullName: fullName,
+        })
+}</span>
+
+// ValidateLoginInput validates login fields.
+func ValidateLoginInput(identifier, password string) error <span class="cov0" title="0">{
+        return validateStruct(loginInput{
+                Identifier: identifier,
+                Password:   password,
+        })
+}</span>
+
+// ValidateChangePasswordInput validates password change fields.
+func ValidateChangePasswordInput(currentPassword, newPassword string) error <span class="cov1" title="1">{
+        if err := validateStruct(changePasswordInput{
+                CurrentPassword: currentPassword,
+                NewPassword:     newPassword,
+        }); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov1" title="1">if currentPassword == newPassword </span><span class="cov1" title="1">{
+                return apperrors.NewValidation("new password must differ from current password", nil)
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+
+// ValidateResetPasswordInput validates password reset fields.
+func ValidateResetPasswordInput(token, newPassword string) error <span class="cov0" title="0">{
+        return validateStruct(resetPasswordInput{
+                Token:       token,
+                NewPassword: newPassword,
+        })
+}</span>
+
+// ValidateEmail validates a single email address.
+func ValidateEmail(email string) error <span class="cov0" title="0">{
+        return validateStruct(struct {
+                Email string `validate:"required,email,max=255"`
+        }{Email: email})
+}</span>
+
+func passwordStrength(fl validator.FieldLevel) bool <span class="cov3" title="3">{
+        value := fl.Field().String()
+        if value == "" </span><span class="cov0" title="0">{
+                return false
+        }</span>
+
+        <span class="cov3" title="3">var hasUpper, hasLower, hasDigit bool
+        for _, r := range value </span><span class="cov10" title="34">{
+                switch </span>{
+                case unicode.IsUpper(r):<span class="cov4" title="4">
+                        hasUpper = true</span>
+                case unicode.IsLower(r):<span class="cov9" title="24">
+                        hasLower = true</span>
+                case unicode.IsDigit(r):<span class="cov5" title="6">
+                        hasDigit = true</span>
+                }
+        }
+
+        <span class="cov3" title="3">return hasUpper &amp;&amp; hasLower &amp;&amp; hasDigit</span>
+}
+
+func validateStruct(input any) error <span class="cov3" title="3">{
+        if err := validate.Struct(input); err != nil </span><span class="cov1" title="1">{
+                return mapValidationError(err)
+        }</span>
+        <span class="cov2" title="2">return nil</span>
+}
+
+func mapValidationError(err error) error <span class="cov1" title="1">{
+        var validationErrs validator.ValidationErrors
+        if errors.As(err, &amp;validationErrs) </span><span class="cov1" title="1">{
+                return apperrors.NewValidation(validationErrs.Error(), nil)
+        }</span>
+        <span class="cov0" title="0">return apperrors.NewValidation(err.Error(), nil)</span>
+}
+</pre>
+		
+		<pre class="file" id="file8" style="display: none">package entity
+
+import (
+        "time"
+
+        "github.com/google/uuid"
+)
+
+// PasswordResetTokenTTL is the default lifetime for password reset tokens.
+const PasswordResetTokenTTL = time.Hour
+
+// PasswordResetToken stores a hashed one-time password reset token.
+type PasswordResetToken struct {
+        ID        uuid.UUID  `db:"id"`
+        UserID    uuid.UUID  `db:"user_id"`
+        TokenHash string     `db:"token_hash"`
+        ExpiresAt time.Time  `db:"expires_at"`
+        UsedAt    *time.Time `db:"used_at"`
+        CreatedAt time.Time  `db:"created_at"`
+}
+
+// IsValid reports whether the token is unused and not expired.
+func (p *PasswordResetToken) IsValid() bool <span class="cov0" title="0">{
+        if p.UsedAt != nil </span><span class="cov0" title="0">{
+                return false
+        }</span>
+        <span class="cov0" title="0">return time.Now().Before(p.ExpiresAt)</span>
+}
+</pre>
+		
+		<pre class="file" id="file9" style="display: none">package entity
+
+import (
+        "time"
+
+        "github.com/google/uuid"
+)
+
+// RefreshToken stores a hashed refresh token for a user session.
+type RefreshToken struct {
+        ID        uuid.UUID  `db:"id"`
+        UserID    uuid.UUID  `db:"user_id"`
+        TokenHash string     `db:"token_hash"`
+        ExpiresAt time.Time  `db:"expires_at"`
+        RevokedAt *time.Time `db:"revoked_at"`
+        IPAddress string     `db:"ip_address"`
+        UserAgent string     `db:"user_agent"`
+        CreatedAt time.Time  `db:"created_at"`
+}
+
+// IsValid reports whether the token is neither revoked nor expired.
+func (r *RefreshToken) IsValid() bool <span class="cov0" title="0">{
+        if r.RevokedAt != nil </span><span class="cov0" title="0">{
+                return false
+        }</span>
+        <span class="cov0" title="0">return time.Now().Before(r.ExpiresAt)</span>
+}
+</pre>
+		
+		<pre class="file" id="file10" style="display: none">package entity
+
+import (
+        "time"
+
+        "github.com/google/uuid"
+        "golang.org/x/crypto/bcrypt"
+)
+
+const bcryptCost = 12
+
+// UserStatus represents the lifecycle state of a user account.
+type UserStatus string
+
+const (
+        UserStatusActive   UserStatus = "active"
+        UserStatusInactive UserStatus = "inactive"
+        UserStatusBanned   UserStatus = "banned"
+)
+
+// User is the core identity aggregate root.
+type User struct {
+        ID           uuid.UUID  `db:"id"`
+        Username     string     `db:"username"`
+        Email        string     `db:"email"`
+        PasswordHash string     `db:"password_hash"`
+        Phone        string     `db:"phone"`
+        FullName     string     `db:"full_name"`
+        AvatarURL    string     `db:"avatar_url"`
+        Status       UserStatus `db:"status"`
+        LastLoginAt  *time.Time `db:"last_login_at"`
+        CreatedAt    time.Time  `db:"created_at"`
+        UpdatedAt    time.Time  `db:"updated_at"`
+}
+
+// SetPassword hashes plain with bcrypt (cost 12) and stores it in PasswordHash.
+func (u *User) SetPassword(plain string) error <span class="cov0" title="0">{
+        hash, err := bcrypt.GenerateFromPassword([]byte(plain), bcryptCost)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">u.PasswordHash = string(hash)
+        return nil</span>
+}
+
+// CheckPassword reports whether plain matches the stored bcrypt hash.
+func (u *User) CheckPassword(plain string) bool <span class="cov0" title="0">{
+        if u.PasswordHash == "" </span><span class="cov0" title="0">{
+                return false
+        }</span>
+        <span class="cov0" title="0">return bcrypt.CompareHashAndPassword([]byte(u.PasswordHash), []byte(plain)) == nil</span>
+}
+
+// IsActive reports whether the account is in active status.
+func (u *User) IsActive() bool <span class="cov0" title="0">{
+        return u.Status == UserStatusActive
+}</span>
+
+// Role defines a named set of permissions.
+type Role struct {
+        ID          uuid.UUID `db:"id"`
+        Name        string    `db:"name"`
+        Description *string   `db:"description"`
+        CreatedAt   time.Time `db:"created_at"`
+}
+
+// Permission defines a resource/action pair for RBAC.
+type Permission struct {
+        ID          uuid.UUID `db:"id"`
+        Resource    string    `db:"resource"`
+        Action      string    `db:"action"`
+        Description *string   `db:"description"`
+}
+
+// UserRole links a user to a role assignment.
+type UserRole struct {
+        UserID     uuid.UUID `db:"user_id"`
+        RoleID     uuid.UUID `db:"role_id"`
+        AssignedAt time.Time `db:"assigned_at"`
+}
+
+// RolePermission links a role to a permission.
+type RolePermission struct {
+        RoleID       uuid.UUID `db:"role_id"`
+        PermissionID uuid.UUID `db:"permission_id"`
+}
+
+// OAuthAccount links an external OAuth provider to a user.
+type OAuthAccount struct {
+        ID             uuid.UUID  `db:"id"`
+        UserID         uuid.UUID  `db:"user_id"`
+        Provider       string     `db:"provider"`
+        ProviderUserID string     `db:"provider_user_id"`
+        AccessToken    *string    `db:"access_token"`
+        RefreshToken   *string    `db:"refresh_token"`
+        TokenExpiresAt *time.Time `db:"token_expires_at"`
+        CreatedAt      time.Time  `db:"created_at"`
+}
+</pre>
+		
+		<pre class="file" id="file11" style="display: none">package cache
+
+import (
+        "context"
+        "fmt"
+        "time"
+
+        "github.com/novacommerce/identity-service/internal/application/port"
+        apperrors "github.com/novacommerce/pkg/errors"
+        "github.com/redis/go-redis/v9"
+)
+
+const useCaseRateLimitScript = `
+local current = redis.call('INCR', KEYS[1])
+if current == 1 then
+  redis.call('PEXPIRE', KEYS[1], ARGV[1])
+end
+return current
+`
+
+// UseCaseRateLimiter implements port.RateLimiter for application-layer throttling.
+type UseCaseRateLimiter struct {
+        client *redis.Client
+        limit  int
+        window time.Duration
+}
+
+// NewUseCaseRateLimiter creates a Redis-backed rate limiter for use cases.
+func NewUseCaseRateLimiter(client *redis.Client, limit int, window time.Duration) port.RateLimiter <span class="cov0" title="0">{
+        return &amp;UseCaseRateLimiter{
+                client: client,
+                limit:  limit,
+                window: window,
+        }
+}</span>
+
+// Allow increments the counter for key and rejects when the limit is exceeded.
+func (r *UseCaseRateLimiter) Allow(ctx context.Context, key string) error <span class="cov0" title="0">{
+        if r.client == nil || r.limit &lt;= 0 || r.window &lt;= 0 </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+
+        <span class="cov0" title="0">redisKey := fmt.Sprintf("rate:usecase:%s", key)
+        count, err := r.client.Eval(ctx, useCaseRateLimitScript, []string{redisKey}, r.window.Milliseconds()).Int64()
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("useCaseRateLimiter.Allow: %w", err)
+        }</span>
+        <span class="cov0" title="0">if count &gt; int64(r.limit) </span><span class="cov0" title="0">{
+                return apperrors.NewTooManyRequests("too many requests")
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file12" style="display: none">package cache
+
+import (
+        "context"
+        "fmt"
+
+        "github.com/novacommerce/identity-service/config"
+        pkglogger "github.com/novacommerce/pkg/logger"
+        "github.com/redis/go-redis/v9"
+)
+
+// NewRedisClient creates and verifies a Redis client.
+func NewRedisClient(ctx context.Context, cfg config.RedisConfig, log *pkglogger.Logger) (*redis.Client, error) <span class="cov0" title="0">{
+        addr := cfg.BuildAddr()
+        if addr == "" </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("redis address is required")
+        }</span>
+
+        <span class="cov0" title="0">poolSize := cfg.PoolSize
+        if poolSize &lt;= 0 </span><span class="cov0" title="0">{
+                poolSize = 10
+        }</span>
+
+        <span class="cov0" title="0">client := redis.NewClient(&amp;redis.Options{
+                Addr:     addr,
+                Password: cfg.Password,
+                DB:       cfg.DB,
+                PoolSize: poolSize,
+        })
+
+        if err := client.Ping(ctx).Err(); err != nil </span><span class="cov0" title="0">{
+                if closeErr := client.Close(); closeErr != nil </span><span class="cov0" title="0">{
+                        return nil, fmt.Errorf("ping redis: %w; close redis: %v", err, closeErr)
+                }</span>
+                <span class="cov0" title="0">return nil, fmt.Errorf("ping redis: %w", err)</span>
+        }
+
+        <span class="cov0" title="0">log.Info().Str("addr", addr).Msg("connected to Redis")
+
+        return client, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file13" style="display: none">package email
+
+import (
+        "github.com/novacommerce/identity-service/internal/application/port"
+        pkglogger "github.com/novacommerce/pkg/logger"
+)
+
+// LogEmailService is a stub email sender that logs messages to the console.
+type LogEmailService struct {
+        logger *pkglogger.Logger
+}
+
+// NewLogEmailService creates a LogEmailService.
+func NewLogEmailService(logger *pkglogger.Logger) port.EmailService <span class="cov0" title="0">{
+        return &amp;LogEmailService{logger: logger}
+}</span>
+
+func (s *LogEmailService) SendPasswordReset(to, token string) error <span class="cov0" title="0">{
+        s.logger.Info().
+                Str("to", to).
+                Str("token", token).
+                Msg("sending password reset email")
+        return nil
+}</span>
+
+func (s *LogEmailService) SendWelcome(to, username string) error <span class="cov0" title="0">{
+        s.logger.Info().
+                Str("to", to).
+                Str("username", username).
+                Msg("sending welcome email")
+        return nil
+}</span>
+</pre>
+		
+		<pre class="file" id="file14" style="display: none">package handler
+
+import (
+        "github.com/gin-gonic/gin"
+        "github.com/novacommerce/identity-service/internal/application/usecase"
+        "github.com/novacommerce/identity-service/internal/infrastructure/http/middleware"
+)
+
+// AuthHandler serves authentication HTTP endpoints.
+type AuthHandler struct {
+        authUseCase usecase.AuthUseCase
+}
+
+// NewAuthHandler creates an AuthHandler.
+func NewAuthHandler(authUseCase usecase.AuthUseCase) *AuthHandler <span class="cov10" title="21">{
+        return &amp;AuthHandler{authUseCase: authUseCase}
+}</span>
+
+type registerRequest struct {
+        Username string `json:"username" binding:"required,min=3,max=30"`
+        Email    string `json:"email" binding:"required,email"`
+        Password string `json:"password" binding:"required,min=8,max=72"`
+        FullName string `json:"full_name" binding:"required"`
+}
+
+type loginRequest struct {
+        Identifier string `json:"identifier" binding:"required"`
+        Password   string `json:"password" binding:"required"`
+}
+
+type refreshTokenRequest struct {
+        RefreshToken string `json:"refresh_token" binding:"required"`
+}
+
+type logoutRequest struct {
+        RefreshToken string `json:"refresh_token" binding:"required"`
+}
+
+type changePasswordRequest struct {
+        CurrentPassword string `json:"current_password" binding:"required"`
+        NewPassword     string `json:"new_password" binding:"required,min=8,max=72"`
+}
+
+type forgotPasswordRequest struct {
+        Email string `json:"email" binding:"required,email"`
+}
+
+type resetPasswordRequest struct {
+        Token       string `json:"token" binding:"required"`
+        NewPassword string `json:"new_password" binding:"required,min=8,max=72"`
+}
+
+// Register handles POST /auth/register.
+func (h *AuthHandler) Register(c *gin.Context) <span class="cov4" title="3">{
+        var req registerRequest
+        if err := c.ShouldBindJSON(&amp;req); err != nil </span><span class="cov1" title="1">{
+                respondValidationError(c, err)
+                return
+        }</span>
+
+        <span class="cov3" title="2">output, err := h.authUseCase.Register(c.Request.Context(), usecase.RegisterInput{
+                Username: req.Username,
+                Email:    req.Email,
+                Password: req.Password,
+                FullName: req.FullName,
+        })
+        if err != nil </span><span class="cov1" title="1">{
+                respondError(c, err)
+                return
+        }</span>
+
+        <span class="cov1" title="1">respondSuccess(c, 201, output)</span>
+}
+
+// Login handles POST /auth/login.
+func (h *AuthHandler) Login(c *gin.Context) <span class="cov3" title="2">{
+        var req loginRequest
+        if err := c.ShouldBindJSON(&amp;req); err != nil </span><span class="cov0" title="0">{
+                respondValidationError(c, err)
+                return
+        }</span>
+
+        <span class="cov3" title="2">output, err := h.authUseCase.Login(c.Request.Context(), usecase.LoginInput{
+                Identifier: req.Identifier,
+                Password:   req.Password,
+                IPAddress:  c.ClientIP(),
+                UserAgent:  c.GetHeader("User-Agent"),
+        })
+        if err != nil </span><span class="cov1" title="1">{
+                respondError(c, err)
+                return
+        }</span>
+
+        <span class="cov1" title="1">respondSuccess(c, 200, output)</span>
+}
+
+// RefreshToken handles POST /auth/refresh.
+func (h *AuthHandler) RefreshToken(c *gin.Context) <span class="cov4" title="3">{
+        var req refreshTokenRequest
+        if err := c.ShouldBindJSON(&amp;req); err != nil </span><span class="cov1" title="1">{
+                respondValidationError(c, err)
+                return
+        }</span>
+
+        <span class="cov3" title="2">output, err := h.authUseCase.RefreshToken(c.Request.Context(), req.RefreshToken)
+        if err != nil </span><span class="cov1" title="1">{
+                respondError(c, err)
+                return
+        }</span>
+
+        <span class="cov1" title="1">respondSuccess(c, 200, output)</span>
+}
+
+// Logout handles POST /auth/logout.
+func (h *AuthHandler) Logout(c *gin.Context) <span class="cov3" title="2">{
+        var req logoutRequest
+        if err := c.ShouldBindJSON(&amp;req); err != nil </span><span class="cov0" title="0">{
+                respondValidationError(c, err)
+                return
+        }</span>
+
+        <span class="cov3" title="2">if err := h.authUseCase.Logout(c.Request.Context(), req.RefreshToken); err != nil </span><span class="cov1" title="1">{
+                respondError(c, err)
+                return
+        }</span>
+
+        <span class="cov1" title="1">respondNoContent(c)</span>
+}
+
+// LogoutAll handles POST /auth/logout-all.
+func (h *AuthHandler) LogoutAll(c *gin.Context) <span class="cov0" title="0">{
+        userID, err := middleware.GetCurrentUserID(c)
+        if err != nil </span><span class="cov0" title="0">{
+                respondError(c, err)
+                return
+        }</span>
+
+        <span class="cov0" title="0">if err := h.authUseCase.LogoutAll(c.Request.Context(), userID); err != nil </span><span class="cov0" title="0">{
+                respondError(c, err)
+                return
+        }</span>
+
+        <span class="cov0" title="0">respondNoContent(c)</span>
+}
+
+// GetMe handles GET /auth/me.
+func (h *AuthHandler) GetMe(c *gin.Context) <span class="cov1" title="1">{
+        userID, err := middleware.GetCurrentUserID(c)
+        if err != nil </span><span class="cov0" title="0">{
+                respondError(c, err)
+                return
+        }</span>
+
+        <span class="cov1" title="1">output, err := h.authUseCase.GetMe(c.Request.Context(), userID)
+        if err != nil </span><span class="cov0" title="0">{
+                respondError(c, err)
+                return
+        }</span>
+
+        <span class="cov1" title="1">respondSuccess(c, 200, output)</span>
+}
+
+// ChangePassword handles PUT /auth/change-password.
+func (h *AuthHandler) ChangePassword(c *gin.Context) <span class="cov4" title="3">{
+        var req changePasswordRequest
+        if err := c.ShouldBindJSON(&amp;req); err != nil </span><span class="cov1" title="1">{
+                respondValidationError(c, err)
+                return
+        }</span>
+
+        <span class="cov3" title="2">userID, err := middleware.GetCurrentUserID(c)
+        if err != nil </span><span class="cov0" title="0">{
+                respondError(c, err)
+                return
+        }</span>
+
+        <span class="cov3" title="2">if err := h.authUseCase.ChangePassword(c.Request.Context(), userID, usecase.ChangePasswordInput{
+                CurrentPassword: req.CurrentPassword,
+                NewPassword:     req.NewPassword,
+        }); err != nil </span><span class="cov1" title="1">{
+                respondError(c, err)
+                return
+        }</span>
+
+        <span class="cov1" title="1">respondSuccess(c, 200, map[string]string{"message": "password changed successfully"})</span>
+}
+
+// ForgotPassword handles POST /auth/forgot-password.
+func (h *AuthHandler) ForgotPassword(c *gin.Context) <span class="cov3" title="2">{
+        var req forgotPasswordRequest
+        if err := c.ShouldBindJSON(&amp;req); err != nil </span><span class="cov1" title="1">{
+                respondValidationError(c, err)
+                return
+        }</span>
+
+        <span class="cov1" title="1">_ = h.authUseCase.ForgotPassword(c.Request.Context(), req.Email)
+
+        respondSuccess(c, 200, map[string]string{
+                "message": "if the email exists, a password reset link has been sent",
+        })</span>
+}
+
+// ResetPassword handles POST /auth/reset-password.
+func (h *AuthHandler) ResetPassword(c *gin.Context) <span class="cov4" title="3">{
+        var req resetPasswordRequest
+        if err := c.ShouldBindJSON(&amp;req); err != nil </span><span class="cov1" title="1">{
+                respondValidationError(c, err)
+                return
+        }</span>
+
+        <span class="cov3" title="2">if err := h.authUseCase.ResetPassword(c.Request.Context(), usecase.ResetPasswordInput{
+                Token:       req.Token,
+                NewPassword: req.NewPassword,
+        }); err != nil </span><span class="cov1" title="1">{
+                respondError(c, err)
+                return
+        }</span>
+
+        <span class="cov1" title="1">respondSuccess(c, 200, map[string]string{"message": "password reset successfully"})</span>
+}
+</pre>
+		
+		<pre class="file" id="file15" style="display: none">package handler
+
+import (
+        "net/http"
+
+        "github.com/gin-gonic/gin"
+        "github.com/novacommerce/identity-service/internal/application/service"
+)
+
+// HealthHandler serves health check endpoints.
+type HealthHandler struct {
+        healthService *service.HealthService
+}
+
+// NewHealthHandler creates a HealthHandler.
+func NewHealthHandler(healthService *service.HealthService) *HealthHandler <span class="cov0" title="0">{
+        return &amp;HealthHandler{healthService: healthService}
+}</span>
+
+type healthEnvelope struct {
+        Data  service.HealthResult `json:"data"`
+        Meta  any                  `json:"meta"`
+        Error any                  `json:"error"`
+}
+
+// Check handles GET /health.
+func (h *HealthHandler) Check(c *gin.Context) <span class="cov0" title="0">{
+        result, allFailed := h.healthService.Check(c.Request.Context())
+
+        statusCode := http.StatusOK
+        if allFailed </span><span class="cov0" title="0">{
+                statusCode = http.StatusServiceUnavailable
+        }</span>
+
+        <span class="cov0" title="0">c.JSON(statusCode, healthEnvelope{
+                Data:  result,
+                Meta:  nil,
+                Error: nil,
+        })</span>
+}
+
+// RegisterRoutes registers health routes on a Gin router group.
+func (h *HealthHandler) RegisterRoutes(r gin.IRoutes) <span class="cov0" title="0">{
+        r.GET("/health", h.Check)
+}</span>
+</pre>
+		
+		<pre class="file" id="file16" style="display: none">package handler
+
+import (
+        "net/http"
+
+        "github.com/gin-gonic/gin"
+        apperrors "github.com/novacommerce/pkg/errors"
+        "github.com/novacommerce/pkg/response"
+)
+
+type apiEnvelope struct {
+        Data  any `json:"data"`
+        Meta  any `json:"meta"`
+        Error any `json:"error"`
+}
+
+func respondSuccess(c *gin.Context, status int, data any) <span class="cov10" title="7">{
+        c.JSON(status, apiEnvelope{
+                Data:  data,
+                Meta:  nil,
+                Error: nil,
+        })
+}</span>
+
+func respondNoContent(c *gin.Context) <span class="cov1" title="1">{
+        c.Status(http.StatusNoContent)
+}</span>
+
+func respondError(c *gin.Context, err error) <span class="cov9" title="6">{
+        if appErr, ok := apperrors.IsAppError(err); ok </span><span class="cov9" title="6">{
+                c.JSON(appErr.HTTPStatus, apiEnvelope{
+                        Data: nil,
+                        Meta: nil,
+                        Error: map[string]any{
+                                "code":    appErr.Code,
+                                "message": appErr.Message,
+                                "details": appErr.Details,
+                        },
+                })
+                return
+        }</span>
+
+        <span class="cov0" title="0">response.Error(c.Writer, apperrors.NewInternal("internal server error"))</span>
+}
+
+func respondValidationError(c *gin.Context, err error) <span class="cov8" title="5">{
+        c.JSON(http.StatusBadRequest, apiEnvelope{
+                Data: nil,
+                Meta: nil,
+                Error: map[string]any{
+                        "code":    apperrors.ErrCodeValidation,
+                        "message": err.Error(),
+                },
+        })
+}</span>
+</pre>
+		
+		<pre class="file" id="file17" style="display: none">package middleware
+
+import (
+        "github.com/gin-gonic/gin"
+        "github.com/google/uuid"
+        "github.com/novacommerce/identity-service/internal/application/port"
+        apperrors "github.com/novacommerce/pkg/errors"
+)
+
+type authErrorEnvelope struct {
+        Data  any `json:"data"`
+        Meta  any `json:"meta"`
+        Error any `json:"error"`
+}
+
+func writeAuthError(c *gin.Context, appErr *apperrors.AppError) <span class="cov0" title="0">{
+        c.JSON(appErr.HTTPStatus, authErrorEnvelope{
+                Data: nil,
+                Meta: nil,
+                Error: map[string]any{
+                        "code":    appErr.Code,
+                        "message": appErr.Message,
+                        "details": appErr.Details,
+                },
+        })
+}</span>
+
+const (
+        contextKeyUserID = "userID"
+        contextKeyEmail  = "email"
+        contextKeyRoles  = "roles"
+)
+
+// JWTAuthMiddleware validates Bearer JWT access tokens and stores claims in context.
+func JWTAuthMiddleware(jwtService port.JWTService) gin.HandlerFunc <span class="cov0" title="0">{
+        return func(c *gin.Context) </span><span class="cov0" title="0">{
+                token := extractBearerToken(c.GetHeader("Authorization"))
+                if token == "" </span><span class="cov0" title="0">{
+                        writeAuthError(c, apperrors.NewUnauthorized("missing or invalid authorization header"))
+                        c.Abort()
+                        return
+                }</span>
+
+                <span class="cov0" title="0">claims, err := jwtService.ValidateAccessToken(token)
+                if err != nil </span><span class="cov0" title="0">{
+                        writeAuthError(c, apperrors.NewUnauthorized("invalid or expired token"))
+                        c.Abort()
+                        return
+                }</span>
+
+                <span class="cov0" title="0">c.Set(contextKeyUserID, claims.UserID)
+                c.Set(contextKeyEmail, claims.Email)
+                c.Set(contextKeyRoles, claims.Roles)
+                c.Next()</span>
+        }
+}
+
+// GetCurrentUserID returns the authenticated user ID from gin context.
+func GetCurrentUserID(c *gin.Context) (uuid.UUID, error) <span class="cov0" title="0">{
+        value, exists := c.Get(contextKeyUserID)
+        if !exists </span><span class="cov0" title="0">{
+                return uuid.Nil, apperrors.NewUnauthorized("unauthorized")
+        }</span>
+
+        <span class="cov0" title="0">userID, ok := value.(uuid.UUID)
+        if !ok || userID == uuid.Nil </span><span class="cov0" title="0">{
+                return uuid.Nil, apperrors.NewUnauthorized("unauthorized")
+        }</span>
+
+        <span class="cov0" title="0">return userID, nil</span>
+}
+
+// GetCurrentUserRoles returns role names attached to the authenticated user.
+func GetCurrentUserRoles(c *gin.Context) []string <span class="cov0" title="0">{
+        value, exists := c.Get(contextKeyRoles)
+        if !exists </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+
+        <span class="cov0" title="0">roles, ok := value.([]string)
+        if !ok </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+
+        <span class="cov0" title="0">return roles</span>
+}
+
+func extractBearerToken(header string) string <span class="cov0" title="0">{
+        const prefix = "Bearer "
+        if len(header) &lt; len(prefix) || header[:len(prefix)] != prefix </span><span class="cov0" title="0">{
+                return ""
+        }</span>
+        <span class="cov0" title="0">return header[len(prefix):]</span>
+}
+</pre>
+		
+		<pre class="file" id="file18" style="display: none">package middleware
+
+import (
+        "net/http"
+        "runtime/debug"
+        "time"
+
+        "github.com/gin-gonic/gin"
+        "github.com/google/uuid"
+        apperrors "github.com/novacommerce/pkg/errors"
+        pkglogger "github.com/novacommerce/pkg/logger"
+        "github.com/novacommerce/pkg/response"
+)
+
+const contextKeyRequestID = "request_id"
+
+var (
+        appLogger   *pkglogger.Logger
+        corsOrigins []string
+)
+
+// Init configures middleware dependencies from application config.
+func Init(log *pkglogger.Logger, allowOrigins []string) <span class="cov0" title="0">{
+        appLogger = log
+        corsOrigins = allowOrigins
+}</span>
+
+// RequestID generates or propagates a UUID v4 request ID.
+func RequestID() gin.HandlerFunc <span class="cov0" title="0">{
+        return func(c *gin.Context) </span><span class="cov0" title="0">{
+                requestID := c.GetHeader("X-Request-ID")
+                if requestID == "" </span><span class="cov0" title="0">{
+                        requestID = uuid.NewString()
+                }</span>
+
+                <span class="cov0" title="0">c.Set(contextKeyRequestID, requestID)
+                c.Header("X-Request-ID", requestID)
+                c.Request = c.Request.WithContext(pkglogger.WithRequestID(c.Request.Context(), requestID))
+                c.Next()</span>
+        }
+}
+
+// InjectLogger stores the application logger in the request context.
+func InjectLogger() gin.HandlerFunc <span class="cov0" title="0">{
+        return func(c *gin.Context) </span><span class="cov0" title="0">{
+                if appLogger != nil </span><span class="cov0" title="0">{
+                        c.Request = c.Request.WithContext(pkglogger.WithContext(c.Request.Context(), appLogger))
+                }</span>
+                <span class="cov0" title="0">c.Next()</span>
+        }
+}
+
+// Logger logs HTTP request metadata after the handler completes.
+func Logger() gin.HandlerFunc <span class="cov0" title="0">{
+        return func(c *gin.Context) </span><span class="cov0" title="0">{
+                if shouldSkipRequestLog(c.Request.URL.Path) </span><span class="cov0" title="0">{
+                        c.Next()
+                        return
+                }</span>
+
+                <span class="cov0" title="0">start := time.Now().UTC()
+                c.Next()
+
+                latency := time.Since(start)
+                status := c.Writer.Status()
+                log := loggerFromContext(c)
+
+                event := log.Info().
+                        Str("method", c.Request.Method).
+                        Str("path", c.Request.URL.Path).
+                        Int("status", status).
+                        Dur("latency", latency).
+                        Str("client_ip", c.ClientIP())
+
+                if requestID, ok := c.Get(contextKeyRequestID); ok </span><span class="cov0" title="0">{
+                        if id, ok := requestID.(string); ok &amp;&amp; id != "" </span><span class="cov0" title="0">{
+                                event = event.Str("request_id", id)
+                        }</span>
+                }
+
+                <span class="cov0" title="0">switch </span>{
+                case status &gt;= http.StatusInternalServerError:<span class="cov0" title="0">
+                        log.Error().
+                                Str("method", c.Request.Method).
+                                Str("path", c.Request.URL.Path).
+                                Int("status", status).
+                                Dur("latency", latency).
+                                Str("client_ip", c.ClientIP()).
+                                Msg("request completed")</span>
+                case status &gt;= http.StatusBadRequest:<span class="cov0" title="0">
+                        log.Warn().
+                                Str("method", c.Request.Method).
+                                Str("path", c.Request.URL.Path).
+                                Int("status", status).
+                                Dur("latency", latency).
+                                Str("client_ip", c.ClientIP()).
+                                Msg("request completed")</span>
+                default:<span class="cov0" title="0">
+                        event.Msg("request completed")</span>
+                }
+        }
+}
+
+func shouldSkipRequestLog(path string) bool <span class="cov0" title="0">{
+        return path == "/health" || path == "/metrics"
+}</span>
+
+func loggerFromContext(c *gin.Context) *pkglogger.Logger <span class="cov0" title="0">{
+        if log := pkglogger.FromContext(c.Request.Context()); log != nil </span><span class="cov0" title="0">{
+                return log
+        }</span>
+        <span class="cov0" title="0">if appLogger != nil </span><span class="cov0" title="0">{
+                return appLogger
+        }</span>
+        <span class="cov0" title="0">return pkglogger.New("identity-service", "development", "info")</span>
+}
+
+// Recovery recovers from panics and returns a standardized 500 response.
+func Recovery() gin.HandlerFunc <span class="cov0" title="0">{
+        return func(c *gin.Context) </span><span class="cov0" title="0">{
+                defer func() </span><span class="cov0" title="0">{
+                        if recovered := recover(); recovered != nil </span><span class="cov0" title="0">{
+                                stack := string(debug.Stack())
+                                log := loggerFromContext(c)
+
+                                event := log.Error().
+                                        Interface("panic", recovered).
+                                        Str("stack", stack).
+                                        Str("path", c.Request.URL.Path)
+
+                                if requestID, ok := c.Get(contextKeyRequestID); ok </span><span class="cov0" title="0">{
+                                        if id, ok := requestID.(string); ok </span><span class="cov0" title="0">{
+                                                event = event.Str("request_id", id)
+                                        }</span>
+                                }
+
+                                <span class="cov0" title="0">event.Msg("panic recovered")
+                                response.Error(c.Writer, apperrors.NewInternal("Internal server error"))
+                                c.Abort()</span>
+                        }
+                }()
+
+                <span class="cov0" title="0">c.Next()</span>
+        }
+}
+
+// CORS applies configurable cross-origin response headers.
+func CORS() gin.HandlerFunc <span class="cov0" title="0">{
+        origins := "*"
+        if len(corsOrigins) &gt; 0 </span><span class="cov0" title="0">{
+                origins = joinOrigins(corsOrigins)
+        }</span>
+
+        <span class="cov0" title="0">return func(c *gin.Context) </span><span class="cov0" title="0">{
+                c.Header("Access-Control-Allow-Origin", origins)
+                c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
+                c.Header("Access-Control-Allow-Headers", "Authorization, Content-Type, X-Request-ID")
+                c.Header("Access-Control-Max-Age", "43200")
+
+                if c.Request.Method == http.MethodOptions </span><span class="cov0" title="0">{
+                        c.AbortWithStatus(http.StatusNoContent)
+                        return
+                }</span>
+
+                <span class="cov0" title="0">c.Next()</span>
+        }
+}
+
+func joinOrigins(origins []string) string <span class="cov0" title="0">{
+        if len(origins) == 1 </span><span class="cov0" title="0">{
+                return origins[0]
+        }</span>
+        <span class="cov0" title="0">result := origins[0]
+        for i := 1; i &lt; len(origins); i++ </span><span class="cov0" title="0">{
+                result += ", " + origins[i]
+        }</span>
+        <span class="cov0" title="0">return result</span>
+}
+</pre>
+		
+		<pre class="file" id="file19" style="display: none">package middleware
+
+import (
+        "context"
+        "fmt"
+        "time"
+
+        "github.com/gin-gonic/gin"
+        "github.com/novacommerce/identity-service/config"
+        apperrors "github.com/novacommerce/pkg/errors"
+        "github.com/redis/go-redis/v9"
+)
+
+type rateLimitErrorEnvelope struct {
+        Data  any `json:"data"`
+        Meta  any `json:"meta"`
+        Error any `json:"error"`
+}
+
+func writeRateLimitError(c *gin.Context, appErr *apperrors.AppError) <span class="cov0" title="0">{
+        c.JSON(appErr.HTTPStatus, rateLimitErrorEnvelope{
+                Data: nil,
+                Meta: nil,
+                Error: map[string]any{
+                        "code":    appErr.Code,
+                        "message": appErr.Message,
+                        "details": appErr.Details,
+                },
+        })
+}</span>
+
+const rateLimitScript = `
+local current = redis.call('INCR', KEYS[1])
+if current == 1 then
+  redis.call('PEXPIRE', KEYS[1], ARGV[1])
+end
+return current
+`
+
+// RateLimiterConfig configures Redis-backed sliding window rate limiting.
+type RateLimiterConfig struct {
+        Redis   *redis.Client
+        Key     string
+        Limit   int
+        Window  time.Duration
+        KeyFunc func(*gin.Context) string
+}
+
+// RateLimiter returns middleware that limits requests using Redis INCR + PEXPIRE.
+func RateLimiter(cfg RateLimiterConfig) gin.HandlerFunc <span class="cov0" title="0">{
+        return func(c *gin.Context) </span><span class="cov0" title="0">{
+                if cfg.Redis == nil || cfg.KeyFunc == nil || cfg.Limit &lt;= 0 || cfg.Window &lt;= 0 </span><span class="cov0" title="0">{
+                        c.Next()
+                        return
+                }</span>
+
+                <span class="cov0" title="0">redisKey := cfg.KeyFunc(c)
+                count, err := incrementRateLimit(c.Request.Context(), cfg.Redis, redisKey, cfg.Window)
+                if err != nil </span><span class="cov0" title="0">{
+                        writeRateLimitError(c, apperrors.NewInternal("rate limiter unavailable"))
+                        c.Abort()
+                        return
+                }</span>
+
+                <span class="cov0" title="0">if count &gt; int64(cfg.Limit) </span><span class="cov0" title="0">{
+                        retryAfter := retryAfterSeconds(c.Request.Context(), cfg.Redis, redisKey, cfg.Window)
+                        c.Header("Retry-After", fmt.Sprintf("%d", retryAfter))
+                        writeRateLimitError(c, apperrors.NewTooManyRequests("too many requests"))
+                        c.Abort()
+                        return
+                }</span>
+
+                <span class="cov0" title="0">c.Next()</span>
+        }
+}
+
+// LoginRateLimiter limits login attempts per configured window and IP.
+func LoginRateLimiter(redisClient *redis.Client, rl config.RateLimitConfig) gin.HandlerFunc <span class="cov0" title="0">{
+        return RateLimiter(RateLimiterConfig{
+                Redis:  redisClient,
+                Key:    "login",
+                Limit:  rl.LoginMaxAttempts,
+                Window: rl.LoginWindow,
+                KeyFunc: func(c *gin.Context) string </span><span class="cov0" title="0">{
+                        return fmt.Sprintf("rate:login:%s", c.ClientIP())
+                }</span>,
+        })
+}
+
+// RegisterRateLimiter limits registration attempts per configured window and IP.
+func RegisterRateLimiter(redisClient *redis.Client, rl config.RateLimitConfig) gin.HandlerFunc <span class="cov0" title="0">{
+        return RateLimiter(RateLimiterConfig{
+                Redis:  redisClient,
+                Key:    "register",
+                Limit:  rl.RegisterMaxAttempts,
+                Window: rl.RegisterWindow,
+                KeyFunc: func(c *gin.Context) string </span><span class="cov0" title="0">{
+                        return fmt.Sprintf("rate:register:%s", c.ClientIP())
+                }</span>,
+        })
+}
+
+func incrementRateLimit(ctx context.Context, client *redis.Client, key string, window time.Duration) (int64, error) <span class="cov0" title="0">{
+        result, err := client.Eval(ctx, rateLimitScript, []string{key}, window.Milliseconds()).Int64()
+        if err != nil </span><span class="cov0" title="0">{
+                return 0, err
+        }</span>
+        <span class="cov0" title="0">return result, nil</span>
+}
+
+func retryAfterSeconds(ctx context.Context, client *redis.Client, key string, window time.Duration) int64 <span class="cov0" title="0">{
+        ttl, err := client.PTTL(ctx, key).Result()
+        if err != nil || ttl &lt;= 0 </span><span class="cov0" title="0">{
+                return int64(window.Seconds())
+        }</span>
+        <span class="cov0" title="0">seconds := int64((ttl + time.Second - 1) / time.Second)
+        if seconds &lt; 1 </span><span class="cov0" title="0">{
+                return 1
+        }</span>
+        <span class="cov0" title="0">return seconds</span>
+}
+</pre>
+		
+		<pre class="file" id="file20" style="display: none">package middleware
+
+import "github.com/gin-gonic/gin"
+
+// SecurityHeaders applies baseline HTTP security headers.
+func SecurityHeaders() gin.HandlerFunc <span class="cov0" title="0">{
+        return func(c *gin.Context) </span><span class="cov0" title="0">{
+                c.Header("X-Content-Type-Options", "nosniff")
+                c.Header("X-Frame-Options", "DENY")
+                c.Header("Referrer-Policy", "no-referrer")
+                c.Header("X-XSS-Protection", "0")
+                c.Header("Cache-Control", "no-store")
+                c.Next()
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file21" style="display: none">package router
+
+import (
+        "net/http"
+
+        "github.com/gin-gonic/gin"
+)
+
+func registerDocsRoutes(r *gin.Engine) <span class="cov0" title="0">{
+        r.StaticFile("/openapi.yaml", "./api/openapi.yaml")
+        r.Static("/docs", "./api/docs")
+
+        r.GET("/swagger", func(c *gin.Context) </span><span class="cov0" title="0">{
+                c.Redirect(http.StatusFound, "/docs/")
+        }</span>)
+}
+</pre>
+		
+		<pre class="file" id="file22" style="display: none">package router
+
+import (
+        "github.com/gin-gonic/gin"
+        "github.com/novacommerce/identity-service/config"
+        "github.com/novacommerce/identity-service/internal/application/port"
+        "github.com/novacommerce/identity-service/internal/infrastructure/http/handler"
+        "github.com/novacommerce/identity-service/internal/infrastructure/http/middleware"
+        "github.com/redis/go-redis/v9"
+        "go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
+)
+
+// Dependencies groups HTTP router dependencies.
+type Dependencies struct {
+        Config        *config.Config
+        RedisClient   *redis.Client
+        JWTService    port.JWTService
+        HealthHandler *handler.HealthHandler
+        AuthHandler   *handler.AuthHandler
+}
+
+// SetupRouter builds the Gin engine with middleware and routes.
+func SetupRouter(deps *Dependencies) *gin.Engine <span class="cov0" title="0">{
+        if deps.Config.Server.Env != "development" </span><span class="cov0" title="0">{
+                gin.SetMode(gin.ReleaseMode)
+        }</span>
+
+        <span class="cov0" title="0">r := gin.New()
+        r.Use(otelgin.Middleware(deps.Config.Telemetry.ServiceName))
+        r.Use(middleware.Recovery())
+        r.Use(middleware.SecurityHeaders())
+        r.Use(middleware.RequestID())
+        r.Use(middleware.InjectLogger())
+        r.Use(middleware.Logger())
+        r.Use(middleware.CORS())
+
+        deps.HealthHandler.RegisterRoutes(r)
+        registerDocsRoutes(r)
+
+        registerLimiter := middleware.RegisterRateLimiter(deps.RedisClient, deps.Config.RateLimit)
+        loginLimiter := middleware.LoginRateLimiter(deps.RedisClient, deps.Config.RateLimit)
+
+        auth := r.Group("/auth")
+        </span><span class="cov0" title="0">{
+                auth.POST("/register", registerLimiter, deps.AuthHandler.Register)
+                auth.POST("/login", loginLimiter, deps.AuthHandler.Login)
+                auth.POST("/refresh", deps.AuthHandler.RefreshToken)
+                auth.POST("/forgot-password", deps.AuthHandler.ForgotPassword)
+                auth.POST("/reset-password", deps.AuthHandler.ResetPassword)
+
+                protected := auth.Group("", middleware.JWTAuthMiddleware(deps.JWTService))
+                </span><span class="cov0" title="0">{
+                        protected.POST("/logout", deps.AuthHandler.Logout)
+                        protected.POST("/logout-all", deps.AuthHandler.LogoutAll)
+                        protected.GET("/me", deps.AuthHandler.GetMe)
+                        protected.PUT("/change-password", deps.AuthHandler.ChangePassword)
+                }</span>
+        }
+
+        <span class="cov0" title="0">return r</span>
+}
+
+// NewRouter is a compatibility wrapper around SetupRouter.
+func NewRouter(cfg *config.Config, deps *Dependencies) *gin.Engine <span class="cov0" title="0">{
+        deps.Config = cfg
+        return SetupRouter(deps)
+}</span>
+</pre>
+		
+		<pre class="file" id="file23" style="display: none">package jwt
+
+import (
+        "crypto/rsa"
+        "crypto/x509"
+        "encoding/pem"
+        "fmt"
+        "os"
+        "time"
+
+        "github.com/golang-jwt/jwt/v5"
+        "github.com/google/uuid"
+        "github.com/novacommerce/identity-service/config"
+        "github.com/novacommerce/identity-service/internal/application/port"
+)
+
+const defaultIssuer = "novacommerce-identity"
+
+type jwtService struct {
+        privateKey *rsa.PrivateKey
+        publicKey  *rsa.PublicKey
+        accessTTL  time.Duration
+        issuer     string
+}
+
+type tokenClaims struct {
+        Email string   `json:"email"`
+        Roles []string `json:"roles"`
+        jwt.RegisteredClaims
+}
+
+// NewJWTService loads RSA keys and returns a JWTService implementation.
+func NewJWTService(cfg config.Config) (port.JWTService, error) <span class="cov0" title="0">{
+        if cfg.JWT.PrivateKeyPath == "" </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("jwt private key path is required")
+        }</span>
+        <span class="cov0" title="0">if cfg.JWT.PublicKeyPath == "" </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("jwt public key path is required")
+        }</span>
+
+        <span class="cov0" title="0">privateKey, err := loadRSAPrivateKey(cfg.JWT.PrivateKeyPath)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("load jwt private key: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">publicKey, err := loadRSAPublicKey(cfg.JWT.PublicKeyPath)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("load jwt public key: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">accessTTL := cfg.JWT.AccessTokenTTL
+        if accessTTL &lt;= 0 </span><span class="cov0" title="0">{
+                accessTTL = 15 * time.Minute
+        }</span>
+        <span class="cov0" title="0">issuer := cfg.JWT.Issuer
+        if issuer == "" </span><span class="cov0" title="0">{
+                issuer = defaultIssuer
+        }</span>
+
+        <span class="cov0" title="0">return &amp;jwtService{
+                privateKey: privateKey,
+                publicKey:  publicKey,
+                accessTTL:  accessTTL,
+                issuer:     issuer,
+        }, nil</span>
+}
+
+func (s *jwtService) GenerateAccessToken(userID uuid.UUID, email string, roles []string) (string, error) <span class="cov0" title="0">{
+        now := time.Now().UTC()
+        claims := tokenClaims{
+                Email: email,
+                Roles: roles,
+                RegisteredClaims: jwt.RegisteredClaims{
+                        Subject:   userID.String(),
+                        Issuer:    s.issuer,
+                        IssuedAt:  jwt.NewNumericDate(now),
+                        ExpiresAt: jwt.NewNumericDate(now.Add(s.accessTTL)),
+                },
+        }
+
+        token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
+        signed, err := token.SignedString(s.privateKey)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", fmt.Errorf("jwtService.GenerateAccessToken: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">return signed, nil</span>
+}
+
+func (s *jwtService) ValidateAccessToken(tokenString string) (*port.Claims, error) <span class="cov0" title="0">{
+        parser := jwt.NewParser(jwt.WithIssuer(s.issuer))
+
+        parsed, err := parser.ParseWithClaims(tokenString, &amp;tokenClaims{}, func(token *jwt.Token) (interface{}, error) </span><span class="cov0" title="0">{
+                if token.Method != jwt.SigningMethodRS256 </span><span class="cov0" title="0">{
+                        return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+                }</span>
+                <span class="cov0" title="0">return s.publicKey, nil</span>
+        })
+        <span class="cov0" title="0">if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("jwtService.ValidateAccessToken: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">claims, ok := parsed.Claims.(*tokenClaims)
+        if !ok || !parsed.Valid </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("jwtService.ValidateAccessToken: invalid token claims")
+        }</span>
+
+        <span class="cov0" title="0">userID, err := uuid.Parse(claims.Subject)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("jwtService.ValidateAccessToken: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">return &amp;port.Claims{
+                UserID: userID,
+                Email:  claims.Email,
+                Roles:  claims.Roles,
+        }, nil</span>
+}
+
+func loadRSAPrivateKey(path string) (*rsa.PrivateKey, error) <span class="cov0" title="0">{
+        data, err := os.ReadFile(path)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("read private key file: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">block, _ := pem.Decode(data)
+        if block == nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("decode private key pem")
+        }</span>
+
+        <span class="cov0" title="0">key, err := x509.ParsePKCS1PrivateKey(block.Bytes)
+        if err != nil </span><span class="cov0" title="0">{
+                parsed, parseErr := x509.ParsePKCS8PrivateKey(block.Bytes)
+                if parseErr != nil </span><span class="cov0" title="0">{
+                        return nil, fmt.Errorf("parse private key: %w", err)
+                }</span>
+                <span class="cov0" title="0">rsaKey, ok := parsed.(*rsa.PrivateKey)
+                if !ok </span><span class="cov0" title="0">{
+                        return nil, fmt.Errorf("private key is not rsa")
+                }</span>
+                <span class="cov0" title="0">return rsaKey, nil</span>
+        }
+
+        <span class="cov0" title="0">return key, nil</span>
+}
+
+func loadRSAPublicKey(path string) (*rsa.PublicKey, error) <span class="cov0" title="0">{
+        data, err := os.ReadFile(path)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("read public key file: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">block, _ := pem.Decode(data)
+        if block == nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("decode public key pem")
+        }</span>
+
+        <span class="cov0" title="0">pub, err := x509.ParsePKIXPublicKey(block.Bytes)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("parse public key: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">rsaKey, ok := pub.(*rsa.PublicKey)
+        if !ok </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("public key is not rsa")
+        }</span>
+
+        <span class="cov0" title="0">return rsaKey, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file24" style="display: none">package messaging
+
+import (
+        "context"
+        "encoding/json"
+        "fmt"
+
+        "github.com/novacommerce/identity-service/internal/application/port"
+        pkglogger "github.com/novacommerce/pkg/logger"
+        "github.com/segmentio/kafka-go"
+        "go.opentelemetry.io/otel/trace"
+)
+
+// KafkaProducer publishes messages to Kafka and can be closed on shutdown.
+type KafkaProducer struct {
+        writer *kafka.Writer
+}
+
+// NewKafkaProducer creates a KafkaProducer backed by segmentio/kafka-go.
+func NewKafkaProducer(brokers []string) (*KafkaProducer, error) <span class="cov0" title="0">{
+        if len(brokers) == 0 </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("at least one kafka broker is required")
+        }</span>
+
+        <span class="cov0" title="0">writer := &amp;kafka.Writer{
+                Addr:         kafka.TCP(brokers...),
+                Balancer:     &amp;kafka.LeastBytes{},
+                RequiredAcks: kafka.RequireAll,
+                Async:        false,
+        }
+
+        return &amp;KafkaProducer{writer: writer}, nil</span>
+}
+
+var _ port.KafkaProducer = (*KafkaProducer)(nil)
+
+func (p *KafkaProducer) Publish(ctx context.Context, topic string, key string, payload interface{}) error <span class="cov0" title="0">{
+        value, err := json.Marshal(payload)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("kafkaProducer.Publish: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">headers := buildKafkaHeaders(ctx)
+        msg := kafka.Message{
+                Topic:   topic,
+                Key:     []byte(key),
+                Value:   value,
+                Headers: headers,
+        }
+
+        if err := p.writer.WriteMessages(ctx, msg); err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("kafkaProducer.Publish: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">return nil</span>
+}
+
+// Close closes the underlying Kafka writer.
+func (p *KafkaProducer) Close() error <span class="cov0" title="0">{
+        if p == nil || p.writer == nil </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+        <span class="cov0" title="0">return p.writer.Close()</span>
+}
+
+func buildKafkaHeaders(ctx context.Context) []kafka.Header <span class="cov0" title="0">{
+        headers := make([]kafka.Header, 0, 2)
+
+        if traceID := traceIDFromContext(ctx); traceID != "" </span><span class="cov0" title="0">{
+                headers = append(headers, kafka.Header{Key: "trace-id", Value: []byte(traceID)})
+        }</span>
+        <span class="cov0" title="0">if requestID := pkglogger.RequestIDFromContext(ctx); requestID != "" </span><span class="cov0" title="0">{
+                headers = append(headers, kafka.Header{Key: "X-Request-ID", Value: []byte(requestID)})
+        }</span>
+
+        <span class="cov0" title="0">return headers</span>
+}
+
+func traceIDFromContext(ctx context.Context) string <span class="cov0" title="0">{
+        span := trace.SpanFromContext(ctx)
+        if !span.SpanContext().IsValid() </span><span class="cov0" title="0">{
+                return ""
+        }</span>
+        <span class="cov0" title="0">return span.SpanContext().TraceID().String()</span>
+}
+</pre>
+		
+		<pre class="file" id="file25" style="display: none">package postgres
+
+import (
+        "context"
+        "fmt"
+        "time"
+
+        "github.com/exaring/otelpgx"
+        "github.com/jackc/pgx/v5/pgxpool"
+        "github.com/novacommerce/identity-service/config"
+        pkglogger "github.com/novacommerce/pkg/logger"
+)
+
+// NewPool creates a PostgreSQL connection pool with OpenTelemetry tracing.
+func NewPool(ctx context.Context, cfg config.DatabaseConfig, log *pkglogger.Logger) (*pgxpool.Pool, error) <span class="cov0" title="0">{
+        dsn := cfg.BuildDSN()
+        if dsn == "" </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("database DSN is required")
+        }</span>
+
+        <span class="cov0" title="0">maxOpen := cfg.MaxConns
+        if maxOpen &lt;= 0 </span><span class="cov0" title="0">{
+                maxOpen = 25
+        }</span>
+        <span class="cov0" title="0">maxIdle := cfg.MinConns
+        if maxIdle &lt;= 0 </span><span class="cov0" title="0">{
+                maxIdle = 5
+        }</span>
+        <span class="cov0" title="0">connMaxLifetime := cfg.ConnMaxLifetime
+        if connMaxLifetime &lt;= 0 </span><span class="cov0" title="0">{
+                connMaxLifetime = 300 * time.Second
+        }</span>
+
+        <span class="cov0" title="0">poolConfig, err := pgxpool.ParseConfig(dsn)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("parse database config: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">poolConfig.MaxConns = int32(maxOpen)
+        poolConfig.MinConns = int32(maxIdle)
+        poolConfig.MaxConnLifetime = connMaxLifetime
+        poolConfig.ConnConfig.Tracer = otelpgx.NewTracer()
+
+        pool, err := pgxpool.NewWithConfig(ctx, poolConfig)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("create database pool: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">if err := pool.Ping(ctx); err != nil </span><span class="cov0" title="0">{
+                pool.Close()
+                return nil, fmt.Errorf("ping database: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">log.Info().
+                Int("max_conns", maxOpen).
+                Int("min_conns", maxIdle).
+                Msg("connected to PostgreSQL")
+
+        return pool, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file26" style="display: none">package postgres
+
+import (
+        "context"
+        "errors"
+        "fmt"
+
+        "github.com/google/uuid"
+        "github.com/jackc/pgx/v5"
+        "github.com/jackc/pgx/v5/pgxpool"
+        "github.com/novacommerce/identity-service/internal/domain/entity"
+        "github.com/novacommerce/identity-service/internal/domain/repository"
+        apperrors "github.com/novacommerce/pkg/errors"
+)
+
+const passwordResetTokenColumns = `id, user_id, token_hash, expires_at, used_at, created_at`
+
+type passwordResetPostgresRepo struct {
+        pool *pgxpool.Pool
+}
+
+// NewPasswordResetPostgresRepo creates a PostgreSQL-backed PasswordResetTokenRepository.
+func NewPasswordResetPostgresRepo(pool *pgxpool.Pool) repository.PasswordResetTokenRepository <span class="cov0" title="0">{
+        return &amp;passwordResetPostgresRepo{pool: pool}
+}</span>
+
+func (r *passwordResetPostgresRepo) Create(ctx context.Context, token *entity.PasswordResetToken) error <span class="cov0" title="0">{
+        query := `
+                INSERT INTO password_reset_tokens (id, user_id, token_hash, expires_at, created_at)
+                VALUES ($1, $2, $3, $4, $5)
+                RETURNING ` + passwordResetTokenColumns
+
+        row := r.pool.QueryRow(ctx, query,
+                token.ID,
+                token.UserID,
+                token.TokenHash,
+                token.ExpiresAt,
+                token.CreatedAt,
+        )
+
+        created, err := scanPasswordResetToken(row)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("passwordResetPostgresRepo.Create: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">*token = *created
+        return nil</span>
+}
+
+func (r *passwordResetPostgresRepo) FindByTokenHash(ctx context.Context, hash string) (*entity.PasswordResetToken, error) <span class="cov0" title="0">{
+        query := `
+                SELECT ` + passwordResetTokenColumns + `
+                FROM password_reset_tokens
+                WHERE token_hash = $1 AND used_at IS NULL AND expires_at &gt; NOW()
+                LIMIT 1
+        `
+
+        row := r.pool.QueryRow(ctx, query, hash)
+        token, err := scanPasswordResetToken(row)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, mapPasswordResetError("FindByTokenHash", err)
+        }</span>
+        <span class="cov0" title="0">return token, nil</span>
+}
+
+func (r *passwordResetPostgresRepo) MarkUsed(ctx context.Context, id uuid.UUID) error <span class="cov0" title="0">{
+        tag, err := r.pool.Exec(ctx, `
+                UPDATE password_reset_tokens
+                SET used_at = NOW()
+                WHERE id = $1 AND used_at IS NULL
+        `, id)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("passwordResetPostgresRepo.MarkUsed: %w", err)
+        }</span>
+        <span class="cov0" title="0">if tag.RowsAffected() == 0 </span><span class="cov0" title="0">{
+                return apperrors.NewNotFound("password reset token not found")
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (r *passwordResetPostgresRepo) DeleteExpiredByUserID(ctx context.Context, userID uuid.UUID) error <span class="cov0" title="0">{
+        _, err := r.pool.Exec(ctx, `
+                DELETE FROM password_reset_tokens
+                WHERE user_id = $1 AND (expires_at &lt; NOW() OR used_at IS NOT NULL)
+        `, userID)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("passwordResetPostgresRepo.DeleteExpiredByUserID: %w", err)
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+
+func scanPasswordResetToken(row pgx.Row) (*entity.PasswordResetToken, error) <span class="cov0" title="0">{
+        var token entity.PasswordResetToken
+        err := row.Scan(
+                &amp;token.ID,
+                &amp;token.UserID,
+                &amp;token.TokenHash,
+                &amp;token.ExpiresAt,
+                &amp;token.UsedAt,
+                &amp;token.CreatedAt,
+        )
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">return &amp;token, nil</span>
+}
+
+func mapPasswordResetError(method string, err error) error <span class="cov0" title="0">{
+        if errors.Is(err, pgx.ErrNoRows) </span><span class="cov0" title="0">{
+                return apperrors.NewNotFound("password reset token not found")
+        }</span>
+        <span class="cov0" title="0">return fmt.Errorf("passwordResetPostgresRepo.%s: %w", method, err)</span>
+}
+</pre>
+		
+		<pre class="file" id="file27" style="display: none">package postgres
+
+import (
+        "context"
+        "encoding/json"
+        "errors"
+        "fmt"
+
+        "github.com/google/uuid"
+        "github.com/jackc/pgx/v5"
+        "github.com/jackc/pgx/v5/pgxpool"
+        "github.com/novacommerce/identity-service/internal/domain/entity"
+        "github.com/novacommerce/identity-service/internal/domain/repository"
+        apperrors "github.com/novacommerce/pkg/errors"
+)
+
+const refreshTokenColumns = `id, user_id, token_hash, expires_at, revoked_at, device_info, created_at`
+
+type refreshTokenPostgresRepo struct {
+        pool *pgxpool.Pool
+}
+
+// NewRefreshTokenPostgresRepo creates a PostgreSQL-backed RefreshTokenRepository.
+func NewRefreshTokenPostgresRepo(pool *pgxpool.Pool) repository.RefreshTokenRepository <span class="cov0" title="0">{
+        return &amp;refreshTokenPostgresRepo{pool: pool}
+}</span>
+
+func (r *refreshTokenPostgresRepo) Create(ctx context.Context, token *entity.RefreshToken) error <span class="cov0" title="0">{
+        deviceInfo, err := encodeDeviceInfo(token.IPAddress, token.UserAgent)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("refreshTokenPostgresRepo.Create: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">query := `
+                INSERT INTO refresh_tokens (id, user_id, token_hash, expires_at, device_info, created_at)
+                VALUES ($1, $2, $3, $4, $5, $6)
+                RETURNING ` + refreshTokenColumns
+
+        row := r.pool.QueryRow(ctx, query,
+                token.ID,
+                token.UserID,
+                token.TokenHash,
+                token.ExpiresAt,
+                deviceInfo,
+                token.CreatedAt,
+        )
+
+        created, err := scanRefreshToken(row)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("refreshTokenPostgresRepo.Create: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">*token = *created
+        return nil</span>
+}
+
+func (r *refreshTokenPostgresRepo) FindByTokenHash(ctx context.Context, hash string) (*entity.RefreshToken, error) <span class="cov0" title="0">{
+        query := `
+                SELECT ` + refreshTokenColumns + `
+                FROM refresh_tokens
+                WHERE token_hash = $1 AND revoked_at IS NULL AND status = 'active'
+                LIMIT 1
+        `
+
+        row := r.pool.QueryRow(ctx, query, hash)
+        token, err := scanRefreshToken(row)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, mapRefreshTokenError("FindByTokenHash", err)
+        }</span>
+        <span class="cov0" title="0">return token, nil</span>
+}
+
+func (r *refreshTokenPostgresRepo) RevokeByID(ctx context.Context, id uuid.UUID) error <span class="cov0" title="0">{
+        tag, err := r.pool.Exec(ctx, `
+                UPDATE refresh_tokens
+                SET revoked_at = NOW(), status = 'revoked'
+                WHERE id = $1 AND revoked_at IS NULL
+        `, id)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("refreshTokenPostgresRepo.RevokeByID: %w", err)
+        }</span>
+        <span class="cov0" title="0">if tag.RowsAffected() == 0 </span><span class="cov0" title="0">{
+                return apperrors.NewNotFound("refresh token not found")
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (r *refreshTokenPostgresRepo) RevokeAllByUserID(ctx context.Context, userID uuid.UUID) error <span class="cov0" title="0">{
+        _, err := r.pool.Exec(ctx, `
+                UPDATE refresh_tokens
+                SET revoked_at = NOW(), status = 'revoked'
+                WHERE user_id = $1 AND revoked_at IS NULL
+        `, userID)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("refreshTokenPostgresRepo.RevokeAllByUserID: %w", err)
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (r *refreshTokenPostgresRepo) DeleteExpired(ctx context.Context) error <span class="cov0" title="0">{
+        _, err := r.pool.Exec(ctx, `
+                DELETE FROM refresh_tokens
+                WHERE expires_at &lt; NOW()
+        `)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("refreshTokenPostgresRepo.DeleteExpired: %w", err)
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+
+func scanRefreshToken(row pgx.Row) (*entity.RefreshToken, error) <span class="cov0" title="0">{
+        var token entity.RefreshToken
+        var deviceInfo []byte
+
+        err := row.Scan(
+                &amp;token.ID,
+                &amp;token.UserID,
+                &amp;token.TokenHash,
+                &amp;token.ExpiresAt,
+                &amp;token.RevokedAt,
+                &amp;deviceInfo,
+                &amp;token.CreatedAt,
+        )
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">if len(deviceInfo) &gt; 0 </span><span class="cov0" title="0">{
+                ip, ua, decodeErr := decodeDeviceInfo(deviceInfo)
+                if decodeErr != nil </span><span class="cov0" title="0">{
+                        return nil, decodeErr
+                }</span>
+                <span class="cov0" title="0">token.IPAddress = ip
+                token.UserAgent = ua</span>
+        }
+
+        <span class="cov0" title="0">return &amp;token, nil</span>
+}
+
+type deviceInfoPayload struct {
+        IPAddress string `json:"ip_address"`
+        UserAgent string `json:"user_agent"`
+}
+
+func encodeDeviceInfo(ipAddress, userAgent string) ([]byte, error) <span class="cov0" title="0">{
+        if ipAddress == "" &amp;&amp; userAgent == "" </span><span class="cov0" title="0">{
+                return nil, nil
+        }</span>
+        <span class="cov0" title="0">return json.Marshal(deviceInfoPayload{
+                IPAddress: ipAddress,
+                UserAgent: userAgent,
+        })</span>
+}
+
+func decodeDeviceInfo(data []byte) (string, string, error) <span class="cov0" title="0">{
+        var payload deviceInfoPayload
+        if err := json.Unmarshal(data, &amp;payload); err != nil </span><span class="cov0" title="0">{
+                return "", "", fmt.Errorf("decode device info: %w", err)
+        }</span>
+        <span class="cov0" title="0">return payload.IPAddress, payload.UserAgent, nil</span>
+}
+
+func mapRefreshTokenError(method string, err error) error <span class="cov0" title="0">{
+        if errors.Is(err, pgx.ErrNoRows) </span><span class="cov0" title="0">{
+                return apperrors.NewNotFound("refresh token not found")
+        }</span>
+        <span class="cov0" title="0">return fmt.Errorf("refreshTokenPostgresRepo.%s: %w", method, err)</span>
+}
+</pre>
+		
+		<pre class="file" id="file28" style="display: none">package postgres
+
+import (
+        "context"
+        "errors"
+        "fmt"
+
+        "github.com/google/uuid"
+        "github.com/jackc/pgx/v5"
+        "github.com/jackc/pgx/v5/pgxpool"
+        "github.com/novacommerce/identity-service/internal/domain/entity"
+        "github.com/novacommerce/identity-service/internal/domain/repository"
+        apperrors "github.com/novacommerce/pkg/errors"
+)
+
+const userColumns = `id, username, email, password_hash, phone, full_name, avatar_url, status, last_login_at, created_at, updated_at`
+
+type userPostgresRepo struct {
+        pool *pgxpool.Pool
+}
+
+// NewUserPostgresRepo creates a PostgreSQL-backed UserRepository.
+func NewUserPostgresRepo(pool *pgxpool.Pool) repository.UserRepository <span class="cov0" title="0">{
+        return &amp;userPostgresRepo{pool: pool}
+}</span>
+
+func (r *userPostgresRepo) Create(ctx context.Context, user *entity.User) error <span class="cov0" title="0">{
+        query := `
+                INSERT INTO users (
+                        id, username, email, password_hash, phone, full_name, avatar_url, status, created_at, updated_at
+                ) VALUES ($1, $2, $3, $4, NULLIF($5, ''), $6, NULLIF($7, ''), $8, $9, $10)
+                RETURNING ` + userColumns
+
+        row := r.pool.QueryRow(ctx, query,
+                user.ID,
+                user.Username,
+                user.Email,
+                user.PasswordHash,
+                user.Phone,
+                user.FullName,
+                user.AvatarURL,
+                user.Status,
+                user.CreatedAt,
+                user.UpdatedAt,
+        )
+
+        created, err := scanUser(row)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("userPostgresRepo.Create: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">*user = *created
+        return nil</span>
+}
+
+func (r *userPostgresRepo) FindByID(ctx context.Context, id uuid.UUID) (*entity.User, error) <span class="cov0" title="0">{
+        query := `SELECT ` + userColumns + ` FROM users WHERE id = $1 LIMIT 1`
+        return r.findOne(ctx, query, id)
+}</span>
+
+func (r *userPostgresRepo) FindByEmail(ctx context.Context, email string) (*entity.User, error) <span class="cov0" title="0">{
+        query := `SELECT ` + userColumns + ` FROM users WHERE email = $1 LIMIT 1`
+        return r.findOne(ctx, query, email)
+}</span>
+
+func (r *userPostgresRepo) FindByUsername(ctx context.Context, username string) (*entity.User, error) <span class="cov0" title="0">{
+        query := `SELECT ` + userColumns + ` FROM users WHERE username = $1 LIMIT 1`
+        return r.findOne(ctx, query, username)
+}</span>
+
+func (r *userPostgresRepo) FindByEmailOrUsername(ctx context.Context, identifier string) (*entity.User, error) <span class="cov0" title="0">{
+        query := `SELECT ` + userColumns + ` FROM users WHERE (email = $1 OR username = $1) LIMIT 1`
+        return r.findOne(ctx, query, identifier)
+}</span>
+
+func (r *userPostgresRepo) Update(ctx context.Context, user *entity.User) error <span class="cov0" title="0">{
+        query := `
+                UPDATE users
+                SET full_name = $2,
+                    phone = NULLIF($3, ''),
+                    avatar_url = NULLIF($4, ''),
+                    status = $5,
+                    updated_at = NOW()
+                WHERE id = $1
+                RETURNING ` + userColumns
+
+        row := r.pool.QueryRow(ctx, query,
+                user.ID,
+                user.FullName,
+                user.Phone,
+                user.AvatarURL,
+                user.Status,
+        )
+
+        updated, err := scanUser(row)
+        if err != nil </span><span class="cov0" title="0">{
+                return mapUserError("Update", err)
+        }</span>
+
+        <span class="cov0" title="0">*user = *updated
+        return nil</span>
+}
+
+func (r *userPostgresRepo) UpdatePassword(ctx context.Context, userID uuid.UUID, passwordHash string) error <span class="cov0" title="0">{
+        tag, err := r.pool.Exec(ctx, `
+                UPDATE users
+                SET password_hash = $2, updated_at = NOW()
+                WHERE id = $1
+        `, userID, passwordHash)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("userPostgresRepo.UpdatePassword: %w", err)
+        }</span>
+        <span class="cov0" title="0">if tag.RowsAffected() == 0 </span><span class="cov0" title="0">{
+                return apperrors.NewNotFound("user not found")
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (r *userPostgresRepo) UpdateLastLogin(ctx context.Context, userID uuid.UUID) error <span class="cov0" title="0">{
+        tag, err := r.pool.Exec(ctx, `
+                UPDATE users
+                SET last_login_at = NOW(), updated_at = NOW()
+                WHERE id = $1
+        `, userID)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("userPostgresRepo.UpdateLastLogin: %w", err)
+        }</span>
+        <span class="cov0" title="0">if tag.RowsAffected() == 0 </span><span class="cov0" title="0">{
+                return apperrors.NewNotFound("user not found")
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (r *userPostgresRepo) findOne(ctx context.Context, query string, arg any) (*entity.User, error) <span class="cov0" title="0">{
+        row := r.pool.QueryRow(ctx, query, arg)
+        user, err := scanUser(row)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, mapUserError("findOne", err)
+        }</span>
+        <span class="cov0" title="0">return user, nil</span>
+}
+
+func scanUser(row pgx.Row) (*entity.User, error) <span class="cov0" title="0">{
+        var user entity.User
+        var phone, avatarURL *string
+
+        err := row.Scan(
+                &amp;user.ID,
+                &amp;user.Username,
+                &amp;user.Email,
+                &amp;user.PasswordHash,
+                &amp;phone,
+                &amp;user.FullName,
+                &amp;avatarURL,
+                &amp;user.Status,
+                &amp;user.LastLoginAt,
+                &amp;user.CreatedAt,
+                &amp;user.UpdatedAt,
+        )
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">if phone != nil </span><span class="cov0" title="0">{
+                user.Phone = *phone
+        }</span>
+        <span class="cov0" title="0">if avatarURL != nil </span><span class="cov0" title="0">{
+                user.AvatarURL = *avatarURL
+        }</span>
+
+        <span class="cov0" title="0">return &amp;user, nil</span>
+}
+
+func mapUserError(method string, err error) error <span class="cov0" title="0">{
+        if errors.Is(err, pgx.ErrNoRows) </span><span class="cov0" title="0">{
+                return apperrors.NewNotFound("user not found")
+        }</span>
+        <span class="cov0" title="0">return fmt.Errorf("userPostgresRepo.%s: %w", method, err)</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

@@ -1,4 +1,4 @@
-.PHONY: test-unit test-integration test-coverage
+.PHONY: test-unit test-integration test-coverage swagger
 
 test-unit:
 	go test ./... -tags unit -v -count=1
@@ -9,3 +9,6 @@ test-integration:
 test-coverage:
 	go test ./... -tags unit -coverprofile=coverage.out -covermode=atomic
 	go tool cover -html=coverage.out -o coverage.html
+
+swagger:
+	go test ./api -run TestOpenAPISpecIsValid -count=1

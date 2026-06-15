@@ -14,12 +14,13 @@ import (
 	"github.com/novacommerce/identity-service/internal/application/port"
 )
 
-const issuer = "novacommerce-identity"
+const defaultIssuer = "novacommerce-identity"
 
 type jwtService struct {
 	privateKey *rsa.PrivateKey
 	publicKey  *rsa.PublicKey
 	accessTTL  time.Duration
+	issuer     string
 }
 
 type tokenClaims struct {
@@ -47,12 +48,20 @@ func NewJWTService(cfg config.Config) (port.JWTService, error) {
 		return nil, fmt.Errorf("load jwt public key: %w", err)
 	}
 
-	accessTTL := time.Duration(cfg.JWT.AccessTokenTTL) * time.Minute
+	accessTTL := cfg.JWT.AccessTokenTTL
+	if accessTTL <= 0 {
+		accessTTL = 15 * time.Minute
+	}
+	issuer := cfg.JWT.Issuer
+	if issuer == "" {
+		issuer = defaultIssuer
+	}
 
 	return &jwtService{
 		privateKey: privateKey,
 		publicKey:  publicKey,
 		accessTTL:  accessTTL,
+		issuer:     issuer,
 	}, nil
 }
 
@@ -63,7 +72,7 @@ func (s *jwtService) GenerateAccessToken(userID uuid.UUID, email string, roles [
 		Roles: roles,
 		RegisteredClaims: jwt.RegisteredClaims{
 			Subject:   userID.String(),
-			Issuer:    issuer,
+			Issuer:    s.issuer,
 			IssuedAt:  jwt.NewNumericDate(now),
 			ExpiresAt: jwt.NewNumericDate(now.Add(s.accessTTL)),
 		},
@@ -79,7 +88,7 @@ func (s *jwtService) GenerateAccessToken(userID uuid.UUID, email string, roles [
 }
 
 func (s *jwtService) ValidateAccessToken(tokenString string) (*port.Claims, error) {
-	parser := jwt.NewParser(jwt.WithIssuer(issuer))
+	parser := jwt.NewParser(jwt.WithIssuer(s.issuer))
 
 	parsed, err := parser.ParseWithClaims(tokenString, &tokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if token.Method != jwt.SigningMethodRS256 {

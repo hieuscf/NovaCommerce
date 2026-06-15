@@ -21,22 +21,24 @@ type Dependencies struct {
 
 // SetupRouter builds the Gin engine with middleware and routes.
 func SetupRouter(deps *Dependencies) *gin.Engine {
-	if deps.Config.App.Env != "development" {
+	if deps.Config.Server.Env != "development" {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
 	r := gin.New()
 	r.Use(otelgin.Middleware(deps.Config.Telemetry.ServiceName))
 	r.Use(middleware.Recovery())
+	r.Use(middleware.SecurityHeaders())
 	r.Use(middleware.RequestID())
 	r.Use(middleware.InjectLogger())
 	r.Use(middleware.Logger())
 	r.Use(middleware.CORS())
 
 	deps.HealthHandler.RegisterRoutes(r)
+	registerDocsRoutes(r)
 
-	registerLimiter := middleware.RegisterRateLimiter(deps.RedisClient)
-	loginLimiter := middleware.LoginRateLimiter(deps.RedisClient)
+	registerLimiter := middleware.RegisterRateLimiter(deps.RedisClient, deps.Config.RateLimit)
+	loginLimiter := middleware.LoginRateLimiter(deps.RedisClient, deps.Config.RateLimit)
 
 	auth := r.Group("/auth")
 	{

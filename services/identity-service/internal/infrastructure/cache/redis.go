@@ -11,14 +11,21 @@ import (
 
 // NewRedisClient creates and verifies a Redis client.
 func NewRedisClient(ctx context.Context, cfg config.RedisConfig, log *pkglogger.Logger) (*redis.Client, error) {
-	if cfg.Addr == "" {
+	addr := cfg.BuildAddr()
+	if addr == "" {
 		return nil, fmt.Errorf("redis address is required")
 	}
 
+	poolSize := cfg.PoolSize
+	if poolSize <= 0 {
+		poolSize = 10
+	}
+
 	client := redis.NewClient(&redis.Options{
-		Addr:     cfg.Addr,
+		Addr:     addr,
 		Password: cfg.Password,
 		DB:       cfg.DB,
+		PoolSize: poolSize,
 	})
 
 	if err := client.Ping(ctx).Err(); err != nil {
@@ -28,7 +35,7 @@ func NewRedisClient(ctx context.Context, cfg config.RedisConfig, log *pkglogger.
 		return nil, fmt.Errorf("ping redis: %w", err)
 	}
 
-	log.Info().Str("addr", cfg.Addr).Msg("connected to Redis")
+	log.Info().Str("addr", addr).Msg("connected to Redis")
 
 	return client, nil
 }

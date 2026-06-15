@@ -27,7 +27,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	log := pkglogger.New(cfg.App.Name, cfg.App.Env, cfg.App.LogLevel)
+	log := pkglogger.New(cfg.Server.Name, cfg.Server.Env, cfg.Server.LogLevel)
 
 	shutdownTelemetry, err := initTelemetry(ctx, cfg, Version)
 	if err != nil {
@@ -52,13 +52,16 @@ func main() {
 	defer app.close(log)
 
 	srv := &http.Server{
-		Addr:              fmt.Sprintf(":%d", cfg.App.Port),
+		Addr:              fmt.Sprintf(":%d", cfg.Server.Port),
 		Handler:           app.engine,
+		ReadTimeout:       cfg.Server.ReadTimeout,
+		WriteTimeout:      cfg.Server.WriteTimeout,
+		IdleTimeout:       cfg.Server.IdleTimeout,
 		ReadHeaderTimeout: 10 * time.Second,
 	}
 
 	go func() {
-		log.Info().Int("port", cfg.App.Port).Str("version", Version).Msg("starting HTTP server")
+		log.Info().Int("port", cfg.Server.Port).Str("version", Version).Msg("starting HTTP server")
 		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			log.Error().Err(err).Msg("HTTP server failed")
 			os.Exit(1)
@@ -71,7 +74,7 @@ func main() {
 
 	log.Info().Msg("shutting down server")
 
-	shutdownCtx, cancel := context.WithTimeout(context.Background(), time.Duration(cfg.App.GracefulTTL)*time.Second)
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), time.Duration(cfg.Server.GracefulTTL)*time.Second)
 	defer cancel()
 
 	if err := srv.Shutdown(shutdownCtx); err != nil {

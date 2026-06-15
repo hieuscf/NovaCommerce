@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -60,7 +59,7 @@ func wireApp(ctx context.Context, cfg *config.Config, log *pkglogger.Logger) (*w
 	}
 
 	emailService := email.NewLogEmailService(log)
-	useCaseRateLimiter := cache.NewUseCaseRateLimiter(redisClient, 5, 15*time.Minute)
+	useCaseRateLimiter := cache.NewUseCaseRateLimiter(redisClient, cfg.RateLimit.LoginMaxAttempts, cfg.RateLimit.LoginWindow)
 
 	authUseCase := usecase.NewAuthUseCase(
 		userRepo,
@@ -72,7 +71,7 @@ func wireApp(ctx context.Context, cfg *config.Config, log *pkglogger.Logger) (*w
 		useCaseRateLimiter,
 	)
 
-	healthService := service.NewHealthService(pool, redisClient, cfg.App.Name)
+	healthService := service.NewHealthService(pool, redisClient, cfg.Server.Name)
 	healthHandler := handler.NewHealthHandler(healthService)
 	authHandler := handler.NewAuthHandler(authUseCase)
 
