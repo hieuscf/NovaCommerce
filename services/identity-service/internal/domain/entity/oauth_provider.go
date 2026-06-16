@@ -1,8 +1,15 @@
 package entity
 
-import "time"
+import (
+	"errors"
+	"time"
+)
 
-// Supported OAuth provider identifiers — must match the oauth_provider DB enum.
+// ErrOAuthEmailRequired is returned by an OAuthProvider when the OAuth flow
+// completes but the provider does not supply an email address.
+var ErrOAuthEmailRequired = errors.New("oauth: provider did not return an email address")
+
+// Supported OAuth provider identifiers — must match the oauth_accounts.provider column.
 const (
 	ProviderGoogle   = "google"
 	ProviderFacebook = "facebook"

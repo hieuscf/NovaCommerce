@@ -21,6 +21,7 @@ type Config struct {
 	RateLimit RateLimitConfig `mapstructure:"rate_limit"`
 	Telemetry TelemetryConfig `mapstructure:"telemetry"`
 	HTTP      HTTPConfig      `mapstructure:"http"`
+	OAuth     OAuthConfig     `mapstructure:"oauth"`
 }
 
 // ServerConfig holds HTTP server settings.
@@ -133,6 +134,19 @@ type HTTPConfig struct {
 	CORSAllowOrigins []string `mapstructure:"cors_allow_origins"`
 }
 
+// OAuthConfig groups per-provider OAuth2 credentials.
+type OAuthConfig struct {
+	Google   OAuthProviderConfig `mapstructure:"google"`
+	Facebook OAuthProviderConfig `mapstructure:"facebook"`
+}
+
+// OAuthProviderConfig holds the credentials for a single OAuth2 provider.
+type OAuthProviderConfig struct {
+	ClientID     string `mapstructure:"client_id"`
+	ClientSecret string `mapstructure:"client_secret"`
+	RedirectURL  string `mapstructure:"redirect_url"`
+}
+
 // Load reads configuration from config.yaml with environment variable overrides.
 func Load() (*Config, error) {
 	_ = gotenv.Load(".env")
@@ -213,6 +227,18 @@ func Load() (*Config, error) {
 		},
 		HTTP: HTTPConfig{
 			CORSAllowOrigins: v.GetStringSlice("http.cors_allow_origins"),
+		},
+		OAuth: OAuthConfig{
+			Google: OAuthProviderConfig{
+				ClientID:     v.GetString("oauth.google.client_id"),
+				ClientSecret: v.GetString("oauth.google.client_secret"),
+				RedirectURL:  v.GetString("oauth.google.redirect_url"),
+			},
+			Facebook: OAuthProviderConfig{
+				ClientID:     v.GetString("oauth.facebook.client_id"),
+				ClientSecret: v.GetString("oauth.facebook.client_secret"),
+				RedirectURL:  v.GetString("oauth.facebook.redirect_url"),
+			},
 		},
 	}
 
@@ -328,6 +354,13 @@ func bindEnv(v *viper.Viper) {
 		"telemetry.service_name":  {"TELEMETRY_SERVICE_NAME"},
 
 		"http.cors_allow_origins": {"HTTP_CORS_ALLOW_ORIGINS"},
+
+		"oauth.google.client_id":       {"GOOGLE_CLIENT_ID"},
+		"oauth.google.client_secret":   {"GOOGLE_CLIENT_SECRET"},
+		"oauth.google.redirect_url":    {"GOOGLE_REDIRECT_URL"},
+		"oauth.facebook.client_id":     {"FACEBOOK_CLIENT_ID"},
+		"oauth.facebook.client_secret": {"FACEBOOK_CLIENT_SECRET"},
+		"oauth.facebook.redirect_url":  {"FACEBOOK_REDIRECT_URL"},
 	}
 
 	for key, envs := range envBindings {

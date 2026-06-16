@@ -36,7 +36,7 @@ func (r *oauthPostgresRepo) FindByProvider(ctx context.Context, provider, provid
 		WHERE  provider = $1 AND provider_user_id = $2
 		LIMIT  1`
 
-	row := r.pool.QueryRow(ctx, query, provider, providerUserID)
+	row := extractQuerier(ctx, r.pool).QueryRow(ctx, query, provider, providerUserID)
 	account, err := scanOAuthAccount(row)
 	if err != nil {
 		return nil, mapOAuthError("FindByProvider", err)
@@ -53,7 +53,7 @@ func (r *oauthPostgresRepo) FindByUserID(ctx context.Context, userID uuid.UUID) 
 		WHERE  user_id = $1
 		ORDER  BY created_at DESC`
 
-	rows, err := r.pool.Query(ctx, query, userID)
+	rows, err := extractQuerier(ctx, r.pool).Query(ctx, query, userID)
 	if err != nil {
 		return nil, fmt.Errorf("oauthPostgresRepo.FindByUserID: %w", err)
 	}
@@ -91,7 +91,7 @@ func (r *oauthPostgresRepo) Create(ctx context.Context, account *entity.OAuthAcc
 		ON CONFLICT (provider, provider_user_id) DO NOTHING
 		RETURNING ` + oauthAccountColumns
 
-	row := r.pool.QueryRow(ctx, query,
+	row := extractQuerier(ctx, r.pool).QueryRow(ctx, query,
 		account.ID,
 		account.UserID,
 		account.Provider,
@@ -135,7 +135,7 @@ func (r *oauthPostgresRepo) Update(ctx context.Context, account *entity.OAuthAcc
 		WHERE  id = $1
 		RETURNING ` + oauthAccountColumns
 
-	row := r.pool.QueryRow(ctx, query,
+	row := extractQuerier(ctx, r.pool).QueryRow(ctx, query,
 		account.ID,
 		account.Email,
 		account.Name,
@@ -156,7 +156,7 @@ func (r *oauthPostgresRepo) Update(ctx context.Context, account *entity.OAuthAcc
 
 // Delete hard-deletes an OAuth account by primary key.
 func (r *oauthPostgresRepo) Delete(ctx context.Context, id uuid.UUID) error {
-	tag, err := r.pool.Exec(ctx, `DELETE FROM oauth_accounts WHERE id = $1`, id)
+	tag, err := extractQuerier(ctx, r.pool).Exec(ctx, `DELETE FROM oauth_accounts WHERE id = $1`, id)
 	if err != nil {
 		return fmt.Errorf("oauthPostgresRepo.Delete: %w", err)
 	}

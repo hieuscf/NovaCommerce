@@ -31,7 +31,7 @@ func (r *userPostgresRepo) Create(ctx context.Context, user *entity.User) error 
 		) VALUES ($1, $2, $3, $4, NULLIF($5, ''), $6, NULLIF($7, ''), $8, $9, $10)
 		RETURNING ` + userColumns
 
-	row := r.pool.QueryRow(ctx, query,
+	row := extractQuerier(ctx, r.pool).QueryRow(ctx, query,
 		user.ID,
 		user.Username,
 		user.Email,
@@ -84,7 +84,7 @@ func (r *userPostgresRepo) Update(ctx context.Context, user *entity.User) error 
 		WHERE id = $1
 		RETURNING ` + userColumns
 
-	row := r.pool.QueryRow(ctx, query,
+	row := extractQuerier(ctx, r.pool).QueryRow(ctx, query,
 		user.ID,
 		user.FullName,
 		user.Phone,
@@ -102,7 +102,7 @@ func (r *userPostgresRepo) Update(ctx context.Context, user *entity.User) error 
 }
 
 func (r *userPostgresRepo) UpdatePassword(ctx context.Context, userID uuid.UUID, passwordHash string) error {
-	tag, err := r.pool.Exec(ctx, `
+	tag, err := extractQuerier(ctx, r.pool).Exec(ctx, `
 		UPDATE users
 		SET password_hash = $2, updated_at = NOW()
 		WHERE id = $1
@@ -117,7 +117,7 @@ func (r *userPostgresRepo) UpdatePassword(ctx context.Context, userID uuid.UUID,
 }
 
 func (r *userPostgresRepo) UpdateLastLogin(ctx context.Context, userID uuid.UUID) error {
-	tag, err := r.pool.Exec(ctx, `
+	tag, err := extractQuerier(ctx, r.pool).Exec(ctx, `
 		UPDATE users
 		SET last_login_at = NOW(), updated_at = NOW()
 		WHERE id = $1
@@ -132,7 +132,7 @@ func (r *userPostgresRepo) UpdateLastLogin(ctx context.Context, userID uuid.UUID
 }
 
 func (r *userPostgresRepo) findOne(ctx context.Context, query string, arg any) (*entity.User, error) {
-	row := r.pool.QueryRow(ctx, query, arg)
+	row := extractQuerier(ctx, r.pool).QueryRow(ctx, query, arg)
 	user, err := scanUser(row)
 	if err != nil {
 		return nil, mapUserError("findOne", err)
