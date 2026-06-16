@@ -7,14 +7,17 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/novacommerce/identity-service/config"
+	"github.com/novacommerce/identity-service/internal/application/port"
 	"github.com/novacommerce/identity-service/internal/application/service"
 	"github.com/novacommerce/identity-service/internal/application/usecase"
+	"github.com/novacommerce/identity-service/internal/domain/entity"
 	"github.com/novacommerce/identity-service/internal/infrastructure/cache"
 	"github.com/novacommerce/identity-service/internal/infrastructure/email"
 	"github.com/novacommerce/identity-service/internal/infrastructure/http/handler"
 	"github.com/novacommerce/identity-service/internal/infrastructure/http/router"
 	infrajwt "github.com/novacommerce/identity-service/internal/infrastructure/jwt"
 	"github.com/novacommerce/identity-service/internal/infrastructure/messaging"
+	infraoauth "github.com/novacommerce/identity-service/internal/infrastructure/oauth"
 	"github.com/novacommerce/identity-service/internal/infrastructure/persistence/postgres"
 	pkglogger "github.com/novacommerce/pkg/logger"
 	"github.com/redis/go-redis/v9"
@@ -49,6 +52,9 @@ func wireApp(ctx context.Context, cfg *config.Config, log *pkglogger.Logger) (*w
 	userRepo := postgres.NewUserPostgresRepo(pool)
 	refreshTokenRepo := postgres.NewRefreshTokenPostgresRepo(pool)
 	passwordResetRepo := postgres.NewPasswordResetPostgresRepo(pool)
+	oauthRepo := postgres.NewOAuthPostgresRepo(pool)
+	outboxRepo := postgres.NewOutboxPostgresRepo(pool)
+	transactor := postgres.NewTransactor(pool)
 
 	jwtService, err := infrajwt.NewJWTService(*cfg)
 	if err != nil {
@@ -71,9 +77,28 @@ func wireApp(ctx context.Context, cfg *config.Config, log *pkglogger.Logger) (*w
 		useCaseRateLimiter,
 	)
 
+	oauthProviders := map[string]port.OAuthProvider{
+		entity.ProviderGoogle:   infraoauth.NewGoogleProvider(cfg.OAuth.Google),
+		entity.ProviderFacebook: infraoauth.NewFacebookProvider(cfg.OAuth.Facebook),
+	}
+	stateManager := infraoauth.NewStateManager(redisClient)
+
+	oauthUseCase := usecase.NewOAuthUseCase(
+		userRepo,
+		oauthRepo,
+		outboxRepo,
+		refreshTokenRepo,
+		jwtService,
+		oauthProviders,
+		stateManager,
+		transactor,
+		kafkaProducer,
+	)
+
 	healthService := service.NewHealthService(pool, redisClient, cfg.Server.Name)
 	healthHandler := handler.NewHealthHandler(healthService)
 	authHandler := handler.NewAuthHandler(authUseCase)
+	oauthHandler := handler.NewOAuthHandler(oauthUseCase)
 
 	engine := router.SetupRouter(&router.Dependencies{
 		Config:        cfg,
@@ -81,6 +106,7 @@ func wireApp(ctx context.Context, cfg *config.Config, log *pkglogger.Logger) (*w
 		JWTService:    jwtService,
 		HealthHandler: healthHandler,
 		AuthHandler:   authHandler,
+		OAuthHandler:  oauthHandler,
 	})
 
 	return &wiredApp{

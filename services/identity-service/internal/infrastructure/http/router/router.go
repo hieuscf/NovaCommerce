@@ -17,6 +17,7 @@ type Dependencies struct {
 	JWTService    port.JWTService
 	HealthHandler *handler.HealthHandler
 	AuthHandler   *handler.AuthHandler
+	OAuthHandler  *handler.OAuthHandler
 }
 
 // SetupRouter builds the Gin engine with middleware and routes.
@@ -54,6 +55,15 @@ func SetupRouter(deps *Dependencies) *gin.Engine {
 			protected.POST("/logout-all", deps.AuthHandler.LogoutAll)
 			protected.GET("/me", deps.AuthHandler.GetMe)
 			protected.PUT("/change-password", deps.AuthHandler.ChangePassword)
+		}
+
+		// OAuth2 social login — no JWT required, CSRF protected via state parameter.
+		if deps.OAuthHandler != nil {
+			oauth := auth.Group("/oauth")
+			{
+				oauth.GET("/:provider", deps.OAuthHandler.Redirect)
+				oauth.GET("/:provider/callback", deps.OAuthHandler.Callback)
+			}
 		}
 	}
 
