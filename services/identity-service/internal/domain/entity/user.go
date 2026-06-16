@@ -84,15 +84,3 @@ type RolePermission struct {
 	RoleID       uuid.UUID `db:"role_id"`
 	PermissionID uuid.UUID `db:"permission_id"`
 }
-
-// OAuthAccount links an external OAuth provider to a user.
-type OAuthAccount struct {
-	ID             uuid.UUID  `db:"id"`
-	UserID         uuid.UUID  `db:"user_id"`
-	Provider       string     `db:"provider"`
-	ProviderUserID string     `db:"provider_user_id"`
-	AccessToken    *string    `db:"access_token"`
-	RefreshToken   *string    `db:"refresh_token"`
-	TokenExpiresAt *time.Time `db:"token_expires_at"`
-	CreatedAt      time.Time  `db:"created_at"`
-}
