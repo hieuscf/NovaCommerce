@@ -14,12 +14,12 @@ type OAuthAccount struct {
 	UserID         uuid.UUID  `db:"user_id"`
 	Provider       string     `db:"provider"`
 	ProviderUserID string     `db:"provider_user_id"`
-	Email          string     `db:"provider_email"`
-	Name           string     `db:"-"`
-	AvatarURL      string     `db:"-"`
+	Email          string     `db:"email"`
+	Name           string     `db:"name"`
+	AvatarURL      string     `db:"avatar_url"`
 	AccessToken    string     `db:"access_token"`
 	RefreshToken   string     `db:"refresh_token"`
-	ExpiresAt      *time.Time `db:"token_expires_at"`
+	ExpiresAt      *time.Time `db:"expires_at"`
 	CreatedAt      time.Time  `db:"created_at"`
 	UpdatedAt      time.Time  `db:"updated_at"`
 }
