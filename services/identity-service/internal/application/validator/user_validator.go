@@ -1,6 +1,7 @@
 package validator
 
 import (
+	"github.com/novacommerce/identity-service/internal/domain/entity"
 	pkgvalidator "github.com/novacommerce/pkg/validator"
 	apperrors "github.com/novacommerce/pkg/errors"
 )
@@ -31,4 +32,16 @@ func ValidateUpdateProfileInput(fullName, phone, avatarURL *string) error {
 	}
 
 	return nil
+}
+
+// ParseUpdateUserStatus maps an API status value to the domain user status.
+func ParseUpdateUserStatus(status string) (entity.UserStatus, error) {
+	switch status {
+	case "active":
+		return entity.UserStatusActive, nil
+	case "disabled":
+		return entity.UserStatusInactive, nil
+	default:
+		return "", apperrors.NewValidation("status must be active or disabled", nil)
+	}
 }

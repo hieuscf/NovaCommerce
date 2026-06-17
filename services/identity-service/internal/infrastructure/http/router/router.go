@@ -77,6 +77,7 @@ func SetupRouter(deps *Dependencies) *gin.Engine {
 			selfOrAdmin := middleware.RequireSelfOrAdmin("id")
 			users.GET("/:id", selfOrAdmin, deps.UserHandler.GetUser)
 			users.PUT("/:id", selfOrAdmin, deps.UserHandler.UpdateProfile)
+			users.PUT("/:id/status", middleware.RequireRole("admin"), deps.UserHandler.UpdateUserStatus)
 		}
 	}
 

@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/novacommerce/identity-service/internal/application/usecase"
+	"github.com/novacommerce/identity-service/internal/infrastructure/http/middleware"
 	apperrors "github.com/novacommerce/pkg/errors"
 	"github.com/novacommerce/pkg/pagination"
 )
@@ -22,6 +23,10 @@ type updateProfileRequest struct {
 	FullName  *string `json:"full_name"`
 	Phone     *string `json:"phone"`
 	AvatarURL *string `json:"avatar_url"`
+}
+
+type updateUserStatusRequest struct {
+	Status string `json:"status" binding:"required"`
 }
 
 // GetUser handles GET /api/v1/users/:id.
@@ -85,6 +90,37 @@ func (h *UserHandler) UpdateProfile(c *gin.Context) {
 		FullName:  req.FullName,
 		Phone:     req.Phone,
 		AvatarURL: req.AvatarURL,
+	})
+	if err != nil {
+		respondError(c, err)
+		return
+	}
+
+	respondSuccess(c, 200, output)
+}
+
+// UpdateUserStatus handles PUT /api/v1/users/:id/status.
+func (h *UserHandler) UpdateUserStatus(c *gin.Context) {
+	targetID, err := parseUserIDParam(c)
+	if err != nil {
+		respondError(c, err)
+		return
+	}
+
+	actorID, err := middleware.GetCurrentUserID(c)
+	if err != nil {
+		respondError(c, err)
+		return
+	}
+
+	var req updateUserStatusRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		respondValidationError(c, err)
+		return
+	}
+
+	output, err := h.userUseCase.UpdateUserStatus(c.Request.Context(), actorID, targetID, usecase.UpdateUserStatusInput{
+		Status: req.Status,
 	})
 	if err != nil {
 		respondError(c, err)

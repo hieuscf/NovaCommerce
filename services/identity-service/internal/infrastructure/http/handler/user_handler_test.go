@@ -51,6 +51,14 @@ func (m *mockUserUseCase) ListUsers(ctx context.Context, input usecase.ListUsers
 	return args.Get(0).(*usecase.ListUsersResult), args.Error(1)
 }
 
+func (m *mockUserUseCase) UpdateUserStatus(ctx context.Context, actorID, targetID uuid.UUID, input usecase.UpdateUserStatusInput) (*usecase.UserProfileOutput, error) {
+	args := m.Called(ctx, actorID, targetID, input)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*usecase.UserProfileOutput), args.Error(1)
+}
+
 type stubJWTService struct{}
 
 func (s *stubJWTService) GenerateAccessToken(userID uuid.UUID, email string, roles []string) (string, error) {
@@ -96,6 +104,7 @@ func setupUserRouter(t *testing.T, uc usecase.UserUseCase) *gin.Engine {
 	selfOrAdmin := middleware.RequireSelfOrAdmin("id")
 	users.GET("/:id", selfOrAdmin, h.GetUser)
 	users.PUT("/:id", selfOrAdmin, h.UpdateProfile)
+	users.PUT("/:id/status", middleware.RequireRole("admin"), h.UpdateUserStatus)
 
 	return r
 }
@@ -260,6 +269,72 @@ func TestUserHandler_ListUsers_ForbiddenForNonAdmin(t *testing.T) {
 
 	require.Equal(t, http.StatusForbidden, rec.Code)
 	uc.AssertNotCalled(t, "ListUsers", mock.Anything, mock.Anything)
+}
+
+func TestUserHandler_UpdateUserStatus_Admin(t *testing.T) {
+	uc := &mockUserUseCase{}
+	engine := setupUserRouter(t, uc)
+
+	adminID := uuid.MustParse("22222222-2222-2222-2222-222222222222")
+	targetID := uuid.MustParse("11111111-1111-1111-1111-111111111111")
+	uc.On("UpdateUserStatus", mock.Anything, adminID, targetID, usecase.UpdateUserStatusInput{
+		Status: "disabled",
+	}).Return(&usecase.UserProfileOutput{
+		ID:     targetID.String(),
+		Status: "inactive",
+	}, nil)
+
+	body := []byte(`{"status":"disabled"}`)
+	req := httptest.NewRequest(http.MethodPut, "/api/v1/users/"+targetID.String()+"/status", bytes.NewReader(body))
+	req.Header.Set("Authorization", "Bearer admin-token")
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+	engine.ServeHTTP(rec, req)
+
+	require.Equal(t, http.StatusOK, rec.Code)
+}
+
+func TestUserHandler_UpdateUserStatus_SelfDisableValidation(t *testing.T) {
+	uc := &mockUserUseCase{}
+	engine := setupUserRouter(t, uc)
+
+	adminID := uuid.MustParse("22222222-2222-2222-2222-222222222222")
+	uc.On("UpdateUserStatus", mock.Anything, adminID, adminID, usecase.UpdateUserStatusInput{
+		Status: "disabled",
+	}).Return(nil, apperrors.NewValidation("admin cannot disable their own account", nil))
+
+	body := []byte(`{"status":"disabled"}`)
+	req := httptest.NewRequest(http.MethodPut, "/api/v1/users/"+adminID.String()+"/status", bytes.NewReader(body))
+	req.Header.Set("Authorization", "Bearer admin-token")
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+	engine.ServeHTTP(rec, req)
+
+	require.Equal(t, http.StatusBadRequest, rec.Code)
+
+	var resp struct {
+		Error struct {
+			Code string `json:"code"`
+		} `json:"error"`
+	}
+	require.NoError(t, json.Unmarshal(rec.Body.Bytes(), &resp))
+	assert.Equal(t, apperrors.ErrCodeValidation, resp.Error.Code)
+}
+
+func TestUserHandler_UpdateUserStatus_ForbiddenForNonAdmin(t *testing.T) {
+	uc := &mockUserUseCase{}
+	engine := setupUserRouter(t, uc)
+
+	targetID := uuid.MustParse("11111111-1111-1111-1111-111111111111")
+	body := []byte(`{"status":"active"}`)
+	req := httptest.NewRequest(http.MethodPut, "/api/v1/users/"+targetID.String()+"/status", bytes.NewReader(body))
+	req.Header.Set("Authorization", "Bearer self-token")
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+	engine.ServeHTTP(rec, req)
+
+	require.Equal(t, http.StatusForbidden, rec.Code)
+	uc.AssertNotCalled(t, "UpdateUserStatus", mock.Anything, mock.Anything, mock.Anything, mock.Anything)
 }
 
 func TestRequireSelfOrAdmin(t *testing.T) {

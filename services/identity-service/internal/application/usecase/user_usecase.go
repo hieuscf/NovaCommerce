@@ -22,6 +22,7 @@ type UserUseCase interface {
 	GetUser(ctx context.Context, id uuid.UUID) (*UserProfileOutput, error)
 	UpdateProfile(ctx context.Context, id uuid.UUID, input UpdateProfileInput) (*UserProfileOutput, error)
 	ListUsers(ctx context.Context, input ListUsersInput) (*ListUsersResult, error)
+	UpdateUserStatus(ctx context.Context, actorID, targetID uuid.UUID, input UpdateUserStatusInput) (*UserProfileOutput, error)
 }
 
 type userUseCase struct {
@@ -145,6 +146,36 @@ func (uc *userUseCase) UpdateProfile(ctx context.Context, id uuid.UUID, input Up
 	}
 
 	output := mapUserToProfileOutput(user)
+	return &output, nil
+}
+
+func (uc *userUseCase) UpdateUserStatus(ctx context.Context, actorID, targetID uuid.UUID, input UpdateUserStatusInput) (*UserProfileOutput, error) {
+	status, err := uservalidator.ParseUpdateUserStatus(input.Status)
+	if err != nil {
+		return nil, err
+	}
+
+	if status == entity.UserStatusInactive && actorID == targetID {
+		return nil, apperrors.NewValidation("admin cannot disable their own account", nil)
+	}
+
+	var updated *entity.User
+	err = uc.transactor.WithTransaction(ctx, func(txCtx context.Context) error {
+		user, err := uc.userRepo.UpdateStatus(txCtx, targetID, status)
+		if err != nil {
+			return err
+		}
+		if err := uc.writeUserUpdatedEvent(txCtx, user); err != nil {
+			return err
+		}
+		updated = user
+		return nil
+	})
+	if err != nil {
+		return nil, wrapUserError("UpdateUserStatus", err)
+	}
+
+	output := mapUserToProfileOutput(updated)
 	return &output, nil
 }
 

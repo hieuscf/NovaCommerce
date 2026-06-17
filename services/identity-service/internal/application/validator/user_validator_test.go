@@ -47,3 +47,25 @@ func TestValidateUpdateProfileInput(t *testing.T) {
 		assert.NoError(t, err)
 	})
 }
+
+func TestParseUpdateUserStatus(t *testing.T) {
+	t.Run("active", func(t *testing.T) {
+		status, err := validator.ParseUpdateUserStatus("active")
+		require.NoError(t, err)
+		assert.Equal(t, "active", string(status))
+	})
+
+	t.Run("disabled maps to inactive", func(t *testing.T) {
+		status, err := validator.ParseUpdateUserStatus("disabled")
+		require.NoError(t, err)
+		assert.Equal(t, "inactive", string(status))
+	})
+
+	t.Run("invalid status", func(t *testing.T) {
+		_, err := validator.ParseUpdateUserStatus("banned")
+		require.Error(t, err)
+		appErr, ok := apperrors.IsAppError(err)
+		require.True(t, ok)
+		assert.Equal(t, apperrors.ErrCodeValidation, appErr.Code)
+	})
+}

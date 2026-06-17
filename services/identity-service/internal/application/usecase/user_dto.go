@@ -39,3 +39,14 @@ type ListUsersResult struct {
 	NextCursor string              `json:"next_cursor,omitempty"`
 	HasMore    bool                `json:"has_more"`
 }
+
+// API user status values accepted by PUT /users/:id/status.
+const (
+	APIUserStatusActive   = "active"
+	APIUserStatusDisabled = "disabled"
+)
+
+// UpdateUserStatusInput holds a status change request.
+type UpdateUserStatusInput struct {
+	Status string
+}
