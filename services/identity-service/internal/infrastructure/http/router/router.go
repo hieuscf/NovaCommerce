@@ -18,6 +18,7 @@ type Dependencies struct {
 	HealthHandler *handler.HealthHandler
 	AuthHandler   *handler.AuthHandler
 	OAuthHandler  *handler.OAuthHandler
+	UserHandler   *handler.UserHandler
 }
 
 // SetupRouter builds the Gin engine with middleware and routes.
@@ -64,6 +65,16 @@ func SetupRouter(deps *Dependencies) *gin.Engine {
 				oauth.GET("/:provider", deps.OAuthHandler.Redirect)
 				oauth.GET("/:provider/callback", deps.OAuthHandler.Callback)
 			}
+		}
+	}
+
+	if deps.UserHandler != nil {
+		v1 := r.Group("/api/v1")
+		users := v1.Group("/users", middleware.JWTAuthMiddleware(deps.JWTService))
+		{
+			selfOrAdmin := middleware.RequireSelfOrAdmin("id")
+			users.GET("/:id", selfOrAdmin, deps.UserHandler.GetUser)
+			users.PUT("/:id", selfOrAdmin, deps.UserHandler.UpdateProfile)
 		}
 	}
 

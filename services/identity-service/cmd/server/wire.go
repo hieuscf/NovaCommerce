@@ -100,6 +100,9 @@ func wireApp(ctx context.Context, cfg *config.Config, log *pkglogger.Logger) (*w
 	authHandler := handler.NewAuthHandler(authUseCase)
 	oauthHandler := handler.NewOAuthHandler(oauthUseCase)
 
+	userUseCase := usecase.NewUserUseCase(userRepo, outboxRepo, transactor)
+	userHandler := handler.NewUserHandler(userUseCase)
+
 	engine := router.SetupRouter(&router.Dependencies{
 		Config:        cfg,
 		RedisClient:   redisClient,
@@ -107,6 +110,7 @@ func wireApp(ctx context.Context, cfg *config.Config, log *pkglogger.Logger) (*w
 		HealthHandler: healthHandler,
 		AuthHandler:   authHandler,
 		OAuthHandler:  oauthHandler,
+		UserHandler:   userHandler,
 	})
 
 	return &wiredApp{

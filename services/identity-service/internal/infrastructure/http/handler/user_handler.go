@@ -1,0 +1,82 @@
+package handler
+
+import (
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	"github.com/novacommerce/identity-service/internal/application/usecase"
+	apperrors "github.com/novacommerce/pkg/errors"
+)
+
+// UserHandler serves user profile HTTP endpoints.
+type UserHandler struct {
+	userUseCase usecase.UserUseCase
+}
+
+// NewUserHandler creates a UserHandler.
+func NewUserHandler(userUseCase usecase.UserUseCase) *UserHandler {
+	return &UserHandler{userUseCase: userUseCase}
+}
+
+type updateProfileRequest struct {
+	FullName  *string `json:"full_name"`
+	Phone     *string `json:"phone"`
+	AvatarURL *string `json:"avatar_url"`
+}
+
+// GetUser handles GET /api/v1/users/:id.
+func (h *UserHandler) GetUser(c *gin.Context) {
+	userID, err := parseUserIDParam(c)
+	if err != nil {
+		respondError(c, err)
+		return
+	}
+
+	output, err := h.userUseCase.GetUser(c.Request.Context(), userID)
+	if err != nil {
+		respondError(c, err)
+		return
+	}
+
+	respondSuccess(c, 200, output)
+}
+
+// UpdateProfile handles PUT /api/v1/users/:id.
+func (h *UserHandler) UpdateProfile(c *gin.Context) {
+	userID, err := parseUserIDParam(c)
+	if err != nil {
+		respondError(c, err)
+		return
+	}
+
+	var req updateProfileRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		respondValidationError(c, err)
+		return
+	}
+
+	output, err := h.userUseCase.UpdateProfile(c.Request.Context(), userID, usecase.UpdateProfileInput{
+		FullName:  req.FullName,
+		Phone:     req.Phone,
+		AvatarURL: req.AvatarURL,
+	})
+	if err != nil {
+		respondError(c, err)
+		return
+	}
+
+	respondSuccess(c, 200, output)
+}
+
+func parseUserIDParam(c *gin.Context) (uuid.UUID, error) {
+	raw := c.Param("id")
+	if raw == "" {
+		return uuid.Nil, apperrors.NewBadRequest("missing user id")
+	}
+
+	userID, err := uuid.Parse(raw)
+	if err != nil {
+		return uuid.Nil, apperrors.NewBadRequest("invalid user id")
+	}
+
+	return userID, nil
+}

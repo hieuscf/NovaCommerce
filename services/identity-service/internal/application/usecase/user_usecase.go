@@ -1,0 +1,139 @@
+package usecase
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"time"
+
+	"github.com/google/uuid"
+	"github.com/novacommerce/identity-service/internal/application/port"
+	uservalidator "github.com/novacommerce/identity-service/internal/application/validator"
+	"github.com/novacommerce/identity-service/internal/domain/entity"
+	"github.com/novacommerce/identity-service/internal/domain/repository"
+	apperrors "github.com/novacommerce/pkg/errors"
+)
+
+const eventUserUpdated = "USER_UPDATED"
+
+// UserUseCase defines user profile management operations.
+type UserUseCase interface {
+	GetUser(ctx context.Context, id uuid.UUID) (*UserProfileOutput, error)
+	UpdateProfile(ctx context.Context, id uuid.UUID, input UpdateProfileInput) (*UserProfileOutput, error)
+}
+
+type userUseCase struct {
+	userRepo   repository.UserRepository
+	outboxRepo repository.OutboxRepository
+	transactor port.Transactor
+}
+
+// NewUserUseCase creates a UserUseCase with the given dependencies.
+func NewUserUseCase(
+	userRepo repository.UserRepository,
+	outboxRepo repository.OutboxRepository,
+	transactor port.Transactor,
+) UserUseCase {
+	return &userUseCase{
+		userRepo:   userRepo,
+		outboxRepo: outboxRepo,
+		transactor: transactor,
+	}
+}
+
+func (uc *userUseCase) GetUser(ctx context.Context, id uuid.UUID) (*UserProfileOutput, error) {
+	user, err := uc.userRepo.FindByID(ctx, id)
+	if err != nil {
+		return nil, wrapUserError("GetUser", err)
+	}
+
+	output := mapUserToProfileOutput(user)
+	return &output, nil
+}
+
+func (uc *userUseCase) UpdateProfile(ctx context.Context, id uuid.UUID, input UpdateProfileInput) (*UserProfileOutput, error) {
+	if err := uservalidator.ValidateUpdateProfileInput(input.FullName, input.Phone, input.AvatarURL); err != nil {
+		return nil, err
+	}
+
+	user, err := uc.userRepo.FindByID(ctx, id)
+	if err != nil {
+		return nil, wrapUserError("UpdateProfile", err)
+	}
+
+	if input.FullName != nil {
+		user.FullName = *input.FullName
+	}
+	if input.Phone != nil {
+		user.Phone = *input.Phone
+	}
+	if input.AvatarURL != nil {
+		user.AvatarURL = *input.AvatarURL
+	}
+
+	err = uc.transactor.WithTransaction(ctx, func(txCtx context.Context) error {
+		if err := uc.userRepo.Update(txCtx, user); err != nil {
+			return err
+		}
+		return uc.writeUserUpdatedEvent(txCtx, user)
+	})
+	if err != nil {
+		return nil, wrapUserError("UpdateProfile", err)
+	}
+
+	output := mapUserToProfileOutput(user)
+	return &output, nil
+}
+
+type userUpdatedPayload struct {
+	Type      string    `json:"type"`
+	UserID    uuid.UUID `json:"user_id"`
+	Email     string    `json:"email"`
+	Timestamp time.Time `json:"timestamp"`
+}
+
+func (uc *userUseCase) writeUserUpdatedEvent(ctx context.Context, user *entity.User) error {
+	raw, err := json.Marshal(userUpdatedPayload{
+		Type:      eventUserUpdated,
+		UserID:    user.ID,
+		Email:     user.Email,
+		Timestamp: time.Now().UTC(),
+	})
+	if err != nil {
+		return fmt.Errorf("userUseCase: marshal user updated event: %w", err)
+	}
+
+	event := &entity.OutboxEvent{
+		ID:        uuid.New(),
+		Topic:     topicUserEvents,
+		Key:       user.ID.String(),
+		Payload:   raw,
+		CreatedAt: time.Now().UTC(),
+	}
+	if err := uc.outboxRepo.Create(ctx, event); err != nil {
+		return fmt.Errorf("userUseCase: persist outbox event: %w", err)
+	}
+	return nil
+}
+
+func mapUserToProfileOutput(user *entity.User) UserProfileOutput {
+	return UserProfileOutput{
+		ID:          user.ID.String(),
+		Username:    user.Username,
+		Email:       user.Email,
+		FullName:    user.FullName,
+		Phone:       user.Phone,
+		AvatarURL:   user.AvatarURL,
+		Status:      string(user.Status),
+		LastLoginAt: user.LastLoginAt,
+		CreatedAt:   user.CreatedAt,
+		UpdatedAt:   user.UpdatedAt,
+	}
+}
+
+func wrapUserError(method string, err error) error {
+	if _, ok := apperrors.IsAppError(err); ok {
+		return err
+	}
+	return fmt.Errorf("userUseCase.%s: %w", method, err)
+}

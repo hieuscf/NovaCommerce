@@ -85,6 +85,70 @@ func GetCurrentUserRoles(c *gin.Context) []string {
 	return roles
 }
 
+// HasRole reports whether the authenticated user has the given role.
+func HasRole(c *gin.Context, role string) bool {
+	for _, r := range GetCurrentUserRoles(c) {
+		if r == role {
+			return true
+		}
+	}
+	return false
+}
+
+// RequireRole allows the request only when the authenticated user has one of the required roles.
+func RequireRole(roles ...string) gin.HandlerFunc {
+	allowed := make(map[string]struct{}, len(roles))
+	for _, role := range roles {
+		allowed[role] = struct{}{}
+	}
+
+	return func(c *gin.Context) {
+		currentRoles := GetCurrentUserRoles(c)
+		for _, role := range currentRoles {
+			if _, ok := allowed[role]; ok {
+				c.Next()
+				return
+			}
+		}
+
+		writeAuthError(c, apperrors.NewForbidden("insufficient permissions"))
+		c.Abort()
+	}
+}
+
+// RequireSelfOrAdmin allows the request when the authenticated user matches the
+// path parameter or holds the admin role.
+func RequireSelfOrAdmin(paramName string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		targetID := c.Param(paramName)
+		if targetID == "" {
+			writeAuthError(c, apperrors.NewBadRequest("missing user id"))
+			c.Abort()
+			return
+		}
+
+		currentUserID, err := GetCurrentUserID(c)
+		if err != nil {
+			writeAuthError(c, apperrors.NewUnauthorized("unauthorized"))
+			c.Abort()
+			return
+		}
+
+		if currentUserID.String() == targetID {
+			c.Next()
+			return
+		}
+
+		if HasRole(c, "admin") {
+			c.Next()
+			return
+		}
+
+		writeAuthError(c, apperrors.NewForbidden("insufficient permissions"))
+		c.Abort()
+	}
+}
+
 func extractBearerToken(header string) string {
 	const prefix = "Bearer "
 	if len(header) < len(prefix) || header[:len(prefix)] != prefix {
