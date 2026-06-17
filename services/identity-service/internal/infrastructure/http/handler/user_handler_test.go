@@ -59,6 +59,26 @@ func (m *mockUserUseCase) UpdateUserStatus(ctx context.Context, actorID, targetI
 	return args.Get(0).(*usecase.UserProfileOutput), args.Error(1)
 }
 
+func (m *mockUserUseCase) GetUserRoles(ctx context.Context, userID uuid.UUID) ([]usecase.RoleOutput, error) {
+	args := m.Called(ctx, userID)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).([]usecase.RoleOutput), args.Error(1)
+}
+
+func (m *mockUserUseCase) AssignRole(ctx context.Context, userID uuid.UUID, input usecase.AssignRoleInput) (*usecase.RoleOutput, error) {
+	args := m.Called(ctx, userID, input)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*usecase.RoleOutput), args.Error(1)
+}
+
+func (m *mockUserUseCase) RevokeRole(ctx context.Context, actorID, userID, roleID uuid.UUID) error {
+	return m.Called(ctx, actorID, userID, roleID).Error(0)
+}
+
 type stubJWTService struct{}
 
 func (s *stubJWTService) GenerateAccessToken(userID uuid.UUID, email string, roles []string) (string, error) {
@@ -100,11 +120,15 @@ func setupUserRouter(t *testing.T, uc usecase.UserUseCase) *gin.Engine {
 
 	v1 := r.Group("/api/v1")
 	users := v1.Group("/users", middleware.JWTAuthMiddleware(jwtSvc))
-	users.GET("", middleware.RequireRole("admin"), h.ListUsers)
+	adminOnly := middleware.RequireRole("admin")
+	users.GET("", adminOnly, h.ListUsers)
 	selfOrAdmin := middleware.RequireSelfOrAdmin("id")
+	users.GET("/:id/roles", adminOnly, h.GetUserRoles)
+	users.POST("/:id/roles", adminOnly, h.AssignRole)
+	users.DELETE("/:id/roles/:role_id", adminOnly, h.RevokeRole)
 	users.GET("/:id", selfOrAdmin, h.GetUser)
 	users.PUT("/:id", selfOrAdmin, h.UpdateProfile)
-	users.PUT("/:id/status", middleware.RequireRole("admin"), h.UpdateUserStatus)
+	users.PUT("/:id/status", adminOnly, h.UpdateUserStatus)
 
 	return r
 }
@@ -335,6 +359,92 @@ func TestUserHandler_UpdateUserStatus_ForbiddenForNonAdmin(t *testing.T) {
 
 	require.Equal(t, http.StatusForbidden, rec.Code)
 	uc.AssertNotCalled(t, "UpdateUserStatus", mock.Anything, mock.Anything, mock.Anything, mock.Anything)
+}
+
+func TestUserHandler_GetUserRoles_Admin(t *testing.T) {
+	uc := &mockUserUseCase{}
+	engine := setupUserRouter(t, uc)
+
+	userID := uuid.MustParse("11111111-1111-1111-1111-111111111111")
+	roleID := uuid.MustParse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
+	uc.On("GetUserRoles", mock.Anything, userID).Return([]usecase.RoleOutput{
+		{ID: roleID.String(), Name: "customer", DisplayName: "Customer"},
+	}, nil)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/users/"+userID.String()+"/roles", nil)
+	req.Header.Set("Authorization", "Bearer admin-token")
+	rec := httptest.NewRecorder()
+	engine.ServeHTTP(rec, req)
+
+	require.Equal(t, http.StatusOK, rec.Code)
+}
+
+func TestUserHandler_AssignRole_Admin(t *testing.T) {
+	uc := &mockUserUseCase{}
+	engine := setupUserRouter(t, uc)
+
+	userID := uuid.MustParse("11111111-1111-1111-1111-111111111111")
+	roleID := uuid.MustParse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
+	uc.On("AssignRole", mock.Anything, userID, usecase.AssignRoleInput{RoleID: roleID}).
+		Return(&usecase.RoleOutput{ID: roleID.String(), Name: "seller"}, nil)
+
+	body := []byte(`{"role_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}`)
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/users/"+userID.String()+"/roles", bytes.NewReader(body))
+	req.Header.Set("Authorization", "Bearer admin-token")
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+	engine.ServeHTTP(rec, req)
+
+	require.Equal(t, http.StatusCreated, rec.Code)
+}
+
+func TestUserHandler_AssignRole_Conflict(t *testing.T) {
+	uc := &mockUserUseCase{}
+	engine := setupUserRouter(t, uc)
+
+	userID := uuid.MustParse("11111111-1111-1111-1111-111111111111")
+	roleID := uuid.MustParse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
+	uc.On("AssignRole", mock.Anything, userID, usecase.AssignRoleInput{RoleID: roleID}).
+		Return(nil, apperrors.NewConflict("role already assigned to user"))
+
+	body := []byte(`{"role_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}`)
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/users/"+userID.String()+"/roles", bytes.NewReader(body))
+	req.Header.Set("Authorization", "Bearer admin-token")
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+	engine.ServeHTTP(rec, req)
+
+	require.Equal(t, http.StatusConflict, rec.Code)
+}
+
+func TestUserHandler_RevokeRole_Admin(t *testing.T) {
+	uc := &mockUserUseCase{}
+	engine := setupUserRouter(t, uc)
+
+	adminID := uuid.MustParse("22222222-2222-2222-2222-222222222222")
+	userID := uuid.MustParse("11111111-1111-1111-1111-111111111111")
+	roleID := uuid.MustParse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
+	uc.On("RevokeRole", mock.Anything, adminID, userID, roleID).Return(nil)
+
+	req := httptest.NewRequest(http.MethodDelete, "/api/v1/users/"+userID.String()+"/roles/"+roleID.String(), nil)
+	req.Header.Set("Authorization", "Bearer admin-token")
+	rec := httptest.NewRecorder()
+	engine.ServeHTTP(rec, req)
+
+	require.Equal(t, http.StatusNoContent, rec.Code)
+}
+
+func TestUserHandler_GetUserRoles_ForbiddenForNonAdmin(t *testing.T) {
+	uc := &mockUserUseCase{}
+	engine := setupUserRouter(t, uc)
+
+	userID := uuid.MustParse("11111111-1111-1111-1111-111111111111")
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/users/"+userID.String()+"/roles", nil)
+	req.Header.Set("Authorization", "Bearer self-token")
+	rec := httptest.NewRecorder()
+	engine.ServeHTTP(rec, req)
+
+	require.Equal(t, http.StatusForbidden, rec.Code)
 }
 
 func TestRequireSelfOrAdmin(t *testing.T) {

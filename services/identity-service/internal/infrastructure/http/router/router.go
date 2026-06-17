@@ -72,12 +72,16 @@ func SetupRouter(deps *Dependencies) *gin.Engine {
 		v1 := r.Group("/api/v1")
 		users := v1.Group("/users", middleware.JWTAuthMiddleware(deps.JWTService))
 		{
-			users.GET("", middleware.RequireRole("admin"), deps.UserHandler.ListUsers)
+			adminOnly := middleware.RequireRole("admin")
+			users.GET("", adminOnly, deps.UserHandler.ListUsers)
 
 			selfOrAdmin := middleware.RequireSelfOrAdmin("id")
+			users.GET("/:id/roles", adminOnly, deps.UserHandler.GetUserRoles)
+			users.POST("/:id/roles", adminOnly, deps.UserHandler.AssignRole)
+			users.DELETE("/:id/roles/:role_id", adminOnly, deps.UserHandler.RevokeRole)
 			users.GET("/:id", selfOrAdmin, deps.UserHandler.GetUser)
 			users.PUT("/:id", selfOrAdmin, deps.UserHandler.UpdateProfile)
-			users.PUT("/:id/status", middleware.RequireRole("admin"), deps.UserHandler.UpdateUserStatus)
+			users.PUT("/:id/status", adminOnly, deps.UserHandler.UpdateUserStatus)
 		}
 	}
 

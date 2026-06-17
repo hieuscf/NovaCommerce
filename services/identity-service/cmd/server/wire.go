@@ -54,6 +54,7 @@ func wireApp(ctx context.Context, cfg *config.Config, log *pkglogger.Logger) (*w
 	passwordResetRepo := postgres.NewPasswordResetPostgresRepo(pool)
 	oauthRepo := postgres.NewOAuthPostgresRepo(pool)
 	outboxRepo := postgres.NewOutboxPostgresRepo(pool)
+	roleRepo := postgres.NewRolePostgresRepo(pool)
 	transactor := postgres.NewTransactor(pool)
 
 	jwtService, err := infrajwt.NewJWTService(*cfg)
@@ -100,7 +101,7 @@ func wireApp(ctx context.Context, cfg *config.Config, log *pkglogger.Logger) (*w
 	authHandler := handler.NewAuthHandler(authUseCase)
 	oauthHandler := handler.NewOAuthHandler(oauthUseCase)
 
-	userUseCase := usecase.NewUserUseCase(userRepo, outboxRepo, transactor)
+	userUseCase := usecase.NewUserUseCase(userRepo, roleRepo, outboxRepo, transactor)
 	userHandler := handler.NewUserHandler(userUseCase)
 
 	engine := router.SetupRouter(&router.Dependencies{

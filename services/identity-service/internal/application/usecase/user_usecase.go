@@ -13,6 +13,7 @@ import (
 	"github.com/novacommerce/identity-service/internal/domain/repository"
 	apperrors "github.com/novacommerce/pkg/errors"
 	"github.com/novacommerce/pkg/pagination"
+	pkglogger "github.com/novacommerce/pkg/logger"
 )
 
 const eventUserUpdated = "USER_UPDATED"
@@ -23,10 +24,14 @@ type UserUseCase interface {
 	UpdateProfile(ctx context.Context, id uuid.UUID, input UpdateProfileInput) (*UserProfileOutput, error)
 	ListUsers(ctx context.Context, input ListUsersInput) (*ListUsersResult, error)
 	UpdateUserStatus(ctx context.Context, actorID, targetID uuid.UUID, input UpdateUserStatusInput) (*UserProfileOutput, error)
+	GetUserRoles(ctx context.Context, userID uuid.UUID) ([]RoleOutput, error)
+	AssignRole(ctx context.Context, userID uuid.UUID, input AssignRoleInput) (*RoleOutput, error)
+	RevokeRole(ctx context.Context, actorID, userID, roleID uuid.UUID) error
 }
 
 type userUseCase struct {
 	userRepo   repository.UserRepository
+	roleRepo   repository.RoleRepository
 	outboxRepo repository.OutboxRepository
 	transactor port.Transactor
 }
@@ -34,11 +39,13 @@ type userUseCase struct {
 // NewUserUseCase creates a UserUseCase with the given dependencies.
 func NewUserUseCase(
 	userRepo repository.UserRepository,
+	roleRepo repository.RoleRepository,
 	outboxRepo repository.OutboxRepository,
 	transactor port.Transactor,
 ) UserUseCase {
 	return &userUseCase{
 		userRepo:   userRepo,
+		roleRepo:   roleRepo,
 		outboxRepo: outboxRepo,
 		transactor: transactor,
 	}
@@ -179,6 +186,85 @@ func (uc *userUseCase) UpdateUserStatus(ctx context.Context, actorID, targetID u
 	return &output, nil
 }
 
+func (uc *userUseCase) GetUserRoles(ctx context.Context, userID uuid.UUID) ([]RoleOutput, error) {
+	if _, err := uc.userRepo.FindByID(ctx, userID); err != nil {
+		return nil, wrapUserError("GetUserRoles", err)
+	}
+
+	roles, err := uc.roleRepo.GetUserRoles(ctx, userID)
+	if err != nil {
+		return nil, wrapUserError("GetUserRoles", err)
+	}
+
+	return mapRolesToOutput(roles), nil
+}
+
+func (uc *userUseCase) AssignRole(ctx context.Context, userID uuid.UUID, input AssignRoleInput) (*RoleOutput, error) {
+	if _, err := uc.userRepo.FindByID(ctx, userID); err != nil {
+		return nil, wrapUserError("AssignRole", err)
+	}
+
+	exists, err := uc.roleRepo.RoleExists(ctx, input.RoleID)
+	if err != nil {
+		return nil, wrapUserError("AssignRole", err)
+	}
+	if !exists {
+		return nil, apperrors.NewNotFound("role not found")
+	}
+
+	role, err := uc.roleRepo.FindByID(ctx, input.RoleID)
+	if err != nil {
+		return nil, wrapUserError("AssignRole", err)
+	}
+
+	if err := uc.roleRepo.AssignRole(ctx, userID, input.RoleID); err != nil {
+		return nil, wrapUserError("AssignRole", err)
+	}
+
+	output := mapRoleToOutput(role)
+	return &output, nil
+}
+
+func (uc *userUseCase) RevokeRole(ctx context.Context, actorID, userID, roleID uuid.UUID) error {
+	if _, err := uc.userRepo.FindByID(ctx, userID); err != nil {
+		return wrapUserError("RevokeRole", err)
+	}
+
+	uc.warnIfRevokingLastAdmin(ctx, actorID, userID, roleID)
+
+	if err := uc.roleRepo.RevokeRole(ctx, userID, roleID); err != nil {
+		return wrapUserError("RevokeRole", err)
+	}
+	return nil
+}
+
+// warnIfRevokingLastAdmin logs when the sole system admin revokes their own admin role.
+// TODO(SVC-IS-005): Enforce lockout guard (block revoke or require break-glass approval)
+// when removing the last admin assignment system-wide.
+func (uc *userUseCase) warnIfRevokingLastAdmin(ctx context.Context, actorID, userID, roleID uuid.UUID) {
+	if actorID != userID {
+		return
+	}
+
+	role, err := uc.roleRepo.FindByID(ctx, roleID)
+	if err != nil || role.Name != "admin" {
+		return
+	}
+
+	count, err := uc.roleRepo.CountUsersWithRole(ctx, roleID)
+	if err != nil || count > 1 {
+		return
+	}
+
+	log := pkglogger.FromContext(ctx)
+	if log != nil {
+		log.Warn().
+			Str("user_id", userID.String()).
+			Str("role_id", roleID.String()).
+			Msg("revoking admin role from the only system admin; lockout guard not yet enforced")
+	}
+}
+
 type userUpdatedPayload struct {
 	Type      string    `json:"type"`
 	UserID    uuid.UUID `json:"user_id"`
@@ -222,6 +308,25 @@ func mapUserToProfileOutput(user *entity.User) UserProfileOutput {
 		LastLoginAt: user.LastLoginAt,
 		CreatedAt:   user.CreatedAt,
 		UpdatedAt:   user.UpdatedAt,
+	}
+}
+
+func mapRolesToOutput(roles []*entity.Role) []RoleOutput {
+	output := make([]RoleOutput, 0, len(roles))
+	for _, role := range roles {
+		output = append(output, mapRoleToOutput(role))
+	}
+	return output
+}
+
+func mapRoleToOutput(role *entity.Role) RoleOutput {
+	return RoleOutput{
+		ID:          role.ID.String(),
+		Name:        role.Name,
+		DisplayName: role.DisplayName,
+		Description: role.Description,
+		IsSystem:    role.IsSystem,
+		CreatedAt:   role.CreatedAt,
 	}
 }
 

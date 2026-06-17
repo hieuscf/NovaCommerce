@@ -1,6 +1,10 @@
 package usecase
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 // UserProfileOutput is the public user profile returned by user management endpoints.
 type UserProfileOutput struct {
@@ -49,4 +53,19 @@ const (
 // UpdateUserStatusInput holds a status change request.
 type UpdateUserStatusInput struct {
 	Status string
+}
+
+// RoleOutput is the public role representation.
+type RoleOutput struct {
+	ID          string    `json:"id"`
+	Name        string    `json:"name"`
+	DisplayName string    `json:"display_name"`
+	Description *string   `json:"description"`
+	IsSystem    bool      `json:"is_system"`
+	CreatedAt   time.Time `json:"created_at"`
+}
+
+// AssignRoleInput holds a role assignment request.
+type AssignRoleInput struct {
+	RoleID uuid.UUID
 }

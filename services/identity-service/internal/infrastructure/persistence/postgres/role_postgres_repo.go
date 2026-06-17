@@ -160,6 +160,17 @@ func (r *rolePostgresRepo) RoleExists(ctx context.Context, roleID uuid.UUID) (bo
 	return exists, nil
 }
 
+func (r *rolePostgresRepo) CountUsersWithRole(ctx context.Context, roleID uuid.UUID) (int, error) {
+	var count int
+	err := extractQuerier(ctx, r.pool).QueryRow(ctx, `
+		SELECT COUNT(DISTINCT user_id) FROM user_roles WHERE role_id = $1
+	`, roleID).Scan(&count)
+	if err != nil {
+		return 0, fmt.Errorf("rolePostgresRepo.CountUsersWithRole: %w", err)
+	}
+	return count, nil
+}
+
 func (r *rolePostgresRepo) roleAssigned(ctx context.Context, userID, roleID uuid.UUID) (bool, error) {
 	var exists bool
 	err := extractQuerier(ctx, r.pool).QueryRow(ctx, `

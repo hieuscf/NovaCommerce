@@ -130,6 +130,100 @@ func (h *UserHandler) UpdateUserStatus(c *gin.Context) {
 	respondSuccess(c, 200, output)
 }
 
+type assignRoleRequest struct {
+	RoleID string `json:"role_id" binding:"required,uuid"`
+}
+
+// GetUserRoles handles GET /api/v1/users/:id/roles.
+func (h *UserHandler) GetUserRoles(c *gin.Context) {
+	userID, err := parseUserIDParam(c)
+	if err != nil {
+		respondError(c, err)
+		return
+	}
+
+	roles, err := h.userUseCase.GetUserRoles(c.Request.Context(), userID)
+	if err != nil {
+		respondError(c, err)
+		return
+	}
+
+	respondSuccess(c, 200, roles)
+}
+
+// AssignRole handles POST /api/v1/users/:id/roles.
+func (h *UserHandler) AssignRole(c *gin.Context) {
+	userID, err := parseUserIDParam(c)
+	if err != nil {
+		respondError(c, err)
+		return
+	}
+
+	var req assignRoleRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		respondValidationError(c, err)
+		return
+	}
+
+	roleID, err := uuid.Parse(req.RoleID)
+	if err != nil {
+		respondError(c, apperrors.NewBadRequest("invalid role_id"))
+		return
+	}
+
+	output, err := h.userUseCase.AssignRole(c.Request.Context(), userID, usecase.AssignRoleInput{
+		RoleID: roleID,
+	})
+	if err != nil {
+		respondError(c, err)
+		return
+	}
+
+	respondSuccess(c, 201, output)
+}
+
+// RevokeRole handles DELETE /api/v1/users/:id/roles/:role_id.
+func (h *UserHandler) RevokeRole(c *gin.Context) {
+	userID, err := parseUserIDParam(c)
+	if err != nil {
+		respondError(c, err)
+		return
+	}
+
+	roleID, err := parseRoleIDParam(c)
+	if err != nil {
+		respondError(c, err)
+		return
+	}
+
+	actorID, err := middleware.GetCurrentUserID(c)
+	if err != nil {
+		respondError(c, err)
+		return
+	}
+
+	if err := h.userUseCase.RevokeRole(c.Request.Context(), actorID, userID, roleID); err != nil {
+		respondError(c, err)
+		return
+	}
+
+	respondNoContent(c)
+}
+
+func parseRoleIDParam(c *gin.Context) (uuid.UUID, error) {
+	raw := c.Param("role_id")
+	if raw == "" {
+		return uuid.Nil, apperrors.NewBadRequest("missing role id")
+	}
+
+	roleID, err := uuid.Parse(raw)
+	if err != nil {
+		return uuid.Nil, apperrors.NewBadRequest("invalid role id")
+	}
+
+	return roleID, nil
+}
+
 func parseUserIDParam(c *gin.Context) (uuid.UUID, error) {
 	raw := c.Param("id")
 	if raw == "" {

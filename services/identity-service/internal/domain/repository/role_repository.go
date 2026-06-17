@@ -17,4 +17,5 @@ type RoleRepository interface {
 	AssignRole(ctx context.Context, userID, roleID uuid.UUID) error
 	RevokeRole(ctx context.Context, userID, roleID uuid.UUID) error
 	RoleExists(ctx context.Context, roleID uuid.UUID) (bool, error)
+	CountUsersWithRole(ctx context.Context, roleID uuid.UUID) (int, error)
 }
