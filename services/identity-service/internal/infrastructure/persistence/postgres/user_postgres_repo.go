@@ -15,6 +15,7 @@ import (
 )
 
 const userColumns = `id, username, email, password_hash, phone, full_name, avatar_url, status, last_login_at, created_at, updated_at`
+const userColumnsAliased = `u.id, u.username, u.email, u.password_hash, u.phone, u.full_name, u.avatar_url, u.status, u.last_login_at, u.created_at, u.updated_at`
 
 type userPostgresRepo struct {
 	pool *pgxpool.Pool
@@ -113,37 +114,10 @@ func (r *userPostgresRepo) List(ctx context.Context, filter repository.UserFilte
 		return nil, 0, err
 	}
 
-	query := `SELECT ` + userColumns + ` FROM users WHERE 1=1`
-	args := make([]any, 0, 4)
-	argPos := 1
-
-	if filter.Status != nil {
-		query += fmt.Sprintf(" AND status = $%d", argPos)
-		args = append(args, *filter.Status)
-		argPos++
+	query, args, err := r.buildUserListQuery(filter, cursor, limit, false)
+	if err != nil {
+		return nil, 0, err
 	}
-
-	if cursor != "" {
-		cursorID, cursorCreatedAt, err := pagination.DecodeCursor(cursor)
-		if err != nil {
-			return nil, 0, apperrors.NewBadRequest("invalid cursor")
-		}
-
-		cursorUUID, err := uuid.Parse(cursorID)
-		if err != nil {
-			return nil, 0, apperrors.NewBadRequest("invalid cursor")
-		}
-
-		query += fmt.Sprintf(
-			" AND (created_at < $%d OR (created_at = $%d AND id < $%d))",
-			argPos, argPos, argPos+1,
-		)
-		args = append(args, cursorCreatedAt, cursorUUID)
-		argPos += 2
-	}
-
-	query += fmt.Sprintf(" ORDER BY created_at DESC, id DESC LIMIT $%d", argPos)
-	args = append(args, limit)
 
 	rows, err := extractQuerier(ctx, r.pool).Query(ctx, query, args...)
 	if err != nil {
@@ -166,6 +140,66 @@ func (r *userPostgresRepo) List(ctx context.Context, filter repository.UserFilte
 	return users, total, nil
 }
 
+func (r *userPostgresRepo) buildUserListQuery(filter repository.UserFilter, cursor string, limit int, forCount bool) (string, []any, error) {
+	args := make([]any, 0, 6)
+	argPos := 1
+
+	joins := ""
+	if filter.Role != "" {
+		joins = fmt.Sprintf(`
+			INNER JOIN user_roles ur ON ur.user_id = u.id
+			INNER JOIN roles r ON r.id = ur.role_id AND r.name = $%d`, argPos)
+		args = append(args, filter.Role)
+		argPos++
+	}
+
+	where := "WHERE 1=1"
+	if filter.Status != nil {
+		where += fmt.Sprintf(" AND u.status = $%d", argPos)
+		args = append(args, *filter.Status)
+		argPos++
+	}
+	if filter.Search != "" {
+		where += fmt.Sprintf(" AND (u.username ILIKE $%d OR u.email ILIKE $%d)", argPos, argPos)
+		args = append(args, "%"+filter.Search+"%")
+		argPos++
+	}
+
+	if !forCount && cursor != "" {
+		cursorID, cursorCreatedAt, err := pagination.DecodeCursor(cursor)
+		if err != nil {
+			return "", nil, apperrors.NewBadRequest("invalid cursor")
+		}
+
+		cursorUUID, err := uuid.Parse(cursorID)
+		if err != nil {
+			return "", nil, apperrors.NewBadRequest("invalid cursor")
+		}
+
+		where += fmt.Sprintf(
+			" AND (u.created_at < $%d OR (u.created_at = $%d AND u.id < $%d))",
+			argPos, argPos, argPos+1,
+		)
+		args = append(args, cursorCreatedAt, cursorUUID)
+		argPos += 2
+	}
+
+	fromClause := "FROM users u" + joins
+
+	if forCount {
+		countExpr := "COUNT(*)"
+		if filter.Role != "" {
+			countExpr = "COUNT(DISTINCT u.id)"
+		}
+		return fmt.Sprintf("SELECT %s %s %s", countExpr, fromClause, where), args, nil
+	}
+
+	query := fmt.Sprintf("SELECT %s %s %s ORDER BY u.created_at DESC, u.id DESC LIMIT $%d",
+		userColumnsAliased, fromClause, where, argPos)
+	args = append(args, limit)
+	return query, args, nil
+}
+
 func (r *userPostgresRepo) UpdateStatus(ctx context.Context, userID uuid.UUID, status entity.UserStatus) (*entity.User, error) {
 	query := `
 		UPDATE users
@@ -182,12 +216,9 @@ func (r *userPostgresRepo) UpdateStatus(ctx context.Context, userID uuid.UUID, s
 }
 
 func (r *userPostgresRepo) countUsers(ctx context.Context, filter repository.UserFilter) (int64, error) {
-	query := `SELECT COUNT(*) FROM users WHERE 1=1`
-	args := make([]any, 0, 1)
-
-	if filter.Status != nil {
-		query += " AND status = $1"
-		args = append(args, *filter.Status)
+	query, args, err := r.buildUserListQuery(filter, "", 0, true)
+	if err != nil {
+		return 0, err
 	}
 
 	var total int64

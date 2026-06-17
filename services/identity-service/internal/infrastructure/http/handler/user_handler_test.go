@@ -43,6 +43,14 @@ func (m *mockUserUseCase) UpdateProfile(ctx context.Context, id uuid.UUID, input
 	return args.Get(0).(*usecase.UserProfileOutput), args.Error(1)
 }
 
+func (m *mockUserUseCase) ListUsers(ctx context.Context, input usecase.ListUsersInput) (*usecase.ListUsersResult, error) {
+	args := m.Called(ctx, input)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*usecase.ListUsersResult), args.Error(1)
+}
+
 type stubJWTService struct{}
 
 func (s *stubJWTService) GenerateAccessToken(userID uuid.UUID, email string, roles []string) (string, error) {
@@ -84,6 +92,7 @@ func setupUserRouter(t *testing.T, uc usecase.UserUseCase) *gin.Engine {
 
 	v1 := r.Group("/api/v1")
 	users := v1.Group("/users", middleware.JWTAuthMiddleware(jwtSvc))
+	users.GET("", middleware.RequireRole("admin"), h.ListUsers)
 	selfOrAdmin := middleware.RequireSelfOrAdmin("id")
 	users.GET("/:id", selfOrAdmin, h.GetUser)
 	users.PUT("/:id", selfOrAdmin, h.UpdateProfile)
@@ -203,6 +212,54 @@ func TestUserHandler_GetUser_Unauthorized(t *testing.T) {
 	engine.ServeHTTP(rec, req)
 
 	require.Equal(t, http.StatusUnauthorized, rec.Code)
+}
+
+func TestUserHandler_ListUsers_Admin(t *testing.T) {
+	uc := &mockUserUseCase{}
+	engine := setupUserRouter(t, uc)
+
+	uc.On("ListUsers", mock.Anything, usecase.ListUsersInput{
+		Status: "active",
+		Limit:  20,
+	}).Return(&usecase.ListUsersResult{
+		Users: []usecase.UserProfileOutput{
+			{ID: "11111111-1111-1111-1111-111111111111", Email: "user@example.com"},
+		},
+		HasMore: false,
+	}, nil)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/users?status=active", nil)
+	req.Header.Set("Authorization", "Bearer admin-token")
+	rec := httptest.NewRecorder()
+	engine.ServeHTTP(rec, req)
+
+	require.Equal(t, http.StatusOK, rec.Code)
+
+	var body struct {
+		Data []usecase.UserProfileOutput `json:"data"`
+		Meta struct {
+			NextCursor string `json:"next_cursor"`
+			HasMore    bool   `json:"has_more"`
+		} `json:"meta"`
+		Error any `json:"error"`
+	}
+	require.NoError(t, json.Unmarshal(rec.Body.Bytes(), &body))
+	require.Len(t, body.Data, 1)
+	assert.False(t, body.Meta.HasMore)
+	assert.Nil(t, body.Error)
+}
+
+func TestUserHandler_ListUsers_ForbiddenForNonAdmin(t *testing.T) {
+	uc := &mockUserUseCase{}
+	engine := setupUserRouter(t, uc)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/users", nil)
+	req.Header.Set("Authorization", "Bearer self-token")
+	rec := httptest.NewRecorder()
+	engine.ServeHTTP(rec, req)
+
+	require.Equal(t, http.StatusForbidden, rec.Code)
+	uc.AssertNotCalled(t, "ListUsers", mock.Anything, mock.Anything)
 }
 
 func TestRequireSelfOrAdmin(t *testing.T) {

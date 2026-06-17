@@ -121,4 +121,12 @@ func TestUserRepository_Integration(t *testing.T) {
 			assert.Equal(t, entity.UserStatusActive, u.Status)
 		}
 	})
+
+	t.Run("List with search filter", func(t *testing.T) {
+		users, total, err := repo.List(ctx, repository.UserFilter{Search: "integration"}, "", 10)
+		require.NoError(t, err)
+		assert.GreaterOrEqual(t, total, int64(1))
+		require.NotEmpty(t, users)
+		assert.Contains(t, users[0].Email, "integration")
+	})
 }

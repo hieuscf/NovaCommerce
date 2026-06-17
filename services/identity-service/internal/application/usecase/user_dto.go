@@ -23,3 +23,19 @@ type UpdateProfileInput struct {
 	Phone     *string
 	AvatarURL *string
 }
+
+// ListUsersInput holds query parameters for listing users.
+type ListUsersInput struct {
+	Status string
+	Role   string
+	Search string
+	Cursor string
+	Limit  int
+}
+
+// ListUsersResult is the paginated list of users.
+type ListUsersResult struct {
+	Users      []UserProfileOutput `json:"users"`
+	NextCursor string              `json:"next_cursor,omitempty"`
+	HasMore    bool                `json:"has_more"`
+}

@@ -12,6 +12,7 @@ import (
 	"github.com/novacommerce/identity-service/internal/domain/entity"
 	"github.com/novacommerce/identity-service/internal/domain/repository"
 	apperrors "github.com/novacommerce/pkg/errors"
+	"github.com/novacommerce/pkg/pagination"
 )
 
 const eventUserUpdated = "USER_UPDATED"
@@ -20,6 +21,7 @@ const eventUserUpdated = "USER_UPDATED"
 type UserUseCase interface {
 	GetUser(ctx context.Context, id uuid.UUID) (*UserProfileOutput, error)
 	UpdateProfile(ctx context.Context, id uuid.UUID, input UpdateProfileInput) (*UserProfileOutput, error)
+	ListUsers(ctx context.Context, input ListUsersInput) (*ListUsersResult, error)
 }
 
 type userUseCase struct {
@@ -49,6 +51,67 @@ func (uc *userUseCase) GetUser(ctx context.Context, id uuid.UUID) (*UserProfileO
 
 	output := mapUserToProfileOutput(user)
 	return &output, nil
+}
+
+func (uc *userUseCase) ListUsers(ctx context.Context, input ListUsersInput) (*ListUsersResult, error) {
+	status, err := parseListUserStatus(input.Status)
+	if err != nil {
+		return nil, err
+	}
+
+	limit := input.Limit
+	if limit <= 0 {
+		limit = 20
+	}
+
+	filter := repository.UserFilter{
+		Status: status,
+		Role:   input.Role,
+		Search: input.Search,
+	}
+
+	users, _, err := uc.userRepo.List(ctx, filter, input.Cursor, limit)
+	if err != nil {
+		return nil, wrapUserError("ListUsers", err)
+	}
+
+	items := make([]UserProfileOutput, 0, len(users))
+	for _, user := range users {
+		items = append(items, mapUserToProfileOutput(user))
+	}
+
+	var lastID string
+	var lastCreatedAt time.Time
+	if len(users) > 0 {
+		last := users[len(users)-1]
+		lastID = last.ID.String()
+		lastCreatedAt = last.CreatedAt
+	}
+
+	pageResult := pagination.BuildResult(items, lastID, lastCreatedAt, 0, &pagination.CursorParams{
+		Cursor: input.Cursor,
+		Limit:  limit,
+	})
+
+	return &ListUsersResult{
+		Users:      items,
+		NextCursor: pageResult.NextCursor,
+		HasMore:    pageResult.HasMore,
+	}, nil
+}
+
+func parseListUserStatus(raw string) (*entity.UserStatus, error) {
+	if raw == "" {
+		return nil, nil
+	}
+
+	status := entity.UserStatus(raw)
+	switch status {
+	case entity.UserStatusActive, entity.UserStatusInactive, entity.UserStatusBanned, entity.UserStatus("pending_verification"):
+		return &status, nil
+	default:
+		return nil, apperrors.NewBadRequest("invalid status")
+	}
 }
 
 func (uc *userUseCase) UpdateProfile(ctx context.Context, id uuid.UUID, input UpdateProfileInput) (*UserProfileOutput, error) {

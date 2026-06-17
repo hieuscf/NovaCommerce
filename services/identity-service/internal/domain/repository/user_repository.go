@@ -10,6 +10,8 @@ import (
 // UserFilter scopes user list queries.
 type UserFilter struct {
 	Status *entity.UserStatus
+	Role   string
+	Search string
 }
 
 // UserRepository persists and retrieves users.

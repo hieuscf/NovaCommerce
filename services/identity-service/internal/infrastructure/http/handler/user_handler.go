@@ -5,6 +5,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/novacommerce/identity-service/internal/application/usecase"
 	apperrors "github.com/novacommerce/pkg/errors"
+	"github.com/novacommerce/pkg/pagination"
 )
 
 // UserHandler serves user profile HTTP endpoints.
@@ -38,6 +39,32 @@ func (h *UserHandler) GetUser(c *gin.Context) {
 	}
 
 	respondSuccess(c, 200, output)
+}
+
+// ListUsers handles GET /api/v1/users.
+func (h *UserHandler) ListUsers(c *gin.Context) {
+	params, err := pagination.ParseParams(c.Request)
+	if err != nil {
+		respondError(c, apperrors.NewBadRequest(err.Error()))
+		return
+	}
+
+	result, err := h.userUseCase.ListUsers(c.Request.Context(), usecase.ListUsersInput{
+		Status: c.Query("status"),
+		Role:   c.Query("role"),
+		Search: c.Query("search"),
+		Cursor: params.Cursor,
+		Limit:  params.Limit,
+	})
+	if err != nil {
+		respondError(c, err)
+		return
+	}
+
+	respondSuccessWithMeta(c, 200, result.Users, map[string]any{
+		"next_cursor": result.NextCursor,
+		"has_more":    result.HasMore,
+	})
 }
 
 // UpdateProfile handles PUT /api/v1/users/:id.

@@ -22,6 +22,14 @@ func respondSuccess(c *gin.Context, status int, data any) {
 	})
 }
 
+func respondSuccessWithMeta(c *gin.Context, status int, data any, meta any) {
+	c.JSON(status, apiEnvelope{
+		Data:  data,
+		Meta:  meta,
+		Error: nil,
+	})
+}
+
 func respondNoContent(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
