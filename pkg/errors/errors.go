@@ -49,6 +49,26 @@ func newAppError(code, message string, status int, details interface{}) *AppErro
 	}
 }
 
+// New creates an AppError with a domain-specific code and message.
+func New(code, message string) *AppError {
+	return newAppError(code, message, statusForCode(code), nil)
+}
+
+func statusForCode(code string) int {
+	switch code {
+	case ErrCodeNotFound, "PRODUCT_NOT_FOUND":
+		return http.StatusNotFound
+	case ErrCodeForbidden, "PRODUCT_FORBIDDEN":
+		return http.StatusForbidden
+	case ErrCodeConflict, "DUPLICATE_SKU":
+		return http.StatusConflict
+	case ErrCodeUnprocessable, "MAX_IMAGES_EXCEEDED", "PRODUCT_NOT_ARCHIVABLE":
+		return http.StatusUnprocessableEntity
+	default:
+		return http.StatusBadRequest
+	}
+}
+
 // NewNotFound creates a not found error.
 func NewNotFound(message string) *AppError {
 	return newAppError(ErrCodeNotFound, message, http.StatusNotFound, nil)

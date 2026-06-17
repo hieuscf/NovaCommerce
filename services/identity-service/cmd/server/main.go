@@ -51,6 +51,15 @@ func main() {
 	}
 	defer app.close(log)
 
+	relayCtx, relayCancel := context.WithCancel(ctx)
+	defer relayCancel()
+	go func() {
+		log.Info().Msg("starting outbox relay")
+		if err := app.outboxRelay.Run(relayCtx); err != nil && !errors.Is(err, context.Canceled) {
+			log.Error().Err(err).Msg("outbox relay stopped")
+		}
+	}()
+
 	srv := &http.Server{
 		Addr:              fmt.Sprintf(":%d", cfg.Server.Port),
 		Handler:           app.engine,

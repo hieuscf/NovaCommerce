@@ -19,15 +19,18 @@ import (
 	"github.com/novacommerce/identity-service/internal/infrastructure/messaging"
 	infraoauth "github.com/novacommerce/identity-service/internal/infrastructure/oauth"
 	"github.com/novacommerce/identity-service/internal/infrastructure/persistence/postgres"
+	pkgkafka "github.com/novacommerce/pkg/kafka"
 	pkglogger "github.com/novacommerce/pkg/logger"
 	"github.com/redis/go-redis/v9"
 )
 
 type wiredApp struct {
-	engine        *gin.Engine
-	pool          *pgxpool.Pool
-	redisClient   *redis.Client
-	kafkaProducer *messaging.KafkaProducer
+	engine          *gin.Engine
+	pool            *pgxpool.Pool
+	redisClient     *redis.Client
+	kafkaProducer   *messaging.KafkaProducer
+	outboxKafka     *pkgkafka.Producer
+	outboxRelay     *messaging.OutboxRelay
 }
 
 func wireApp(ctx context.Context, cfg *config.Config, log *pkglogger.Logger) (*wiredApp, error) {
@@ -104,6 +107,19 @@ func wireApp(ctx context.Context, cfg *config.Config, log *pkglogger.Logger) (*w
 	userUseCase := usecase.NewUserUseCase(userRepo, roleRepo, outboxRepo, transactor)
 	userHandler := handler.NewUserHandler(userUseCase)
 
+	outboxKafkaProducer, err := pkgkafka.NewProducer(pkgkafka.ProducerConfig{
+		Brokers:     cfg.Kafka.Brokers,
+		ServiceName: cfg.Server.Name,
+	})
+	if err != nil {
+		pool.Close()
+		_ = redisClient.Close()
+		_ = kafkaProducer.Close()
+		return nil, fmt.Errorf("init outbox kafka producer: %w", err)
+	}
+
+	outboxRelay := messaging.NewOutboxRelay(outboxRepo, outboxKafkaProducer, log, messaging.OutboxRelayConfig{})
+
 	engine := router.SetupRouter(&router.Dependencies{
 		Config:        cfg,
 		RedisClient:   redisClient,
@@ -119,10 +135,17 @@ func wireApp(ctx context.Context, cfg *config.Config, log *pkglogger.Logger) (*w
 		pool:          pool,
 		redisClient:   redisClient,
 		kafkaProducer: kafkaProducer,
+		outboxKafka:   outboxKafkaProducer,
+		outboxRelay:   outboxRelay,
 	}, nil
 }
 
 func (a *wiredApp) close(log *pkglogger.Logger) {
+	if a.outboxKafka != nil {
+		if err := a.outboxKafka.Close(); err != nil {
+			log.Error().Err(err).Msg("close outbox kafka producer")
+		}
+	}
 	if a.kafkaProducer != nil {
 		if err := a.kafkaProducer.Close(); err != nil {
 			log.Error().Err(err).Msg("close kafka producer")

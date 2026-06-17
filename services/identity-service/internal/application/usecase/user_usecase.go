@@ -132,13 +132,17 @@ func (uc *userUseCase) UpdateProfile(ctx context.Context, id uuid.UUID, input Up
 		return nil, wrapUserError("UpdateProfile", err)
 	}
 
-	if input.FullName != nil {
+	var changedFields []string
+	if input.FullName != nil && *input.FullName != user.FullName {
+		changedFields = append(changedFields, "full_name")
 		user.FullName = *input.FullName
 	}
-	if input.Phone != nil {
+	if input.Phone != nil && *input.Phone != user.Phone {
+		changedFields = append(changedFields, "phone")
 		user.Phone = *input.Phone
 	}
-	if input.AvatarURL != nil {
+	if input.AvatarURL != nil && *input.AvatarURL != user.AvatarURL {
+		changedFields = append(changedFields, "avatar_url")
 		user.AvatarURL = *input.AvatarURL
 	}
 
@@ -146,7 +150,7 @@ func (uc *userUseCase) UpdateProfile(ctx context.Context, id uuid.UUID, input Up
 		if err := uc.userRepo.Update(txCtx, user); err != nil {
 			return err
 		}
-		return uc.writeUserUpdatedEvent(txCtx, user)
+		return uc.writeUserUpdatedEvent(txCtx, user, changedFields)
 	})
 	if err != nil {
 		return nil, wrapUserError("UpdateProfile", err)
@@ -172,7 +176,7 @@ func (uc *userUseCase) UpdateUserStatus(ctx context.Context, actorID, targetID u
 		if err != nil {
 			return err
 		}
-		if err := uc.writeUserUpdatedEvent(txCtx, user); err != nil {
+		if err := uc.writeUserUpdatedEvent(txCtx, user, []string{"status"}); err != nil {
 			return err
 		}
 		updated = user
@@ -266,18 +270,18 @@ func (uc *userUseCase) warnIfRevokingLastAdmin(ctx context.Context, actorID, use
 }
 
 type userUpdatedPayload struct {
-	Type      string    `json:"type"`
-	UserID    uuid.UUID `json:"user_id"`
-	Email     string    `json:"email"`
-	Timestamp time.Time `json:"timestamp"`
+	Type          string    `json:"type"`
+	UserID        uuid.UUID `json:"user_id"`
+	ChangedFields []string  `json:"changed_fields"`
+	Timestamp     time.Time `json:"timestamp"`
 }
 
-func (uc *userUseCase) writeUserUpdatedEvent(ctx context.Context, user *entity.User) error {
+func (uc *userUseCase) writeUserUpdatedEvent(ctx context.Context, user *entity.User, changedFields []string) error {
 	raw, err := json.Marshal(userUpdatedPayload{
-		Type:      eventUserUpdated,
-		UserID:    user.ID,
-		Email:     user.Email,
-		Timestamp: time.Now().UTC(),
+		Type:          eventUserUpdated,
+		UserID:        user.ID,
+		ChangedFields: changedFields,
+		Timestamp:     time.Now().UTC(),
 	})
 	if err != nil {
 		return fmt.Errorf("userUseCase: marshal user updated event: %w", err)
