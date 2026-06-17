@@ -60,8 +60,11 @@ func (u *User) IsActive() bool {
 type Role struct {
 	ID          uuid.UUID `db:"id"`
 	Name        string    `db:"name"`
+	DisplayName string    `db:"display_name"`
 	Description *string   `db:"description"`
+	IsSystem    bool      `db:"is_system"`
 	CreatedAt   time.Time `db:"created_at"`
+	UpdatedAt   time.Time `db:"updated_at"`
 }
 
 // Permission defines a resource/action pair for RBAC.

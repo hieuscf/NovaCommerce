@@ -9,6 +9,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/novacommerce/identity-service/internal/domain/entity"
+	"github.com/novacommerce/identity-service/internal/domain/repository"
 	"github.com/novacommerce/identity-service/internal/infrastructure/persistence/postgres"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -79,5 +80,45 @@ func TestUserRepository_Integration(t *testing.T) {
 		updated, err := repo.FindByID(ctx, found.ID)
 		require.NoError(t, err)
 		assert.NotNil(t, updated.LastLoginAt)
+	})
+
+	t.Run("Update profile fields", func(t *testing.T) {
+		found, err := repo.FindByEmail(ctx, "integration@example.com")
+		require.NoError(t, err)
+
+		found.FullName = "Updated Integration User"
+		found.Phone = "+84901234567"
+		found.AvatarURL = "https://example.com/avatar.png"
+		require.NoError(t, repo.Update(ctx, found))
+
+		updated, err := repo.FindByID(ctx, found.ID)
+		require.NoError(t, err)
+		assert.Equal(t, "Updated Integration User", updated.FullName)
+		assert.Equal(t, "+84901234567", updated.Phone)
+		assert.Equal(t, "https://example.com/avatar.png", updated.AvatarURL)
+	})
+
+	t.Run("UpdateStatus", func(t *testing.T) {
+		found, err := repo.FindByEmail(ctx, "integration@example.com")
+		require.NoError(t, err)
+
+		updated, err := repo.UpdateStatus(ctx, found.ID, entity.UserStatusInactive)
+		require.NoError(t, err)
+		assert.Equal(t, entity.UserStatusInactive, updated.Status)
+	})
+
+	t.Run("List with cursor pagination", func(t *testing.T) {
+		users, total, err := repo.List(ctx, repository.UserFilter{}, "", 10)
+		require.NoError(t, err)
+		assert.GreaterOrEqual(t, total, int64(1))
+		assert.NotEmpty(t, users)
+
+		active := entity.UserStatusActive
+		filtered, filteredTotal, err := repo.List(ctx, repository.UserFilter{Status: &active}, "", 10)
+		require.NoError(t, err)
+		assert.GreaterOrEqual(t, filteredTotal, int64(0))
+		for _, u := range filtered {
+			assert.Equal(t, entity.UserStatusActive, u.Status)
+		}
 	})
 }

@@ -7,6 +7,11 @@ import (
 	"github.com/novacommerce/identity-service/internal/domain/entity"
 )
 
+// UserFilter scopes user list queries.
+type UserFilter struct {
+	Status *entity.UserStatus
+}
+
 // UserRepository persists and retrieves users.
 // Implementations should return pkg/errors types: NewNotFound, NewConflict, NewUnauthorized.
 type UserRepository interface {
@@ -18,4 +23,6 @@ type UserRepository interface {
 	Update(ctx context.Context, user *entity.User) error
 	UpdatePassword(ctx context.Context, userID uuid.UUID, passwordHash string) error
 	UpdateLastLogin(ctx context.Context, userID uuid.UUID) error
+	List(ctx context.Context, filter UserFilter, cursor string, limit int) ([]*entity.User, int64, error)
+	UpdateStatus(ctx context.Context, userID uuid.UUID, status entity.UserStatus) (*entity.User, error)
 }

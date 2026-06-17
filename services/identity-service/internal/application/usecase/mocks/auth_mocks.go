@@ -68,6 +68,22 @@ func (m *UserRepository) UpdateLastLogin(ctx context.Context, userID uuid.UUID) 
 	return args.Error(0)
 }
 
+func (m *UserRepository) List(ctx context.Context, filter repository.UserFilter, cursor string, limit int) ([]*entity.User, int64, error) {
+	args := m.Called(ctx, filter, cursor, limit)
+	if args.Get(0) == nil {
+		return nil, args.Get(1).(int64), args.Error(2)
+	}
+	return args.Get(0).([]*entity.User), args.Get(1).(int64), args.Error(2)
+}
+
+func (m *UserRepository) UpdateStatus(ctx context.Context, userID uuid.UUID, status entity.UserStatus) (*entity.User, error) {
+	args := m.Called(ctx, userID, status)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*entity.User), args.Error(1)
+}
+
 type RefreshTokenRepository struct {
 	mock.Mock
 }

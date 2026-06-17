@@ -11,6 +11,7 @@ import (
 	"github.com/novacommerce/identity-service/internal/domain/entity"
 	"github.com/novacommerce/identity-service/internal/domain/repository"
 	apperrors "github.com/novacommerce/pkg/errors"
+	"github.com/novacommerce/pkg/pagination"
 )
 
 const userColumns = `id, username, email, password_hash, phone, full_name, avatar_url, status, last_login_at, created_at, updated_at`
@@ -79,7 +80,6 @@ func (r *userPostgresRepo) Update(ctx context.Context, user *entity.User) error 
 		SET full_name = $2,
 		    phone = NULLIF($3, ''),
 		    avatar_url = NULLIF($4, ''),
-		    status = $5,
 		    updated_at = NOW()
 		WHERE id = $1
 		RETURNING ` + userColumns
@@ -89,7 +89,6 @@ func (r *userPostgresRepo) Update(ctx context.Context, user *entity.User) error 
 		user.FullName,
 		user.Phone,
 		user.AvatarURL,
-		user.Status,
 	)
 
 	updated, err := scanUser(row)
@@ -99,6 +98,103 @@ func (r *userPostgresRepo) Update(ctx context.Context, user *entity.User) error 
 
 	*user = *updated
 	return nil
+}
+
+func (r *userPostgresRepo) List(ctx context.Context, filter repository.UserFilter, cursor string, limit int) ([]*entity.User, int64, error) {
+	if limit <= 0 {
+		limit = 20
+	}
+	if limit > 100 {
+		limit = 100
+	}
+
+	total, err := r.countUsers(ctx, filter)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	query := `SELECT ` + userColumns + ` FROM users WHERE 1=1`
+	args := make([]any, 0, 4)
+	argPos := 1
+
+	if filter.Status != nil {
+		query += fmt.Sprintf(" AND status = $%d", argPos)
+		args = append(args, *filter.Status)
+		argPos++
+	}
+
+	if cursor != "" {
+		cursorID, cursorCreatedAt, err := pagination.DecodeCursor(cursor)
+		if err != nil {
+			return nil, 0, apperrors.NewBadRequest("invalid cursor")
+		}
+
+		cursorUUID, err := uuid.Parse(cursorID)
+		if err != nil {
+			return nil, 0, apperrors.NewBadRequest("invalid cursor")
+		}
+
+		query += fmt.Sprintf(
+			" AND (created_at < $%d OR (created_at = $%d AND id < $%d))",
+			argPos, argPos, argPos+1,
+		)
+		args = append(args, cursorCreatedAt, cursorUUID)
+		argPos += 2
+	}
+
+	query += fmt.Sprintf(" ORDER BY created_at DESC, id DESC LIMIT $%d", argPos)
+	args = append(args, limit)
+
+	rows, err := extractQuerier(ctx, r.pool).Query(ctx, query, args...)
+	if err != nil {
+		return nil, 0, fmt.Errorf("userPostgresRepo.List: %w", err)
+	}
+	defer rows.Close()
+
+	users := make([]*entity.User, 0, limit)
+	for rows.Next() {
+		user, err := scanUser(rows)
+		if err != nil {
+			return nil, 0, fmt.Errorf("userPostgresRepo.List scan: %w", err)
+		}
+		users = append(users, user)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, 0, fmt.Errorf("userPostgresRepo.List rows: %w", err)
+	}
+
+	return users, total, nil
+}
+
+func (r *userPostgresRepo) UpdateStatus(ctx context.Context, userID uuid.UUID, status entity.UserStatus) (*entity.User, error) {
+	query := `
+		UPDATE users
+		SET status = $2, updated_at = NOW()
+		WHERE id = $1
+		RETURNING ` + userColumns
+
+	row := extractQuerier(ctx, r.pool).QueryRow(ctx, query, userID, status)
+	user, err := scanUser(row)
+	if err != nil {
+		return nil, mapUserError("UpdateStatus", err)
+	}
+	return user, nil
+}
+
+func (r *userPostgresRepo) countUsers(ctx context.Context, filter repository.UserFilter) (int64, error) {
+	query := `SELECT COUNT(*) FROM users WHERE 1=1`
+	args := make([]any, 0, 1)
+
+	if filter.Status != nil {
+		query += " AND status = $1"
+		args = append(args, *filter.Status)
+	}
+
+	var total int64
+	if err := extractQuerier(ctx, r.pool).QueryRow(ctx, query, args...).Scan(&total); err != nil {
+		return 0, fmt.Errorf("userPostgresRepo.countUsers: %w", err)
+	}
+	return total, nil
 }
 
 func (r *userPostgresRepo) UpdatePassword(ctx context.Context, userID uuid.UUID, passwordHash string) error {
