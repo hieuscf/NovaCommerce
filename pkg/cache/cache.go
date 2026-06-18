@@ -258,3 +258,36 @@ func MGet[T any](ctx context.Context, c *Cache, keys []string) (map[string]T, er
 
 	return result, nil
 }
+
+type pipelineClient interface {
+	Pipeline() redis.Pipeliner
+}
+
+// SetManyWithTTL stores multiple string values with the same TTL using a Redis pipeline.
+func (c *Cache) SetManyWithTTL(ctx context.Context, items map[string]string, ttl time.Duration) error {
+	if c == nil || c.client == nil {
+		return apperrors.NewInternal("cache client is not initialized")
+	}
+	if len(items) == 0 {
+		return nil
+	}
+
+	pc, ok := c.client.(pipelineClient)
+	if !ok {
+		for key, value := range items {
+			if err := c.client.Set(ctx, key, value, ttl).Err(); err != nil {
+				return mapRedisError(err)
+			}
+		}
+		return nil
+	}
+
+	pipe := pc.Pipeline()
+	for key, value := range items {
+		pipe.Set(ctx, key, value, ttl)
+	}
+	if _, err := pipe.Exec(ctx); err != nil {
+		return mapRedisError(err)
+	}
+	return nil
+}
