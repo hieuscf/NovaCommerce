@@ -22,17 +22,8 @@ type ProductStatus string
 const (
 	ProductStatusDraft    ProductStatus = "draft"
 	ProductStatusActive   ProductStatus = "active"
+	ProductStatusInactive ProductStatus = "inactive"
 	ProductStatusArchived ProductStatus = "archived"
-)
-
-// ProductVariantStatus is the lifecycle state of a product variant.
-type ProductVariantStatus string
-
-const (
-	ProductVariantStatusDraft    ProductVariantStatus = "draft"
-	ProductVariantStatusActive   ProductVariantStatus = "active"
-	ProductVariantStatusInactive ProductVariantStatus = "inactive"
-	ProductVariantStatusArchived ProductVariantStatus = "archived"
 )
 
 // AttributeType describes the kind of product attribute.

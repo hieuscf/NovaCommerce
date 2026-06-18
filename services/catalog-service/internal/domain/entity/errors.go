@@ -15,5 +15,5 @@ var (
 	ErrDuplicateCode      = errors.New("DUPLICATE_CODE", "warehouse code already exists")
 	ErrMaxImagesExceeded  = errors.New("MAX_IMAGES_EXCEEDED", "product cannot have more than 10 images")
 	ErrInsufficientStock  = errors.New("INSUFFICIENT_STOCK", "insufficient stock available")
-	ErrProductNotArchivable = errors.New("PRODUCT_NOT_ARCHIVABLE", "only draft products can be archived directly")
+	ErrProductNotArchivable = errors.New("PRODUCT_NOT_ARCHIVABLE", "only draft/inactive products can be archived directly; active products must be set inactive first")
 )
