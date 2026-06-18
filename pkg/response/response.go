@@ -61,6 +61,11 @@ func NoContent(w http.ResponseWriter) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// Paginated writes a 200 OK paginated list response.
+func Paginated(w http.ResponseWriter, data interface{}, meta *Meta) {
+	writeJSON(w, http.StatusOK, Response{Data: data, Meta: meta})
+}
+
 // Error writes an error response, detecting AppError when possible.
 func Error(w http.ResponseWriter, err error) {
 	if appErr, ok := apperrors.IsAppError(err); ok {

@@ -46,15 +46,6 @@ func (h *CatalogHandler) RegisterRoutes(r gin.IRouter) {
 			brands.PUT("/:id", notImplemented)
 		}
 
-		products := v1.Group("/products")
-		{
-			products.GET("", notImplemented)
-			products.POST("", notImplemented)
-			products.GET("/:id", notImplemented)
-			products.PUT("/:id", notImplemented)
-			products.DELETE("/:id", notImplemented)
-		}
-
 		inventory := v1.Group("/inventory")
 		{
 			inventory.GET("/:variant_id", notImplemented)

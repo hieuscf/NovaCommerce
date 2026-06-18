@@ -22,6 +22,14 @@ func respondSuccess(c *gin.Context, status int, data any) {
 	})
 }
 
+func respondSuccessWithMeta(c *gin.Context, status int, data any, meta any) {
+	c.JSON(status, apiEnvelope{
+		Data:  data,
+		Meta:  meta,
+		Error: nil,
+	})
+}
+
 func respondError(c *gin.Context, err error) {
 	if appErr, ok := apperrors.IsAppError(err); ok {
 		c.JSON(appErr.HTTPStatus, apiEnvelope{

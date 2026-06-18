@@ -13,6 +13,7 @@ type Dependencies struct {
 	Config          *config.Config
 	HealthHandler   *handler.HealthHandler
 	CatalogHandler  *handler.CatalogHandler
+	ProductHandler  *handler.ProductHandler
 }
 
 // SetupRouter builds the Gin engine with middleware and routes.
@@ -36,6 +37,10 @@ func SetupRouter(deps *Dependencies) *gin.Engine {
 
 	if deps.CatalogHandler != nil {
 		deps.CatalogHandler.RegisterRoutes(r)
+	}
+
+	if deps.ProductHandler != nil {
+		deps.ProductHandler.RegisterRoutes(r)
 	}
 
 	return r

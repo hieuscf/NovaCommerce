@@ -56,7 +56,7 @@ func New(code, message string) *AppError {
 
 func statusForCode(code string) int {
 	switch code {
-	case ErrCodeNotFound, "PRODUCT_NOT_FOUND":
+	case ErrCodeNotFound, "PRODUCT_NOT_FOUND", "VARIANT_NOT_FOUND":
 		return http.StatusNotFound
 	case ErrCodeForbidden, "PRODUCT_FORBIDDEN":
 		return http.StatusForbidden

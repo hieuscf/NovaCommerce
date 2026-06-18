@@ -9,6 +9,7 @@ import (
 	"unicode"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/google/uuid"
 	apperrors "github.com/novacommerce/pkg/errors"
 )
 
@@ -48,6 +49,7 @@ func New() *Validator {
 		_ = v.RegisterValidation("phone_vn", validatePhoneVN)
 		_ = v.RegisterValidation("slug", validateSlug)
 		_ = v.RegisterValidation("password_strength", validatePasswordStrength)
+		_ = v.RegisterValidation("uuid4", validateUUID4)
 
 		instance = &Validator{validate: v}
 	})
@@ -105,6 +107,8 @@ func humanReadableMessage(fe validator.FieldError) string {
 		return fmt.Sprintf("%s must contain only lowercase letters, numbers, and hyphens", field)
 	case "password_strength":
 		return fmt.Sprintf("%s must be at least 8 characters and include uppercase, lowercase, and digit characters", field)
+	case "uuid4":
+		return fmt.Sprintf("%s must be a valid UUID", field)
 	default:
 		return fmt.Sprintf("%s failed on '%s' validation", field, fe.Tag())
 	}
@@ -141,4 +145,13 @@ func validatePasswordStrength(fl validator.FieldLevel) bool {
 	}
 
 	return hasUpper && hasLower && hasDigit
+}
+
+func validateUUID4(fl validator.FieldLevel) bool {
+	value := fl.Field().String()
+	if value == "" {
+		return true
+	}
+	_, err := uuid.Parse(value)
+	return err == nil
 }
