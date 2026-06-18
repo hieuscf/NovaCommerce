@@ -7,19 +7,23 @@ import (
 )
 
 // Category represents a node in the product category tree.
-// Children is populated in memory when building the tree; it is not mapped from the database.
 type Category struct {
-	ID          uuid.UUID
-	ParentID    *uuid.UUID
-	Name        string
-	Slug        string
-	Description string
-	ImageURL    string
-	SortOrder   int
-	IsActive    bool
-	Children    []*Category
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	ID          uuid.UUID      `db:"id" json:"id"`
+	ParentID    *uuid.UUID     `db:"parent_id" json:"parent_id,omitempty"`
+	Name        string         `db:"name" json:"name"`
+	Slug        string         `db:"slug" json:"slug"`
+	Description string         `db:"description" json:"description,omitempty"`
+	ImageURL    string         `db:"image_url" json:"image_url,omitempty"`
+	SortOrder   int            `db:"sort_order" json:"sort_order"`
+	Status      CategoryStatus `db:"status" json:"status"`
+	CreatedAt   time.Time      `db:"created_at" json:"created_at"`
+	UpdatedAt   time.Time      `db:"updated_at" json:"updated_at"`
+	Children    []*Category    `db:"-" json:"children,omitempty"`
+}
+
+// IsActive reports whether the category is visible in the catalog.
+func (c *Category) IsActive() bool {
+	return c.Status == CategoryStatusActive
 }
 
 // HasChildren reports whether the category has child nodes in the in-memory tree.
