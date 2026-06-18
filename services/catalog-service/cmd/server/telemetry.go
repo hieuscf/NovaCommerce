@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/novacommerce/identity-service/config"
+	"github.com/novacommerce/services/catalog-service/config"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"

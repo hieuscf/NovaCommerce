@@ -143,6 +143,67 @@ func (m *PasswordResetTokenRepository) DeleteExpiredByUserID(ctx context.Context
 	return args.Error(0)
 }
 
+type RoleRepository struct {
+	mock.Mock
+}
+
+func (m *RoleRepository) Create(ctx context.Context, role *entity.Role) error {
+	args := m.Called(ctx, role)
+	return args.Error(0)
+}
+
+func (m *RoleRepository) FindByID(ctx context.Context, id uuid.UUID) (*entity.Role, error) {
+	args := m.Called(ctx, id)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*entity.Role), args.Error(1)
+}
+
+func (m *RoleRepository) FindByName(ctx context.Context, name string) (*entity.Role, error) {
+	args := m.Called(ctx, name)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*entity.Role), args.Error(1)
+}
+
+func (m *RoleRepository) List(ctx context.Context) ([]*entity.Role, error) {
+	args := m.Called(ctx)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).([]*entity.Role), args.Error(1)
+}
+
+func (m *RoleRepository) GetUserRoles(ctx context.Context, userID uuid.UUID) ([]*entity.Role, error) {
+	args := m.Called(ctx, userID)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).([]*entity.Role), args.Error(1)
+}
+
+func (m *RoleRepository) AssignRole(ctx context.Context, userID, roleID uuid.UUID) error {
+	args := m.Called(ctx, userID, roleID)
+	return args.Error(0)
+}
+
+func (m *RoleRepository) RevokeRole(ctx context.Context, userID, roleID uuid.UUID) error {
+	args := m.Called(ctx, userID, roleID)
+	return args.Error(0)
+}
+
+func (m *RoleRepository) RoleExists(ctx context.Context, roleID uuid.UUID) (bool, error) {
+	args := m.Called(ctx, roleID)
+	return args.Bool(0), args.Error(1)
+}
+
+func (m *RoleRepository) CountUsersWithRole(ctx context.Context, roleID uuid.UUID) (int, error) {
+	args := m.Called(ctx, roleID)
+	return args.Int(0), args.Error(1)
+}
+
 type JWTService struct {
 	mock.Mock
 }
@@ -194,6 +255,7 @@ func (m *RateLimiter) Allow(ctx context.Context, key string) error {
 
 var (
 	_ repository.UserRepository               = (*UserRepository)(nil)
+	_ repository.RoleRepository               = (*RoleRepository)(nil)
 	_ repository.RefreshTokenRepository       = (*RefreshTokenRepository)(nil)
 	_ repository.PasswordResetTokenRepository = (*PasswordResetTokenRepository)(nil)
 	_ port.JWTService                         = (*JWTService)(nil)

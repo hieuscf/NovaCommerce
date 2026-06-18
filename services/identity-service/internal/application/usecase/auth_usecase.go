@@ -39,6 +39,7 @@ type AuthUseCase interface {
 
 type authUseCase struct {
 	userRepo          repository.UserRepository
+	roleRepo          repository.RoleRepository
 	refreshTokenRepo  repository.RefreshTokenRepository
 	passwordResetRepo repository.PasswordResetTokenRepository
 	jwtService        port.JWTService
@@ -50,6 +51,7 @@ type authUseCase struct {
 // NewAuthUseCase creates an AuthUseCase with the given dependencies.
 func NewAuthUseCase(
 	userRepo repository.UserRepository,
+	roleRepo repository.RoleRepository,
 	refreshTokenRepo repository.RefreshTokenRepository,
 	passwordResetRepo repository.PasswordResetTokenRepository,
 	jwtService port.JWTService,
@@ -59,6 +61,7 @@ func NewAuthUseCase(
 ) AuthUseCase {
 	return &authUseCase{
 		userRepo:          userRepo,
+		roleRepo:          roleRepo,
 		refreshTokenRepo:  refreshTokenRepo,
 		passwordResetRepo: passwordResetRepo,
 		jwtService:        jwtService,
@@ -101,6 +104,10 @@ func (uc *authUseCase) Register(ctx context.Context, input RegisterInput) (*Regi
 	}
 
 	if err := uc.userRepo.Create(ctx, user); err != nil {
+		return nil, wrapAuthError("Register", err)
+	}
+
+	if err := assignDefaultCustomerRole(ctx, uc.roleRepo, user.ID); err != nil {
 		return nil, wrapAuthError("Register", err)
 	}
 
@@ -153,7 +160,12 @@ func (uc *authUseCase) RefreshToken(ctx context.Context, rawRefreshToken string)
 		return nil, err
 	}
 
-	accessToken, err := uc.jwtService.GenerateAccessToken(user.ID, user.Email, nil)
+	roleNames, err := loadRoleNames(ctx, uc.roleRepo, user.ID)
+	if err != nil {
+		return nil, wrapAuthError("RefreshToken", err)
+	}
+
+	accessToken, err := uc.jwtService.GenerateAccessToken(user.ID, user.Email, roleNames)
 	if err != nil {
 		return nil, fmt.Errorf("authUseCase.RefreshToken: %w", err)
 	}
@@ -320,7 +332,12 @@ func (uc *authUseCase) issueLoginTokens(
 	user *entity.User,
 	ipAddress, userAgent, existingRefreshToken string,
 ) (*LoginOutput, error) {
-	accessToken, err := uc.jwtService.GenerateAccessToken(user.ID, user.Email, nil)
+	roleNames, err := loadRoleNames(ctx, uc.roleRepo, user.ID)
+	if err != nil {
+		return nil, wrapAuthError("Login", err)
+	}
+
+	accessToken, err := uc.jwtService.GenerateAccessToken(user.ID, user.Email, roleNames)
 	if err != nil {
 		return nil, fmt.Errorf("authUseCase.Login: %w", err)
 	}

@@ -28,7 +28,9 @@ func SetupRouter(deps *Dependencies) *gin.Engine {
 	}
 
 	r := gin.New()
-	r.Use(otelgin.Middleware(deps.Config.Telemetry.ServiceName))
+	if deps.Config.Telemetry.Enabled {
+		r.Use(otelgin.Middleware(deps.Config.Telemetry.ServiceName))
+	}
 	r.Use(middleware.Recovery())
 	r.Use(middleware.SecurityHeaders())
 	r.Use(middleware.RequestID())

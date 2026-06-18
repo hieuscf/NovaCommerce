@@ -10,18 +10,14 @@ import (
 	"github.com/subosito/gotenv"
 )
 
-// Config holds all identity-service configuration.
+// Config holds all catalog-service configuration.
 type Config struct {
 	Server    ServerConfig    `mapstructure:"server"`
 	Database  DatabaseConfig  `mapstructure:"database"`
 	Redis     RedisConfig     `mapstructure:"redis"`
 	Kafka     KafkaConfig     `mapstructure:"kafka"`
-	JWT       JWTConfig       `mapstructure:"jwt"`
-	Email     EmailConfig     `mapstructure:"email"`
-	RateLimit RateLimitConfig `mapstructure:"rate_limit"`
 	Telemetry TelemetryConfig `mapstructure:"telemetry"`
 	HTTP      HTTPConfig      `mapstructure:"http"`
-	OAuth     OAuthConfig     `mapstructure:"oauth"`
 }
 
 // ServerConfig holds HTTP server settings.
@@ -51,7 +47,7 @@ type DatabaseConfig struct {
 	DSN             string        `mapstructure:"dsn"`
 }
 
-// DSN returns a PostgreSQL connection string.
+// BuildDSN returns a PostgreSQL connection string.
 func (c DatabaseConfig) BuildDSN() string {
 	if c.DSN != "" {
 		return c.DSN
@@ -93,34 +89,12 @@ func (c RedisConfig) BuildAddr() string {
 	return fmt.Sprintf("%s:%d", c.Host, c.Port)
 }
 
-// KafkaConfig holds Kafka producer settings.
+// KafkaConfig holds Kafka client settings.
 type KafkaConfig struct {
-	Brokers  []string `mapstructure:"brokers"`
-	ClientID string   `mapstructure:"client_id"`
-	GroupID  string   `mapstructure:"group_id"`
-}
-
-// JWTConfig holds JWT signing settings.
-type JWTConfig struct {
-	PrivateKeyPath string        `mapstructure:"private_key_path"`
-	PublicKeyPath  string        `mapstructure:"public_key_path"`
-	AccessTokenTTL time.Duration `mapstructure:"access_token_ttl"`
-	RefreshTTL     time.Duration `mapstructure:"refresh_ttl"`
-	Issuer         string        `mapstructure:"issuer"`
-}
-
-// EmailConfig holds outbound email settings.
-type EmailConfig struct {
-	From           string `mapstructure:"from"`
-	SendGridAPIKey string `mapstructure:"sendgrid_api_key"`
-}
-
-// RateLimitConfig holds HTTP rate limit settings.
-type RateLimitConfig struct {
-	LoginMaxAttempts    int           `mapstructure:"login_max_attempts"`
-	LoginWindow         time.Duration `mapstructure:"login_window"`
-	RegisterMaxAttempts int           `mapstructure:"register_max_attempts"`
-	RegisterWindow      time.Duration `mapstructure:"register_window"`
+	Brokers       []string `mapstructure:"brokers"`
+	ClientID      string   `mapstructure:"client_id"`
+	GroupID       string   `mapstructure:"group_id"`
+	ConsumeTopics []string `mapstructure:"consume_topics"`
 }
 
 // TelemetryConfig holds OpenTelemetry settings.
@@ -133,19 +107,6 @@ type TelemetryConfig struct {
 // HTTPConfig holds HTTP middleware settings.
 type HTTPConfig struct {
 	CORSAllowOrigins []string `mapstructure:"cors_allow_origins"`
-}
-
-// OAuthConfig groups per-provider OAuth2 credentials.
-type OAuthConfig struct {
-	Google   OAuthProviderConfig `mapstructure:"google"`
-	Facebook OAuthProviderConfig `mapstructure:"facebook"`
-}
-
-// OAuthProviderConfig holds the credentials for a single OAuth2 provider.
-type OAuthProviderConfig struct {
-	ClientID     string `mapstructure:"client_id"`
-	ClientSecret string `mapstructure:"client_secret"`
-	RedirectURL  string `mapstructure:"redirect_url"`
 }
 
 // Load reads configuration from config.yaml with environment variable overrides.
@@ -201,26 +162,10 @@ func Load() (*Config, error) {
 			Addr:     v.GetString("redis.addr"),
 		},
 		Kafka: KafkaConfig{
-			Brokers:  v.GetStringSlice("kafka.brokers"),
-			ClientID: v.GetString("kafka.client_id"),
-			GroupID:  v.GetString("kafka.group_id"),
-		},
-		JWT: JWTConfig{
-			PrivateKeyPath: v.GetString("jwt.private_key_path"),
-			PublicKeyPath:  v.GetString("jwt.public_key_path"),
-			AccessTokenTTL: v.GetDuration("jwt.access_token_ttl"),
-			RefreshTTL:     v.GetDuration("jwt.refresh_ttl"),
-			Issuer:         v.GetString("jwt.issuer"),
-		},
-		Email: EmailConfig{
-			From:           v.GetString("email.from"),
-			SendGridAPIKey: v.GetString("email.sendgrid_api_key"),
-		},
-		RateLimit: RateLimitConfig{
-			LoginMaxAttempts:    v.GetInt("rate_limit.login_max_attempts"),
-			LoginWindow:         v.GetDuration("rate_limit.login_window"),
-			RegisterMaxAttempts: v.GetInt("rate_limit.register_max_attempts"),
-			RegisterWindow:      v.GetDuration("rate_limit.register_window"),
+			Brokers:       v.GetStringSlice("kafka.brokers"),
+			ClientID:      v.GetString("kafka.client_id"),
+			GroupID:       v.GetString("kafka.group_id"),
+			ConsumeTopics: v.GetStringSlice("kafka.consume_topics"),
 		},
 		Telemetry: TelemetryConfig{
 			Enabled:      v.GetBool("telemetry.enabled"),
@@ -230,30 +175,18 @@ func Load() (*Config, error) {
 		HTTP: HTTPConfig{
 			CORSAllowOrigins: v.GetStringSlice("http.cors_allow_origins"),
 		},
-		OAuth: OAuthConfig{
-			Google: OAuthProviderConfig{
-				ClientID:     v.GetString("oauth.google.client_id"),
-				ClientSecret: v.GetString("oauth.google.client_secret"),
-				RedirectURL:  v.GetString("oauth.google.redirect_url"),
-			},
-			Facebook: OAuthProviderConfig{
-				ClientID:     v.GetString("oauth.facebook.client_id"),
-				ClientSecret: v.GetString("oauth.facebook.client_secret"),
-				RedirectURL:  v.GetString("oauth.facebook.redirect_url"),
-			},
-		},
 	}
 
 	applyLegacyEnvFallback(v, cfg)
-	normalize(&cfg.Server, &cfg.Database, &cfg.Redis, &cfg.Kafka, &cfg.JWT, &cfg.RateLimit, &cfg.Telemetry, &cfg.HTTP)
+	normalize(&cfg.Server, &cfg.Database, &cfg.Redis, &cfg.Kafka, &cfg.Telemetry, &cfg.HTTP)
 
 	return cfg, nil
 }
 
 func setDefaults(v *viper.Viper) {
-	v.SetDefault("server.name", "identity-service")
+	v.SetDefault("server.name", "catalog-service")
 	v.SetDefault("server.env", "development")
-	v.SetDefault("server.port", 8081)
+	v.SetDefault("server.port", 8082)
 	v.SetDefault("server.graceful_ttl", 30)
 	v.SetDefault("server.log_level", "info")
 	v.SetDefault("server.read_timeout", "30s")
@@ -262,9 +195,9 @@ func setDefaults(v *viper.Viper) {
 
 	v.SetDefault("database.host", "localhost")
 	v.SetDefault("database.port", 5432)
-	v.SetDefault("database.user", "nova_identity")
+	v.SetDefault("database.user", "nova_catalog")
 	v.SetDefault("database.password", "secret")
-	v.SetDefault("database.name", "identity_db")
+	v.SetDefault("database.name", "catalog_db")
 	v.SetDefault("database.ssl_mode", "disable")
 	v.SetDefault("database.max_conns", 25)
 	v.SetDefault("database.min_conns", 5)
@@ -278,26 +211,13 @@ func setDefaults(v *viper.Viper) {
 	v.SetDefault("redis.pool_size", 10)
 
 	v.SetDefault("kafka.brokers", []string{"localhost:9092"})
-	v.SetDefault("kafka.client_id", "identity-service")
-	v.SetDefault("kafka.group_id", "identity-service")
+	v.SetDefault("kafka.client_id", "catalog-service")
+	v.SetDefault("kafka.group_id", "catalog-service")
+	v.SetDefault("kafka.consume_topics", []string{"user-events"})
 
-	v.SetDefault("jwt.private_key_path", "./keys/private.pem")
-	v.SetDefault("jwt.public_key_path", "./keys/public.pem")
-	v.SetDefault("jwt.access_token_ttl", "15m")
-	v.SetDefault("jwt.refresh_ttl", "168h")
-	v.SetDefault("jwt.issuer", "novacommerce-identity")
-
-	v.SetDefault("email.from", "noreply@novacommerce.com")
-	v.SetDefault("email.sendgrid_api_key", "")
-
-	v.SetDefault("rate_limit.login_max_attempts", 5)
-	v.SetDefault("rate_limit.login_window", "15m")
-	v.SetDefault("rate_limit.register_max_attempts", 10)
-	v.SetDefault("rate_limit.register_window", "1h")
-
-	v.SetDefault("telemetry.enabled", true)
+	v.SetDefault("telemetry.enabled", false)
 	v.SetDefault("telemetry.otlp_endpoint", "localhost:4317")
-	v.SetDefault("telemetry.service_name", "identity-service")
+	v.SetDefault("telemetry.service_name", "catalog-service")
 
 	v.SetDefault("http.cors_allow_origins", []string{"*"})
 }
@@ -335,36 +255,16 @@ func bindEnv(v *viper.Viper) {
 		"redis.pool_size": {"REDIS_POOL_SIZE"},
 		"redis.addr":      {"REDIS_ADDR"},
 
-		"kafka.brokers":   {"KAFKA_BROKERS"},
-		"kafka.client_id": {"KAFKA_CLIENT_ID"},
-		"kafka.group_id":  {"KAFKA_GROUP_ID"},
-
-		"jwt.private_key_path": {"JWT_PRIVATE_KEY_PATH"},
-		"jwt.public_key_path":  {"JWT_PUBLIC_KEY_PATH"},
-		"jwt.access_token_ttl": {"JWT_ACCESS_TOKEN_TTL", "JWT_ACCESS_TTL"},
-		"jwt.refresh_ttl":      {"JWT_REFRESH_TTL"},
-		"jwt.issuer":           {"JWT_ISSUER"},
-
-		"email.from":             {"EMAIL_FROM"},
-		"email.sendgrid_api_key": {"EMAIL_SENDGRID_API_KEY"},
-
-		"rate_limit.login_max_attempts":    {"RATE_LIMIT_LOGIN_MAX"},
-		"rate_limit.login_window":          {"RATE_LIMIT_LOGIN_WINDOW"},
-		"rate_limit.register_max_attempts": {"RATE_LIMIT_REGISTER_MAX"},
-		"rate_limit.register_window":       {"RATE_LIMIT_REGISTER_WINDOW"},
+		"kafka.brokers":         {"KAFKA_BROKERS"},
+		"kafka.client_id":       {"KAFKA_CLIENT_ID"},
+		"kafka.group_id":        {"KAFKA_GROUP_ID"},
+		"kafka.consume_topics":  {"KAFKA_CONSUME_TOPICS"},
 
 		"telemetry.enabled":       {"TELEMETRY_ENABLED"},
 		"telemetry.otlp_endpoint": {"TELEMETRY_OTLP_ENDPOINT"},
 		"telemetry.service_name":  {"TELEMETRY_SERVICE_NAME"},
 
 		"http.cors_allow_origins": {"HTTP_CORS_ALLOW_ORIGINS"},
-
-		"oauth.google.client_id":       {"GOOGLE_CLIENT_ID"},
-		"oauth.google.client_secret":   {"GOOGLE_CLIENT_SECRET"},
-		"oauth.google.redirect_url":    {"GOOGLE_REDIRECT_URL"},
-		"oauth.facebook.client_id":     {"FACEBOOK_CLIENT_ID"},
-		"oauth.facebook.client_secret": {"FACEBOOK_CLIENT_SECRET"},
-		"oauth.facebook.redirect_url":  {"FACEBOOK_REDIRECT_URL"},
 	}
 
 	for key, envs := range envBindings {
@@ -390,6 +290,11 @@ func applyLegacyEnvFallback(v *viper.Viper, cfg *Config) {
 			cfg.Kafka.Brokers = strings.Split(brokers, ",")
 		}
 	}
+	if len(cfg.Kafka.ConsumeTopics) == 0 {
+		if topics := v.GetString("KAFKA_CONSUME_TOPICS"); topics != "" {
+			cfg.Kafka.ConsumeTopics = strings.Split(topics, ",")
+		}
+	}
 }
 
 func normalize(
@@ -397,8 +302,6 @@ func normalize(
 	db *DatabaseConfig,
 	redis *RedisConfig,
 	kafka *KafkaConfig,
-	jwt *JWTConfig,
-	rateLimit *RateLimitConfig,
 	telemetry *TelemetryConfig,
 	http *HTTPConfig,
 ) {
@@ -433,32 +336,13 @@ func normalize(
 		redis.PoolSize = 10
 	}
 	if kafka.ClientID == "" {
-		kafka.ClientID = "identity-service"
+		kafka.ClientID = "catalog-service"
 	}
-	if jwt.AccessTokenTTL <= 0 {
-		jwt.AccessTokenTTL = 15 * time.Minute
-	} else {
-		jwt.AccessTokenTTL = normalizeBareDuration(jwt.AccessTokenTTL, time.Minute)
+	if kafka.GroupID == "" {
+		kafka.GroupID = "catalog-service"
 	}
-	if jwt.RefreshTTL <= 0 {
-		jwt.RefreshTTL = 7 * 24 * time.Hour
-	} else {
-		jwt.RefreshTTL = normalizeBareDuration(jwt.RefreshTTL, 24*time.Hour)
-	}
-	if jwt.Issuer == "" {
-		jwt.Issuer = "novacommerce-identity"
-	}
-	if rateLimit.LoginMaxAttempts < 0 {
-		rateLimit.LoginMaxAttempts = 5
-	}
-	if rateLimit.LoginWindow < 0 {
-		rateLimit.LoginWindow = 15 * time.Minute
-	}
-	if rateLimit.RegisterMaxAttempts < 0 {
-		rateLimit.RegisterMaxAttempts = 10
-	}
-	if rateLimit.RegisterWindow < 0 {
-		rateLimit.RegisterWindow = time.Hour
+	if len(kafka.ConsumeTopics) == 0 {
+		kafka.ConsumeTopics = []string{"user-events"}
 	}
 	if telemetry.ServiceName == "" {
 		telemetry.ServiceName = server.Name
@@ -466,14 +350,4 @@ func normalize(
 	if len(http.CORSAllowOrigins) == 0 {
 		http.CORSAllowOrigins = []string{"*"}
 	}
-}
-
-// normalizeBareDuration recovers human-friendly durations when env vars like
-// JWT_ACCESS_TTL=15 are parsed by viper/cast as nanoseconds (15ns).
-// Values already specified with units (>= 1s) are returned unchanged.
-func normalizeBareDuration(ttl time.Duration, unit time.Duration) time.Duration {
-	if ttl >= time.Second {
-		return ttl
-	}
-	return time.Duration(ttl) * unit
 }

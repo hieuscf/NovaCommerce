@@ -73,6 +73,7 @@ func wireApp(ctx context.Context, cfg *config.Config, log *pkglogger.Logger) (*w
 
 	authUseCase := usecase.NewAuthUseCase(
 		userRepo,
+		roleRepo,
 		refreshTokenRepo,
 		passwordResetRepo,
 		jwtService,
@@ -89,6 +90,7 @@ func wireApp(ctx context.Context, cfg *config.Config, log *pkglogger.Logger) (*w
 
 	oauthUseCase := usecase.NewOAuthUseCase(
 		userRepo,
+		roleRepo,
 		oauthRepo,
 		outboxRepo,
 		refreshTokenRepo,

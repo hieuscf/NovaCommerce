@@ -1,7 +1,7 @@
 server:
-  name: identity-service
+  name: catalog-service
   env: development
-  port: 8081
+  port: 8082
   graceful_ttl: 30
   log_level: info
   read_timeout: 30s
@@ -11,9 +11,9 @@ server:
 database:
   host: localhost
   port: 5432
-  user: nova_identity
+  user: nova_catalog
   password: secret
-  name: identity_db
+  name: catalog_db
   ssl_mode: disable
   max_conns: 25
   min_conns: 5
@@ -30,30 +30,15 @@ redis:
 kafka:
   brokers:
     - localhost:9092
-  client_id: identity-service
-  group_id: identity-service
-
-jwt:
-  private_key_path: ./keys/private.pem
-  public_key_path: ./keys/public.pem
-  access_token_ttl: 15m
-  refresh_ttl: 168h
-  issuer: novacommerce-identity
-
-email:
-  from: noreply@novacommerce.com
-  sendgrid_api_key: ""
-
-rate_limit:
-  login_max_attempts: 5
-  login_window: 15m
-  register_max_attempts: 10
-  register_window: 1h
+  client_id: catalog-service
+  group_id: catalog-service
+  consume_topics:
+    - user-events
 
 telemetry:
   enabled: false
   otlp_endpoint: localhost:4317
-  service_name: identity-service
+  service_name: catalog-service
 
 http:
   cors_allow_origins:

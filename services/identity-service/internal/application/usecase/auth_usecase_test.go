@@ -19,6 +19,18 @@ import (
 
 const testPassword = "SecurePass123"
 
+func defaultRoleRepo() *mocks.RoleRepository {
+	customerRoleID := uuid.New()
+	roles := &mocks.RoleRepository{}
+	roles.On("GetUserRoles", mock.Anything, mock.Anything).Return([]*entity.Role{}, nil).Maybe()
+	roles.On("FindByName", mock.Anything, "customer").Return(&entity.Role{
+		ID:   customerRoleID,
+		Name: "customer",
+	}, nil).Maybe()
+	roles.On("AssignRole", mock.Anything, mock.Anything, customerRoleID).Return(nil).Maybe()
+	return roles
+}
+
 func newAuthUseCase(
 	userRepo *mocks.UserRepository,
 	refreshRepo *mocks.RefreshTokenRepository,
@@ -30,6 +42,7 @@ func newAuthUseCase(
 ) usecase.AuthUseCase {
 	return usecase.NewAuthUseCase(
 		userRepo,
+		defaultRoleRepo(),
 		refreshRepo,
 		resetRepo,
 		jwtSvc,
@@ -80,6 +93,44 @@ func TestRegister_Success(t *testing.T) {
 	require.NotNil(t, out)
 	assert.Equal(t, "john@example.com", out.User.Email)
 	kafka.AssertCalled(t, "Publish", ctx, "user-events", mock.AnythingOfType("string"), mock.Anything)
+}
+
+func TestRegister_AssignsCustomerRole(t *testing.T) {
+	ctx := context.Background()
+	customerRoleID := uuid.New()
+	users := &mocks.UserRepository{}
+	roles := &mocks.RoleRepository{}
+	kafka := &mocks.KafkaProducer{}
+
+	users.On("FindByEmail", ctx, "john@example.com").Return(nil, apperrors.NewNotFound("user not found"))
+	users.On("FindByUsername", ctx, "johndoe").Return(nil, apperrors.NewNotFound("user not found"))
+	users.On("Create", ctx, mock.AnythingOfType("*entity.User")).Return(nil)
+	roles.On("FindByName", ctx, "customer").Return(&entity.Role{
+		ID:   customerRoleID,
+		Name: "customer",
+	}, nil)
+	roles.On("AssignRole", ctx, mock.Anything, customerRoleID).Return(nil)
+	kafka.On("Publish", ctx, "user-events", mock.AnythingOfType("string"), mock.Anything).Return(nil)
+
+	uc := usecase.NewAuthUseCase(
+		users,
+		roles,
+		&mocks.RefreshTokenRepository{},
+		&mocks.PasswordResetTokenRepository{},
+		&mocks.JWTService{},
+		&mocks.EmailService{},
+		kafka,
+		&mocks.RateLimiter{},
+	)
+	_, err := uc.Register(ctx, usecase.RegisterInput{
+		Username: "johndoe",
+		Email:    "john@example.com",
+		Password: testPassword,
+		FullName: "John Doe",
+	})
+
+	require.NoError(t, err)
+	roles.AssertExpectations(t)
 }
 
 func TestRegister_DuplicateEmail(t *testing.T) {
@@ -159,6 +210,46 @@ func TestLogin_Success_WithEmail(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, "access-token", out.AccessToken)
 	assert.NotEmpty(t, out.RefreshToken)
+}
+
+func TestLogin_IncludesRolesInJWT(t *testing.T) {
+	ctx := context.Background()
+	user := createActiveUser()
+	users := &mocks.UserRepository{}
+	refresh := &mocks.RefreshTokenRepository{}
+	jwtSvc := &mocks.JWTService{}
+	limiter := &mocks.RateLimiter{}
+	roles := &mocks.RoleRepository{}
+
+	limiter.On("Allow", ctx, "login:john@example.com").Return(nil)
+	users.On("FindByEmailOrUsername", ctx, "john@example.com").Return(user, nil)
+	users.On("UpdateLastLogin", ctx, user.ID).Return(nil)
+	roles.On("GetUserRoles", ctx, user.ID).Return([]*entity.Role{
+		{Name: "admin"},
+		{Name: "customer"},
+	}, nil)
+	jwtSvc.On("GenerateAccessToken", user.ID, user.Email, []string{"admin", "customer"}).Return("access-token", nil)
+	refresh.On("Create", ctx, mock.AnythingOfType("*entity.RefreshToken")).Return(nil)
+
+	uc := usecase.NewAuthUseCase(
+		users,
+		roles,
+		refresh,
+		&mocks.PasswordResetTokenRepository{},
+		jwtSvc,
+		&mocks.EmailService{},
+		&mocks.KafkaProducer{},
+		limiter,
+	)
+	out, err := uc.Login(ctx, usecase.LoginInput{
+		Identifier: "john@example.com",
+		Password:   testPassword,
+	})
+
+	require.NoError(t, err)
+	assert.Equal(t, "access-token", out.AccessToken)
+	roles.AssertExpectations(t)
+	jwtSvc.AssertExpectations(t)
 }
 
 func TestLogin_Success_WithUsername(t *testing.T) {

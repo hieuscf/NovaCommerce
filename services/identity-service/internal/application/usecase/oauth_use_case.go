@@ -35,6 +35,7 @@ type OAuthUseCase interface {
 
 type oauthUseCase struct {
 	userRepo         repository.UserRepository
+	roleRepo         repository.RoleRepository
 	oauthRepo        repository.OAuthRepository
 	outboxRepo       repository.OutboxRepository
 	refreshTokenRepo repository.RefreshTokenRepository
@@ -48,6 +49,7 @@ type oauthUseCase struct {
 // NewOAuthUseCase creates an OAuthUseCase with the given dependencies.
 func NewOAuthUseCase(
 	userRepo repository.UserRepository,
+	roleRepo repository.RoleRepository,
 	oauthRepo repository.OAuthRepository,
 	outboxRepo repository.OutboxRepository,
 	refreshTokenRepo repository.RefreshTokenRepository,
@@ -59,6 +61,7 @@ func NewOAuthUseCase(
 ) OAuthUseCase {
 	return &oauthUseCase{
 		userRepo:         userRepo,
+		roleRepo:         roleRepo,
 		oauthRepo:        oauthRepo,
 		outboxRepo:       outboxRepo,
 		refreshTokenRepo: refreshTokenRepo,
@@ -237,6 +240,10 @@ func (uc *oauthUseCase) findOrCreateUser(
 		return nil, false, fmt.Errorf("oauthUseCase: create user: %w", err)
 	}
 
+	if err := assignDefaultCustomerRole(ctx, uc.roleRepo, newUser.ID); err != nil {
+		return nil, false, fmt.Errorf("oauthUseCase: %w", err)
+	}
+
 	return newUser, true, nil
 }
 
@@ -283,7 +290,12 @@ func (uc *oauthUseCase) writeRegistrationEvent(
 
 // issueOAuthTokens generates a JWT access token and a refresh token for user.
 func (uc *oauthUseCase) issueOAuthTokens(ctx context.Context, user *entity.User) (*OAuthOutput, error) {
-	accessToken, err := uc.jwtService.GenerateAccessToken(user.ID, user.Email, nil)
+	roleNames, err := loadRoleNames(ctx, uc.roleRepo, user.ID)
+	if err != nil {
+		return nil, wrapAuthError("issueOAuthTokens", err)
+	}
+
+	accessToken, err := uc.jwtService.GenerateAccessToken(user.ID, user.Email, roleNames)
 	if err != nil {
 		return nil, fmt.Errorf("oauthUseCase.issueOAuthTokens: %w", err)
 	}
