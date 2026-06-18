@@ -114,6 +114,15 @@ func (p *Producer) PublishBatch(ctx context.Context, msgs []Message) error {
 	return p.sendBatchWithRetry(producerMsgs)
 }
 
+// PublishBytes publishes a raw JSON payload to Kafka.
+func (p *Producer) PublishBytes(ctx context.Context, topic, key string, payload []byte) error {
+	return p.Publish(ctx, Message{
+		Topic:   topic,
+		Key:     key,
+		Payload: json.RawMessage(payload),
+	})
+}
+
 // Close closes the underlying producer.
 func (p *Producer) Close() error {
 	if p == nil || p.producer == nil {

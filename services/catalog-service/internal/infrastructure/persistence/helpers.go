@@ -25,32 +25,32 @@ type querier interface {
 }
 
 type queryLogger struct {
-	q      querier
+	pool   *pgxpool.Pool
 	logger *pkglogger.Logger
 	table  string
 }
 
 func newQueryLogger(pool *pgxpool.Pool, logger *pkglogger.Logger, table string) queryLogger {
-	return queryLogger{q: pool, logger: logger, table: table}
+	return queryLogger{pool: pool, logger: logger, table: table}
 }
 
 func (l queryLogger) Query(ctx context.Context, sql string, args ...any) (pgx.Rows, error) {
 	start := time.Now()
-	rows, err := l.q.Query(ctx, sql, args...)
+	rows, err := extractQuerier(ctx, l.pool).Query(ctx, sql, args...)
 	l.logSlow(sql, time.Since(start))
 	return rows, err
 }
 
 func (l queryLogger) QueryRow(ctx context.Context, sql string, args ...any) pgx.Row {
 	start := time.Now()
-	row := l.q.QueryRow(ctx, sql, args...)
+	row := extractQuerier(ctx, l.pool).QueryRow(ctx, sql, args...)
 	l.logSlow(sql, time.Since(start))
 	return row
 }
 
 func (l queryLogger) Exec(ctx context.Context, sql string, args ...any) (pgconn.CommandTag, error) {
 	start := time.Now()
-	tag, err := l.q.Exec(ctx, sql, args...)
+	tag, err := extractQuerier(ctx, l.pool).Exec(ctx, sql, args...)
 	l.logSlow(sql, time.Since(start))
 	return tag, err
 }

@@ -5,15 +5,16 @@ import (
 	"github.com/novacommerce/services/catalog-service/config"
 	"github.com/novacommerce/services/catalog-service/internal/infrastructure/http/handler"
 	"github.com/novacommerce/services/catalog-service/internal/infrastructure/http/middleware"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 )
 
 // Dependencies groups HTTP router dependencies.
 type Dependencies struct {
-	Config          *config.Config
-	HealthHandler   *handler.HealthHandler
-	CatalogHandler  *handler.CatalogHandler
-	ProductHandler  *handler.ProductHandler
+	Config         *config.Config
+	HealthHandler  *handler.HealthHandler
+	CatalogHandler *handler.CatalogHandler
+	ProductHandler *handler.ProductHandler
 }
 
 // SetupRouter builds the Gin engine with middleware and routes.
@@ -34,6 +35,7 @@ func SetupRouter(deps *Dependencies) *gin.Engine {
 	r.Use(middleware.CORS())
 
 	deps.HealthHandler.RegisterRoutes(r)
+	r.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
 	if deps.CatalogHandler != nil {
 		deps.CatalogHandler.RegisterRoutes(r)

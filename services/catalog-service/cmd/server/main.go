@@ -10,9 +10,9 @@ import (
 	"syscall"
 	"time"
 
+	pkglogger "github.com/novacommerce/pkg/logger"
 	"github.com/novacommerce/services/catalog-service/config"
 	"github.com/novacommerce/services/catalog-service/internal/infrastructure/http/middleware"
-	pkglogger "github.com/novacommerce/pkg/logger"
 )
 
 // Version is injected at build time via -ldflags.
@@ -44,12 +44,22 @@ func main() {
 
 	middleware.Init(log, cfg.HTTP.CORSAllowOrigins)
 
-	app, err := wireApp(ctx, cfg, log)
+	app, err := wireApp(ctx, cfg, log, Version)
 	if err != nil {
 		log.Error().Err(err).Msg("wire application")
 		os.Exit(1)
 	}
 	defer app.close(log)
+
+	workerCtx, workerCancel := context.WithCancel(ctx)
+	defer workerCancel()
+
+	go func() {
+		log.Info().Msg("starting outbox worker")
+		if err := app.outboxWorker.Run(workerCtx); err != nil && workerCtx.Err() == nil {
+			log.Error().Err(err).Msg("outbox worker stopped")
+		}
+	}()
 
 	consumerCtx, consumerCancel := context.WithCancel(ctx)
 	defer consumerCancel()
@@ -78,6 +88,7 @@ func main() {
 
 	log.Info().Msg("shutting down server")
 
+	workerCancel()
 	consumerCancel()
 
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), time.Duration(cfg.Server.GracefulTTL)*time.Second)

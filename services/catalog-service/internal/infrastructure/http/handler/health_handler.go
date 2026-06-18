@@ -17,26 +17,16 @@ func NewHealthHandler(healthService *service.HealthService) *HealthHandler {
 	return &HealthHandler{healthService: healthService}
 }
 
-type healthEnvelope struct {
-	Data  service.HealthData `json:"data"`
-	Meta  any                `json:"meta"`
-	Error any                `json:"error"`
-}
-
 // Check handles GET /health.
 func (h *HealthHandler) Check(c *gin.Context) {
-	result, allFailed := h.healthService.Check(c.Request.Context())
+	result, healthy := h.healthService.Check(c.Request.Context())
 
 	statusCode := http.StatusOK
-	if allFailed {
+	if !healthy {
 		statusCode = http.StatusServiceUnavailable
 	}
 
-	c.JSON(statusCode, healthEnvelope{
-		Data:  result,
-		Meta:  nil,
-		Error: nil,
-	})
+	c.JSON(statusCode, result)
 }
 
 // RegisterRoutes registers health routes on a Gin router group.

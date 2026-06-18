@@ -8,44 +8,69 @@ import (
 	pkgdatabase "github.com/novacommerce/pkg/database"
 )
 
-// HealthData describes dependency check outcomes for GET /health.
-type HealthData struct {
-	Status      string `json:"status"`
-	DBStatus    string `json:"db_status"`
-	RedisStatus string `json:"redis_status"`
+// DependencyStatus maps dependency names to health check results.
+type DependencyStatus map[string]string
+
+// HealthResponse is returned by GET /health.
+type HealthResponse struct {
+	Status       string           `json:"status"`
+	Dependencies DependencyStatus `json:"dependencies"`
+	Service      string           `json:"service"`
+	Version      string           `json:"version"`
 }
 
 // HealthService performs connectivity checks for dependencies.
 type HealthService struct {
-	db    *pkgdatabase.DB
-	cache *pkgcache.Cache
+	db           *pkgdatabase.DB
+	cache        *pkgcache.Cache
+	kafkaChecker func() error
+	serviceName  string
+	version      string
 }
 
 // NewHealthService creates a HealthService.
-func NewHealthService(db *pkgdatabase.DB, cache *pkgcache.Cache) *HealthService {
+func NewHealthService(
+	db *pkgdatabase.DB,
+	cache *pkgcache.Cache,
+	kafkaChecker func() error,
+	serviceName, version string,
+) *HealthService {
 	return &HealthService{
-		db:    db,
-		cache: cache,
+		db:           db,
+		cache:        cache,
+		kafkaChecker: kafkaChecker,
+		serviceName:  serviceName,
+		version:      version,
 	}
 }
 
-// Check verifies database and Redis connectivity.
-func (s *HealthService) Check(ctx context.Context) (HealthData, bool) {
-	dbStatus := s.checkDatabase(ctx)
-	redisStatus := s.checkRedis(ctx)
-
-	allFailed := dbStatus != "ok" && redisStatus != "ok"
-
-	status := "ok"
-	if allFailed {
-		status = "unavailable"
+// Check verifies database, Redis, and Kafka connectivity.
+func (s *HealthService) Check(ctx context.Context) (HealthResponse, bool) {
+	deps := DependencyStatus{
+		"postgres": s.checkDatabase(ctx),
+		"redis":    s.checkRedis(ctx),
+		"kafka":    s.checkKafka(),
 	}
 
-	return HealthData{
-		Status:      status,
-		DBStatus:    dbStatus,
-		RedisStatus: redisStatus,
-	}, allFailed
+	healthy := true
+	for _, status := range deps {
+		if status != "ok" {
+			healthy = false
+			break
+		}
+	}
+
+	status := "ok"
+	if !healthy {
+		status = "degraded"
+	}
+
+	return HealthResponse{
+		Status:       status,
+		Dependencies: deps,
+		Service:      s.serviceName,
+		Version:      s.version,
+	}, healthy
 }
 
 func (s *HealthService) checkDatabase(ctx context.Context) string {
@@ -63,6 +88,16 @@ func (s *HealthService) checkRedis(ctx context.Context) string {
 		return "error: redis client is not initialized"
 	}
 	if err := s.cache.Ping(ctx); err != nil {
+		return fmt.Sprintf("error: %v", err)
+	}
+	return "ok"
+}
+
+func (s *HealthService) checkKafka() string {
+	if s.kafkaChecker == nil {
+		return "error: kafka checker is not initialized"
+	}
+	if err := s.kafkaChecker(); err != nil {
 		return fmt.Sprintf("error: %v", err)
 	}
 	return "ok"

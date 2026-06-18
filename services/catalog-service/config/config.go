@@ -12,12 +12,30 @@ import (
 
 // Config holds all catalog-service configuration.
 type Config struct {
-	Server    ServerConfig    `mapstructure:"server"`
-	Database  DatabaseConfig  `mapstructure:"database"`
-	Redis     RedisConfig     `mapstructure:"redis"`
-	Kafka     KafkaConfig     `mapstructure:"kafka"`
-	Telemetry TelemetryConfig `mapstructure:"telemetry"`
-	HTTP      HTTPConfig      `mapstructure:"http"`
+	Server      ServerConfig      `mapstructure:"server"`
+	Database    DatabaseConfig    `mapstructure:"database"`
+	Redis       RedisConfig       `mapstructure:"redis"`
+	Kafka       KafkaConfig       `mapstructure:"kafka"`
+	Telemetry   TelemetryConfig   `mapstructure:"telemetry"`
+	HTTP        HTTPConfig        `mapstructure:"http"`
+	FileService FileServiceConfig `mapstructure:"file_service"`
+}
+
+// ValidateRequired ensures mandatory runtime configuration is present.
+func (c *Config) ValidateRequired() error {
+	if c.Database.BuildDSN() == "" {
+		return fmt.Errorf("CATALOG_DB_DSN (or database DSN) is required")
+	}
+	if c.Redis.BuildAddr() == "" {
+		return fmt.Errorf("CATALOG_REDIS_ADDR (or redis address) is required")
+	}
+	if len(c.Kafka.Brokers) == 0 {
+		return fmt.Errorf("CATALOG_KAFKA_BROKERS (or kafka brokers) is required")
+	}
+	if c.FileService.URL == "" {
+		return fmt.Errorf("CATALOG_FILE_SERVICE_URL is required")
+	}
+	return nil
 }
 
 // ServerConfig holds HTTP server settings.
@@ -109,6 +127,12 @@ type HTTPConfig struct {
 	CORSAllowOrigins []string `mapstructure:"cors_allow_origins"`
 }
 
+// FileServiceConfig holds file service client settings.
+type FileServiceConfig struct {
+	URL       string `mapstructure:"url"`
+	PublicURL string `mapstructure:"public_url"`
+}
+
 // Load reads configuration from config.yaml with environment variable overrides.
 func Load() (*Config, error) {
 	_ = gotenv.Load(".env")
@@ -175,10 +199,19 @@ func Load() (*Config, error) {
 		HTTP: HTTPConfig{
 			CORSAllowOrigins: v.GetStringSlice("http.cors_allow_origins"),
 		},
+		FileService: FileServiceConfig{
+			URL:       v.GetString("file_service.url"),
+			PublicURL: v.GetString("file_service.public_url"),
+		},
 	}
 
 	applyLegacyEnvFallback(v, cfg)
+	applyCatalogEnvOverrides(v, cfg)
 	normalize(&cfg.Server, &cfg.Database, &cfg.Redis, &cfg.Kafka, &cfg.Telemetry, &cfg.HTTP)
+
+	if err := cfg.ValidateRequired(); err != nil {
+		return nil, err
+	}
 
 	return cfg, nil
 }
@@ -220,6 +253,9 @@ func setDefaults(v *viper.Viper) {
 	v.SetDefault("telemetry.service_name", "catalog-service")
 
 	v.SetDefault("http.cors_allow_origins", []string{"*"})
+
+	v.SetDefault("file_service.url", "http://localhost:8085")
+	v.SetDefault("file_service.public_url", "http://localhost:8085")
 }
 
 func bindEnv(v *viper.Viper) {
@@ -229,7 +265,7 @@ func bindEnv(v *viper.Viper) {
 	envBindings := map[string][]string{
 		"server.name":          {"SERVER_NAME", "APP_NAME"},
 		"server.env":           {"SERVER_ENV", "APP_ENV"},
-		"server.port":          {"SERVER_PORT", "APP_PORT"},
+		"server.port":          {"SERVER_PORT", "APP_PORT", "CATALOG_PORT"},
 		"server.graceful_ttl":  {"SERVER_GRACEFUL_TTL", "APP_GRACEFUL_TTL"},
 		"server.log_level":     {"SERVER_LOG_LEVEL", "APP_LOG_LEVEL"},
 		"server.read_timeout":  {"SERVER_READ_TIMEOUT"},
@@ -246,25 +282,28 @@ func bindEnv(v *viper.Viper) {
 		"database.min_conns":         {"DB_MIN_CONNS", "DATABASE_MAX_IDLE_CONNS"},
 		"database.conn_timeout":      {"DB_CONN_TIMEOUT"},
 		"database.conn_max_lifetime": {"DB_CONN_MAX_LIFETIME", "DATABASE_CONN_MAX_LIFETIME"},
-		"database.dsn":               {"DATABASE_DSN"},
+		"database.dsn":               {"DATABASE_DSN", "CATALOG_DB_DSN"},
 
 		"redis.host":      {"REDIS_HOST"},
 		"redis.port":      {"REDIS_PORT"},
 		"redis.password":  {"REDIS_PASSWORD"},
 		"redis.db":        {"REDIS_DB"},
 		"redis.pool_size": {"REDIS_POOL_SIZE"},
-		"redis.addr":      {"REDIS_ADDR"},
+		"redis.addr":      {"REDIS_ADDR", "CATALOG_REDIS_ADDR"},
 
-		"kafka.brokers":         {"KAFKA_BROKERS"},
-		"kafka.client_id":       {"KAFKA_CLIENT_ID"},
-		"kafka.group_id":        {"KAFKA_GROUP_ID"},
-		"kafka.consume_topics":  {"KAFKA_CONSUME_TOPICS"},
+		"kafka.brokers":        {"KAFKA_BROKERS", "CATALOG_KAFKA_BROKERS"},
+		"kafka.client_id":      {"KAFKA_CLIENT_ID"},
+		"kafka.group_id":       {"KAFKA_GROUP_ID"},
+		"kafka.consume_topics": {"KAFKA_CONSUME_TOPICS"},
 
 		"telemetry.enabled":       {"TELEMETRY_ENABLED"},
-		"telemetry.otlp_endpoint": {"TELEMETRY_OTLP_ENDPOINT"},
+		"telemetry.otlp_endpoint": {"TELEMETRY_OTLP_ENDPOINT", "CATALOG_OTEL_ENDPOINT"},
 		"telemetry.service_name":  {"TELEMETRY_SERVICE_NAME"},
 
 		"http.cors_allow_origins": {"HTTP_CORS_ALLOW_ORIGINS"},
+
+		"file_service.url":        {"CATALOG_FILE_SERVICE_URL", "FILE_SERVICE_URL"},
+		"file_service.public_url": {"CATALOG_FILE_SERVICE_PUBLIC_URL", "FILE_SERVICE_BASE_URL"},
 	}
 
 	for key, envs := range envBindings {
@@ -272,6 +311,26 @@ func bindEnv(v *viper.Viper) {
 			_ = v.BindEnv(key, env)
 		}
 	}
+}
+
+func applyCatalogEnvOverrides(v *viper.Viper, cfg *Config) {
+	if port := strings.TrimSpace(v.GetString("CATALOG_PORT")); port != "" {
+		if parsed, err := parsePort(port); err == nil {
+			cfg.Server.Port = parsed
+		}
+	}
+	if cfg.FileService.PublicURL == "" {
+		cfg.FileService.PublicURL = cfg.FileService.URL
+	}
+}
+
+func parsePort(value string) (int, error) {
+	var port int
+	_, err := fmt.Sscanf(value, "%d", &port)
+	if err != nil || port <= 0 {
+		return 0, fmt.Errorf("invalid port: %s", value)
+	}
+	return port, nil
 }
 
 func applyLegacyEnvFallback(v *viper.Viper, cfg *Config) {

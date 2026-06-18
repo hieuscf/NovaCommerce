@@ -2,18 +2,22 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	pkgcache "github.com/novacommerce/pkg/cache"
+	pkgdatabase "github.com/novacommerce/pkg/database"
+	"github.com/novacommerce/pkg/kafka"
+	pkglogger "github.com/novacommerce/pkg/logger"
 	"github.com/novacommerce/services/catalog-service/config"
+	"github.com/novacommerce/services/catalog-service/internal/application"
 	"github.com/novacommerce/services/catalog-service/internal/application/service"
 	infracache "github.com/novacommerce/services/catalog-service/internal/infrastructure/cache"
 	"github.com/novacommerce/services/catalog-service/internal/infrastructure/http/handler"
 	"github.com/novacommerce/services/catalog-service/internal/infrastructure/http/router"
 	"github.com/novacommerce/services/catalog-service/internal/infrastructure/messaging"
 	"github.com/novacommerce/services/catalog-service/internal/infrastructure/persistence"
-	pkgcache "github.com/novacommerce/pkg/cache"
-	pkgdatabase "github.com/novacommerce/pkg/database"
-	pkglogger "github.com/novacommerce/pkg/logger"
 )
 
 type wiredApp struct {
@@ -21,12 +25,18 @@ type wiredApp struct {
 	db           *pkgdatabase.DB
 	cache        *pkgcache.Cache
 	kafkaClients *messaging.KafkaClients
+	outboxWorker *messaging.OutboxWorker
 }
 
-func wireApp(ctx context.Context, cfg *config.Config, log *pkglogger.Logger) (*wiredApp, error) {
+func wireApp(ctx context.Context, cfg *config.Config, log *pkglogger.Logger, version string) (*wiredApp, error) {
 	db, err := persistence.NewDatabase(ctx, cfg.Database, log)
 	if err != nil {
 		return nil, err
+	}
+
+	if err := persistence.RunMigrations(cfg.Database.BuildDSN()); err != nil {
+		db.Close()
+		return nil, fmt.Errorf("run migrations: %w", err)
 	}
 
 	cacheClient, err := infracache.NewRedisClient(ctx, cfg.Redis, log)
@@ -42,7 +52,40 @@ func wireApp(ctx context.Context, cfg *config.Config, log *pkglogger.Logger) (*w
 		return nil, err
 	}
 
-	healthService := service.NewHealthService(db, cacheClient)
+	pool := db.Pool
+
+	pgProductRepo := persistence.NewProductPostgresRepo(pool, log)
+	pgVariantRepo := persistence.NewProductVariantPostgresRepo(pool, log)
+	pgImageRepo := persistence.NewProductImagePostgresRepo(pool, log)
+	variantAttrRepo := persistence.NewVariantAttributeValuePostgresRepo(pool, log)
+
+	productCache := infracache.NewProductRedisCache(cacheClient, log)
+	cachedProductRepo := infracache.NewCachedProductRepository(
+		pgProductRepo,
+		productCache,
+		log,
+		infracache.DefaultProductCacheTTL,
+	)
+
+	outbox := kafka.NewPostgresOutboxWriter(pool)
+	transactor := persistence.NewTransactor(pool)
+	fileClient := application.NewFileServiceClient(cfg.FileService.URL, cfg.FileService.PublicURL)
+	productUC := application.NewProductUseCase(
+		cachedProductRepo,
+		pgVariantRepo,
+		pgImageRepo,
+		variantAttrRepo,
+		outbox,
+		transactor,
+		fileClient,
+	)
+
+	productHandler := handler.NewProductHandler(productUC)
+
+	kafkaChecker := func() error {
+		return messaging.ValidateKafkaBrokers(cfg.Kafka.Brokers)
+	}
+	healthService := service.NewHealthService(db, cacheClient, kafkaChecker, cfg.Server.Name, version)
 	healthHandler := handler.NewHealthHandler(healthService)
 	catalogHandler := handler.NewCatalogHandler()
 
@@ -50,13 +93,17 @@ func wireApp(ctx context.Context, cfg *config.Config, log *pkglogger.Logger) (*w
 		Config:         cfg,
 		HealthHandler:  healthHandler,
 		CatalogHandler: catalogHandler,
+		ProductHandler: productHandler,
 	})
+
+	outboxWorker := messaging.NewOutboxWorker(pool, kafkaClients.Producer, log, time.Second)
 
 	return &wiredApp{
 		engine:       engine,
 		db:           db,
 		cache:        cacheClient,
 		kafkaClients: kafkaClients,
+		outboxWorker: outboxWorker,
 	}, nil
 }
 

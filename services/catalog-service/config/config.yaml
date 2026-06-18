@@ -43,3 +43,7 @@ telemetry:
 http:
   cors_allow_origins:
     - "*"
+
+file_service:
+  url: http://localhost:8085
+  public_url: http://localhost:8085
