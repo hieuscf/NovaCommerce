@@ -248,8 +248,8 @@ func insertTestCategory(t *testing.T, ctx context.Context, pool *pgxpool.Pool) u
 
 	id := uuid.New()
 	_, err := pool.Exec(ctx, `
-		INSERT INTO categories (id, name, slug, status)
-		VALUES ($1, $2, $3, 'active')`,
+		INSERT INTO categories (id, name, slug, is_active)
+		VALUES ($1, $2, $3, true)`,
 		id, "Test Category "+id.String()[:8], "test-category-"+id.String()[:8],
 	)
 	require.NoError(t, err)
@@ -261,8 +261,8 @@ func insertTestBrand(t *testing.T, ctx context.Context, pool *pgxpool.Pool) uuid
 
 	id := uuid.New()
 	_, err := pool.Exec(ctx, `
-		INSERT INTO brands (id, name, slug, status)
-		VALUES ($1, $2, $3, 'active')`,
+		INSERT INTO brands (id, name, slug, is_active)
+		VALUES ($1, $2, $3, true)`,
 		id, "Test Brand "+id.String()[:8], "test-brand-"+id.String()[:8],
 	)
 	require.NoError(t, err)
