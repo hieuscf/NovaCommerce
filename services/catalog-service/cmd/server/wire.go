@@ -80,7 +80,27 @@ func wireApp(ctx context.Context, cfg *config.Config, log *pkglogger.Logger, ver
 		fileClient,
 	)
 
+	pgCategoryRepo := persistence.NewCategoryPostgresRepository(pool, log)
+	categoryRepo := infracache.NewCachedCategoryRepository(
+		pgCategoryRepo,
+		cacheClient,
+		log,
+		infracache.DefaultCategoryCacheTTL,
+	)
+	categorySvc := application.NewCategoryService(categoryRepo)
+
+	pgBrandRepo := persistence.NewBrandPostgresRepository(pool, log)
+	brandRepo := infracache.NewCachedBrandRepository(
+		pgBrandRepo,
+		cacheClient,
+		log,
+		infracache.DefaultBrandCacheTTL,
+	)
+	brandSvc := application.NewBrandService(brandRepo)
+
 	productHandler := handler.NewProductHandler(productUC)
+	categoryHandler := handler.NewCategoryHandler(categorySvc, productUC)
+	brandHandler := handler.NewBrandHandler(brandSvc)
 
 	kafkaChecker := func() error {
 		return messaging.ValidateKafkaBrokers(cfg.Kafka.Brokers)
@@ -90,10 +110,12 @@ func wireApp(ctx context.Context, cfg *config.Config, log *pkglogger.Logger, ver
 	catalogHandler := handler.NewCatalogHandler()
 
 	engine := router.SetupRouter(&router.Dependencies{
-		Config:         cfg,
-		HealthHandler:  healthHandler,
-		CatalogHandler: catalogHandler,
-		ProductHandler: productHandler,
+		Config:          cfg,
+		HealthHandler:   healthHandler,
+		CatalogHandler:  catalogHandler,
+		CategoryHandler: categoryHandler,
+		BrandHandler:    brandHandler,
+		ProductHandler:  productHandler,
 	})
 
 	outboxWorker := messaging.NewOutboxWorker(pool, kafkaClients.Producer, log, time.Second)

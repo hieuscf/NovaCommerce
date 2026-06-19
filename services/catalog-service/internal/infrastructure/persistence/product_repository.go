@@ -293,7 +293,11 @@ func buildProductFilter(filter repository.ProductFilter) ([]string, []any) {
 	var args []any
 	argPos := 1
 
-	if filter.CategoryID != nil {
+	if len(filter.CategoryIDs) > 0 {
+		where = append(where, fmt.Sprintf("p.category_id = ANY($%d::uuid[])", argPos))
+		args = append(args, filter.CategoryIDs)
+		argPos++
+	} else if filter.CategoryID != nil {
 		where = append(where, fmt.Sprintf("p.category_id = $%d", argPos))
 		args = append(args, *filter.CategoryID)
 		argPos++

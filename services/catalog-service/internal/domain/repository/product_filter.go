@@ -7,8 +7,9 @@ import (
 
 // ProductFilter scopes product list queries.
 type ProductFilter struct {
-	CategoryID *uuid.UUID
-	BrandID    *uuid.UUID
+	CategoryID  *uuid.UUID
+	CategoryIDs []uuid.UUID
+	BrandID     *uuid.UUID
 	SellerID   *uuid.UUID
 	MinPrice   *float64
 	MaxPrice   *float64

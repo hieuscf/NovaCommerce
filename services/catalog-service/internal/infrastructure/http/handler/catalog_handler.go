@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// CatalogHandler serves catalog API endpoints (stub until business logic is implemented).
+// CatalogHandler serves catalog API endpoints not yet implemented (inventory).
 type CatalogHandler struct{}
 
 // NewCatalogHandler creates a CatalogHandler.
@@ -25,33 +25,14 @@ func notImplemented(c *gin.Context) {
 	})
 }
 
-// RegisterRoutes registers catalog API routes on /api/v1.
+// RegisterRoutes registers inventory stub routes on /api/v1.
 func (h *CatalogHandler) RegisterRoutes(r gin.IRouter) {
 	v1 := r.Group("/api/v1")
+	inventory := v1.Group("/inventory")
 	{
-		categories := v1.Group("/categories")
-		{
-			categories.GET("", notImplemented)
-			categories.POST("", notImplemented)
-			categories.GET("/:id", notImplemented)
-			categories.PUT("/:id", notImplemented)
-			categories.GET("/:id/products", notImplemented)
-		}
-
-		brands := v1.Group("/brands")
-		{
-			brands.GET("", notImplemented)
-			brands.POST("", notImplemented)
-			brands.GET("/:id", notImplemented)
-			brands.PUT("/:id", notImplemented)
-		}
-
-		inventory := v1.Group("/inventory")
-		{
-			inventory.GET("/:variant_id", notImplemented)
-			inventory.PUT("/:variant_id", notImplemented)
-			inventory.POST("/adjust", notImplemented)
-			inventory.GET("/low-stock", notImplemented)
-		}
+		inventory.GET("/:variant_id", notImplemented)
+		inventory.PUT("/:variant_id", notImplemented)
+		inventory.POST("/adjust", notImplemented)
+		inventory.GET("/low-stock", notImplemented)
 	}
 }
