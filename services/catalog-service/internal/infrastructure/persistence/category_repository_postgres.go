@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"sort"
 	"time"
 
 	"github.com/google/uuid"
@@ -224,44 +223,4 @@ func (r *postgresCategoryRepository) mapError(method string, err error) error {
 			Msg("database error")
 	}
 	return fmt.Errorf("category repository %s: %w", method, err)
-}
-
-// buildCategoryTree assembles a hierarchical tree from a flat category list.
-// Root nodes have parent_id IS NULL; children are sorted by sort_order.
-func buildCategoryTree(categories []*domain.Category) []*domain.Category {
-	byID := make(map[uuid.UUID]*domain.Category, len(categories))
-	for _, category := range categories {
-		category.Children = nil
-		byID[category.ID] = category
-	}
-
-	roots := make([]*domain.Category, 0)
-	for _, category := range categories {
-		if category.ParentID == nil {
-			roots = append(roots, category)
-			continue
-		}
-
-		parent, ok := byID[*category.ParentID]
-		if !ok {
-			roots = append(roots, category)
-			continue
-		}
-		parent.Children = append(parent.Children, category)
-	}
-
-	sortCategoriesByOrder(roots)
-	for _, category := range byID {
-		if len(category.Children) > 0 {
-			sortCategoriesByOrder(category.Children)
-		}
-	}
-
-	return roots
-}
-
-func sortCategoriesByOrder(categories []*domain.Category) {
-	sort.Slice(categories, func(i, j int) bool {
-		return categories[i].SortOrder < categories[j].SortOrder
-	})
 }

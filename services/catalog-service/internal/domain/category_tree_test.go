@@ -1,4 +1,4 @@
-package persistence
+package domain_test
 
 import (
 	"testing"
@@ -22,7 +22,7 @@ func TestBuildCategoryTree(t *testing.T) {
 		{ID: grandchildID, ParentID: &childAID, Name: "Grandchild", SortOrder: 1},
 	}
 
-	roots := buildCategoryTree(categories)
+	roots := domain.BuildCategoryTree(categories)
 	require.Len(t, roots, 1)
 	assert.Equal(t, rootID, roots[0].ID)
 	require.Len(t, roots[0].Children, 2)
