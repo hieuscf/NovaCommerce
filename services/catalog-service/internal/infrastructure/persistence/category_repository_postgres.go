@@ -31,6 +31,11 @@ func NewCategoryPostgresRepository(pool *pgxpool.Pool, log *pkglogger.Logger) re
 	}
 }
 
+// NewPostgresCategoryRepository is an alias for NewCategoryPostgresRepository.
+func NewPostgresCategoryRepository(pool *pgxpool.Pool, log *pkglogger.Logger) repository.CategoryRepository {
+	return NewCategoryPostgresRepository(pool, log)
+}
+
 func (r *postgresCategoryRepository) GetAll(ctx context.Context) ([]*domain.Category, error) {
 	query := `
 		SELECT ` + categoryColumns + `

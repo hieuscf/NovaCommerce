@@ -31,6 +31,11 @@ func NewBrandPostgresRepository(pool *pgxpool.Pool, log *pkglogger.Logger) repos
 	}
 }
 
+// NewPostgresBrandRepository is an alias for NewBrandPostgresRepository.
+func NewPostgresBrandRepository(pool *pgxpool.Pool, log *pkglogger.Logger) repository.BrandRepository {
+	return NewBrandPostgresRepository(pool, log)
+}
+
 func (r *postgresBrandRepository) GetAll(ctx context.Context, onlyActive bool) ([]*domain.Brand, error) {
 	query := `
 		SELECT ` + brandColumns + `

@@ -56,18 +56,18 @@ func main() {
 
 	go func() {
 		log.Info().Msg("starting outbox worker")
-		if err := app.outboxWorker.Run(workerCtx); err != nil && workerCtx.Err() == nil {
+		if err := app.OutboxWorker.Run(workerCtx); err != nil && workerCtx.Err() == nil {
 			log.Error().Err(err).Msg("outbox worker stopped")
 		}
 	}()
 
 	consumerCtx, consumerCancel := context.WithCancel(ctx)
 	defer consumerCancel()
-	app.kafkaClients.StartConsumer(consumerCtx, log)
+	app.KafkaClients.StartConsumer(consumerCtx, log)
 
 	srv := &http.Server{
 		Addr:              fmt.Sprintf(":%d", cfg.Server.Port),
-		Handler:           app.engine,
+		Handler:           app.Engine,
 		ReadTimeout:       cfg.Server.ReadTimeout,
 		WriteTimeout:      cfg.Server.WriteTimeout,
 		IdleTimeout:       cfg.Server.IdleTimeout,

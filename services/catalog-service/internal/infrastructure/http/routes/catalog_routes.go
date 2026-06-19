@@ -3,7 +3,7 @@ package routes
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/novacommerce/services/catalog-service/internal/infrastructure/http/handler"
-	pkgmiddleware "github.com/novacommerce/pkg/middleware"
+	catalogmiddleware "github.com/novacommerce/services/catalog-service/internal/infrastructure/http/middleware"
 )
 
 // RegisterCatalogRoutes registers category and brand API routes on /api/v1.
@@ -25,7 +25,7 @@ func RegisterCatalogRoutes(
 			categories.GET("", categoryHandler.GetCategoryTree)
 			categories.GET("/:id/products", categoryHandler.GetProductsByCategory)
 
-			admin := categories.Group("", pkgmiddleware.JWTAuth(), pkgmiddleware.RequireRole("admin"))
+			admin := categories.Group("", catalogmiddleware.GatewayAuth(), catalogmiddleware.RequireRole("admin"))
 			{
 				admin.POST("", categoryHandler.CreateCategory)
 				admin.PUT("/:id", categoryHandler.UpdateCategory)
@@ -38,7 +38,7 @@ func RegisterCatalogRoutes(
 		{
 			brands.GET("", brandHandler.GetBrands)
 
-			admin := brands.Group("", pkgmiddleware.JWTAuth(), pkgmiddleware.RequireRole("admin"))
+			admin := brands.Group("", catalogmiddleware.GatewayAuth(), catalogmiddleware.RequireRole("admin"))
 			{
 				admin.POST("", brandHandler.CreateBrand)
 				admin.PUT("/:id", brandHandler.UpdateBrand)
