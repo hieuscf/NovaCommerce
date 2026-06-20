@@ -1,0 +1,11 @@
+{
+  "common": {
+    "welcome": "Welcome to NovaCommerce",
+    "search": "Search products, brands, or categories"
+  },
+  "nav": {
+    "home": "Home",
+    "cart": "Cart",
+    "account": "Account"
+  }
+}

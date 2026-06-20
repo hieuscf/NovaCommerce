@@ -1,0 +1,11 @@
+{
+  "common": {
+    "welcome": "Chao mung ban den voi NovaCommerce",
+    "search": "Tim kiem san pham, thuong hieu hoac danh muc"
+  },
+  "nav": {
+    "home": "Trang chu",
+    "cart": "Gio hang",
+    "account": "Tai khoan"
+  }
+}
