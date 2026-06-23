@@ -17,6 +17,13 @@ npm run dev
 
 Ung dung mac dinh chay tai `http://localhost:3000`.
 
+## Environment variables
+
+- `NEXT_PUBLIC_API_URL`: public Kong gateway URL (`http://localhost:8080/api/v1`)
+- `IDENTITY_SERVICE_INTERNAL_URL`: server-side BFF URL cho route handlers (mac dinh trung `NEXT_PUBLIC_API_URL`)
+- `NEXT_PUBLIC_APP_URL`: frontend app URL
+- `NEXT_PUBLIC_DEFAULT_LOCALE`: locale mac dinh (`vi`)
+
 ## Scripts
 
 - `npm run dev`: Chay development server
@@ -55,7 +62,8 @@ frontend/web-store
 
 - App Router + locale segment (`/[locale]`)
 - API response format: `{ data, meta, error }`
-- Access token attach qua axios interceptor
-- Refresh token flow qua `/auth/refresh` khi gap `401`
-- Auth state luu trong zustand, token duoc persist qua API route de set httpOnly cookie
+- Client components chi goi Route Handlers (`/api/**`) theo BFF pattern
+- Access token + refresh token luu trong httpOnly cookies
+- Route Handlers goi Identity Service va tu refresh token khi gap `401`
+- Auth store chi luu `user` + `isAuthenticated` (khong luu token)
 - UI components theo shadcn/ui (`src/components/ui`)

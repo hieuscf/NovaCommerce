@@ -1,11 +1,92 @@
 {
   "common": {
     "welcome": "Welcome to NovaCommerce",
-    "search": "Search products, brands, or categories"
+    "search": "Search products, brands, or categories",
+    "loading": "Processing..."
   },
   "nav": {
     "home": "Home",
     "cart": "Cart",
     "account": "Account"
+  },
+  "auth": {
+    "login": {
+      "title": "Sign in",
+      "subtitle": "Sign in to continue shopping",
+      "identifier": "Email or username",
+      "password": "Password",
+      "submit": "Sign in",
+      "google": "Sign in with Google",
+      "facebook": "Sign in with Facebook",
+      "forgotPassword": "Forgot password?",
+      "noAccount": "Create account",
+      "oauthError": "OAuth login failed. Please try again.",
+      "registeredSuccess": "Registration successful. Please sign in.",
+      "resetSuccess": "Password reset successfully. Please sign in."
+    },
+    "register": {
+      "title": "Create account",
+      "subtitle": "Create your NovaCommerce account",
+      "username": "Username",
+      "email": "Email",
+      "fullName": "Full name",
+      "phone": "Phone",
+      "password": "Password",
+      "confirmPassword": "Confirm password",
+      "submit": "Register",
+      "haveAccount": "Already have an account? Sign in"
+    },
+    "forgotPassword": {
+      "title": "Forgot password",
+      "subtitle": "Enter your email to receive reset instructions",
+      "email": "Email",
+      "submit": "Send request",
+      "genericSuccess": "If the email exists, a reset link has been sent.",
+      "backToLogin": "Back to login"
+    },
+    "resetPassword": {
+      "title": "Reset password",
+      "subtitle": "Set your new password",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm new password",
+      "submit": "Update password",
+      "invalidToken": "Reset token is invalid or expired.",
+      "backToForgot": "Back to forgot password"
+    },
+    "account": {
+      "profileTitle": "Profile information",
+      "saveProfile": "Save profile",
+      "profileSaved": "Profile updated successfully.",
+      "passwordTitle": "Change password",
+      "currentPassword": "Current password",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm new password",
+      "savePassword": "Save new password",
+      "passwordSaved": "Password changed successfully.",
+      "avatarTitle": "Avatar",
+      "avatarSaved": "Avatar updated successfully.",
+      "avatarFailed": "Unable to upload avatar. Please try again."
+    },
+    "errors": {
+      "generic": "Something went wrong. Please try again.",
+      "unauthorized": "Invalid authentication information.",
+      "notFound": "Requested resource was not found.",
+      "validation": "Provided data is invalid.",
+      "conflict": "Resource already exists.",
+      "invalidToken": "Session expired. Please sign in again.",
+      "accountDisabled": "Your account has been disabled."
+    },
+    "validation": {
+      "identifierRequired": "Please enter your email or username.",
+      "passwordRequired": "Please enter your password.",
+      "usernameMin": "Username must be at least 3 characters.",
+      "emailInvalid": "Invalid email format.",
+      "passwordRule": "Password must be at least 8 chars, 1 uppercase and 1 number.",
+      "confirmPasswordRequired": "Please confirm your password.",
+      "passwordMismatch": "Password confirmation does not match.",
+      "fullNameRequired": "Please enter your full name.",
+      "phoneInvalid": "Invalid phone number.",
+      "currentPasswordRequired": "Please enter your current password."
+    }
   }
 }

@@ -12,6 +12,7 @@ export type ApiEnvelope<TData> = {
 };
 
 export type RefreshTokenResponse = {
-  accessToken: string;
+  access_token: string;
+  refresh_token: string;
   user?: AuthUser;
 };

@@ -1,11 +1,92 @@
 {
   "common": {
     "welcome": "Chao mung ban den voi NovaCommerce",
-    "search": "Tim kiem san pham, thuong hieu hoac danh muc"
+    "search": "Tim kiem san pham, thuong hieu hoac danh muc",
+    "loading": "Dang xu ly..."
   },
   "nav": {
     "home": "Trang chu",
     "cart": "Gio hang",
     "account": "Tai khoan"
+  },
+  "auth": {
+    "login": {
+      "title": "Dang nhap",
+      "subtitle": "Dang nhap de tiep tuc mua sam",
+      "identifier": "Email hoac ten dang nhap",
+      "password": "Mat khau",
+      "submit": "Dang nhap",
+      "google": "Dang nhap voi Google",
+      "facebook": "Dang nhap voi Facebook",
+      "forgotPassword": "Quen mat khau?",
+      "noAccount": "Tao tai khoan moi",
+      "oauthError": "Dang nhap OAuth that bai, vui long thu lai.",
+      "registeredSuccess": "Dang ky thanh cong, vui long dang nhap.",
+      "resetSuccess": "Dat lai mat khau thanh cong, vui long dang nhap."
+    },
+    "register": {
+      "title": "Dang ky tai khoan",
+      "subtitle": "Tao tai khoan moi cho NovaCommerce",
+      "username": "Ten dang nhap",
+      "email": "Email",
+      "fullName": "Ho va ten",
+      "phone": "So dien thoai",
+      "password": "Mat khau",
+      "confirmPassword": "Xac nhan mat khau",
+      "submit": "Dang ky",
+      "haveAccount": "Da co tai khoan? Dang nhap"
+    },
+    "forgotPassword": {
+      "title": "Quen mat khau",
+      "subtitle": "Nhap email de nhan huong dan dat lai mat khau",
+      "email": "Email",
+      "submit": "Gui yeu cau",
+      "genericSuccess": "Neu email ton tai, link reset da duoc gui.",
+      "backToLogin": "Quay lai dang nhap"
+    },
+    "resetPassword": {
+      "title": "Dat lai mat khau",
+      "subtitle": "Nhap mat khau moi cua ban",
+      "newPassword": "Mat khau moi",
+      "confirmPassword": "Xac nhan mat khau moi",
+      "submit": "Cap nhat mat khau",
+      "invalidToken": "Token dat lai mat khau khong hop le hoac da het han.",
+      "backToForgot": "Quay lai trang quen mat khau"
+    },
+    "account": {
+      "profileTitle": "Thong tin ca nhan",
+      "saveProfile": "Luu thong tin",
+      "profileSaved": "Cap nhat thong tin thanh cong.",
+      "passwordTitle": "Doi mat khau",
+      "currentPassword": "Mat khau hien tai",
+      "newPassword": "Mat khau moi",
+      "confirmPassword": "Xac nhan mat khau moi",
+      "savePassword": "Luu mat khau moi",
+      "passwordSaved": "Doi mat khau thanh cong.",
+      "avatarTitle": "Anh dai dien",
+      "avatarSaved": "Cap nhat avatar thanh cong.",
+      "avatarFailed": "Khong the tai avatar. Vui long thu lai."
+    },
+    "errors": {
+      "generic": "Co loi xay ra, vui long thu lai.",
+      "unauthorized": "Thong tin dang nhap khong hop le.",
+      "notFound": "Khong tim thay tai nguyen yeu cau.",
+      "validation": "Du lieu dau vao khong hop le.",
+      "conflict": "Du lieu da ton tai trong he thong.",
+      "invalidToken": "Phien dang nhap da het han, vui long dang nhap lai.",
+      "accountDisabled": "Tai khoan cua ban dang bi khoa."
+    },
+    "validation": {
+      "identifierRequired": "Vui long nhap email hoac ten dang nhap.",
+      "passwordRequired": "Vui long nhap mat khau.",
+      "usernameMin": "Ten dang nhap toi thieu 3 ky tu.",
+      "emailInvalid": "Email khong dung dinh dang.",
+      "passwordRule": "Mat khau phai co it nhat 8 ky tu, 1 chu hoa va 1 so.",
+      "confirmPasswordRequired": "Vui long xac nhan mat khau.",
+      "passwordMismatch": "Mat khau xac nhan khong khop.",
+      "fullNameRequired": "Vui long nhap ho va ten.",
+      "phoneInvalid": "So dien thoai khong hop le.",
+      "currentPasswordRequired": "Vui long nhap mat khau hien tai."
+    }
   }
 }
