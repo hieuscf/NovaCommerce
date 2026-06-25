@@ -6,10 +6,14 @@ type CartState = {
   items: CartItem[];
   totalItems: number;
   totalPrice: number;
+  isDrawerOpen: boolean;
   addItem: (item: CartItem) => void;
   removeItem: (itemId: string) => void;
   updateQuantity: (itemId: string, quantity: number) => void;
   clearCart: () => void;
+  openDrawer: () => void;
+  closeDrawer: () => void;
+  toggleDrawer: () => void;
 };
 
 const calculateTotals = (items: CartItem[]) => {
@@ -26,6 +30,7 @@ export const useCartStore = create<CartState>((set) => ({
   items: [],
   totalItems: 0,
   totalPrice: 0,
+  isDrawerOpen: false,
   addItem: (item) => {
     set((state) => {
       const existing = state.items.find((cartItem) => cartItem.id === item.id);
@@ -39,6 +44,7 @@ export const useCartStore = create<CartState>((set) => ({
 
       return {
         items: nextItems,
+        isDrawerOpen: true,
         ...calculateTotals(nextItems),
       };
     });
@@ -66,6 +72,9 @@ export const useCartStore = create<CartState>((set) => ({
     });
   },
   clearCart: () => {
-    set({ items: [], totalItems: 0, totalPrice: 0 });
+    set({ items: [], totalItems: 0, totalPrice: 0, isDrawerOpen: false });
   },
+  openDrawer: () => set({ isDrawerOpen: true }),
+  closeDrawer: () => set({ isDrawerOpen: false }),
+  toggleDrawer: () => set((state) => ({ isDrawerOpen: !state.isDrawerOpen })),
 }));

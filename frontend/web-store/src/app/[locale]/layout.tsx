@@ -6,6 +6,7 @@ import { notFound } from 'next/navigation';
 import { Footer } from '@/components/common/footer';
 import { Header } from '@/components/common/header';
 import { Providers } from '@/components/common/providers';
+import { CartDrawer } from '@/components/store/cart-drawer';
 import { routing } from '@/i18n/routing';
 
 type LocaleLayoutProps = {
@@ -64,6 +65,7 @@ export default async function LocaleLayout({
             {children}
           </main>
           <Footer />
+          <CartDrawer />
         </div>
       </Providers>
     </NextIntlClientProvider>
