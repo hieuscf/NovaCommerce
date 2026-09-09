@@ -2,6 +2,6 @@
 
 **Bounded Context:** Analytics
 
-**Responsibility:** Reporting, metrics, and analytics — event ingestion, dashboards, and business intelligence read models.
+**Status:** Domain layer skipped — read model context with no transactional aggregate.
 
-**Dependencies / Communication:** Consumes domain events from Order, User, Catalog, and others (eventual consistency). CQRS/reporting focus — does not mutate source aggregates.
+Analytics consumes events and maintains projections; it does not own Order/Product/Payment transactional data.

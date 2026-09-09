@@ -1,700 +1,416 @@
-NovaCommerce Domain Model
+# NovaCommerce Domain Model
 
-Version: 0.1.0
-Status: Draft / Foundation Design
-Last Updated: 2026-09-09
+> **Version:** 0.2.0  
+> **Status:** Foundation Design — Reviewed for Implementation  
+> **Last Updated:** 2026-09-09  
+> **Related:** [event-catalog.md](./event-catalog.md), [database-design.md](./database-design.md), [NovaCommerce Architecture.md](./NovaCommerce%20Architecture.md)
 
-1. Purpose
+---
+
+## 1. Purpose
 
 Định nghĩa Domain Driven Design (DDD) cho NovaCommerce:
 
-Bounded Context
+- Bounded Context
+- Aggregate Root
+- Entity
+- Value Object
+- Domain Event
+- Domain Service
+- Quy tắc giao tiếp giữa các Context
+
+Đây là **domain design**, không phải database schema. Persistence mapping thuộc Infrastructure layer.
+
+---
+
+## 2. Bounded Context Classification
+
+### Core / Commerce Contexts (TypeScript — `modules/`)
+
+| Context | Module | Responsibility |
+|---------|--------|----------------|
+| Identity | `modules/identity` | Authentication, credentials, identity lifecycle |
+| User | `modules/user` | Customer profile, addresses, preferences |
+| Catalog | `modules/catalog` | Product, variant, category |
+| Cart | `modules/cart` | Shopping cart |
+| Checkout | `modules/checkout` | Checkout orchestration |
+| Order | `modules/order` | Order lifecycle |
+| Inventory | `modules/inventory` | Stock and reservation |
+| Payment | `modules/payment` | Payment lifecycle |
+| Shipping | `modules/shipping` | Shipment and fulfillment |
+| Promotion | `modules/promotion` | Promotion and coupon |
+| Notification | `modules/notification` | Notification delivery |
+| Review | `modules/review` | Product review and rating |
+| CMS | `modules/cms` | Content management |
+
+### Read / Supporting Contexts
+
+| Context | Module | Domain Layer |
+|---------|--------|--------------|
+| Search | `modules/search` | Read model / CQRS — no transactional aggregate |
+| Analytics | `modules/analytics` | Read model / projections — no transactional aggregate |
+
+### External / Deferred Contexts
+
+| Context | Location | Notes |
+|---------|----------|-------|
+| AI | `ai-services/` (Python/FastAPI) | **Not** a TypeScript module — independent AI platform |
+| Seller | `modules/seller` | Scaffold only — insufficient requirements |
+| ReturnRefund | — | Planned context — not in current scope |
+
+`packages/building-blocks` and `packages/database` are supporting packages, not business bounded contexts.
+
+---
+
+## 3. Domain Audit Summary
+
+Audit date: 2026-09-09. Cross-checked against `event-catalog.md`, `database-design.md`, `NovaCommerce Architecture.md`, and `modules/`.
+
+| Context | Aggregates | Entities | Value Objects | Domain Services | Repositories | Events | Invariants | Code |
+|---------|------------|----------|---------------|-----------------|--------------|--------|------------|------|
+| Identity | Identity | Credential, ExternalIdentity, RefreshSession | EmailAddress, IdentityId, Provider | — | IIdentityRepository | 3 | Active/disabled identity | ✅ |
+| User | User | UserProfile, UserAddress, UserPreference | UserId, DisplayName, PhoneNumber, Address | — | IUserRepository | 2 | Valid profile refs | ✅ |
+| Catalog | Product, Category | ProductVariant, ProductImage, ProductAttribute, ProductOption | ProductSku, Money, ProductName, ProductSlug | — | IProductRepository, ICategoryRepository | 4 | Publish/price rules | ✅ |
+| Cart | Cart | CartItem | CartId, ProductReference, Quantity, Money | — | ICartRepository | 4 | Valid quantities | ✅ |
+| Checkout | CheckoutSession | CheckoutLine, CheckoutAdjustment | — | — | ICheckoutSessionRepository | 2 | Session lifecycle | ✅ |
+| Order | Order | OrderLine, OrderAdjustment, OrderAddress, OrderPaymentReference, OrderShipmentReference | OrderId, OrderNumber, Money, Quantity, Address | — | IOrderRepository | 4 | Lines before confirm; no modify terminal state | ✅ |
+| Inventory | InventoryItem | StockReservation, StockAdjustment | Sku, Quantity, ReservationId, WarehouseId | — | IInventoryItemRepository | 4 | Non-negative available stock | ✅ |
+| Payment | Payment | PaymentAttempt, PaymentTransaction | Money, PaymentReference, PaymentMethod, ProviderReference | — | IPaymentRepository | 4 | Payment state transitions | ✅ |
+| Shipping | Shipment | ShipmentItem, TrackingRecord | TrackingNumber, Address, CarrierCode | — | IShipmentRepository | 4 | Shipment lifecycle | ✅ |
+| Promotion | Promotion, Coupon | PromotionRule, PromotionBenefit, CouponRedemption | CouponCode, Percentage, Money, DateRange | — | IPromotionRepository, ICouponRepository | 4 | Coupon usage rules | ✅ |
+| Notification | Notification | NotificationDelivery | — | — | INotificationRepository | 3 | Delivery tracking | ✅ |
+| Review | Review | ReviewMedia | Rating, ReviewText, ProductReference | — | IReviewRepository | 3 | Rating bounds | ✅ |
+| CMS | Content | — | — | — | IContentRepository | 3 | Content publish lifecycle | ✅ |
+| Search | — | — | — | — | — | consumes ProductUpdated | N/A | ⏳ read-side |
+| Analytics | — | — | — | — | — | consumes OrderCreated etc. | N/A | ⏳ read-side |
+| Seller | TBD | TBD | TBD | — | TBD | TBD | TBD | ⏳ deferred |
+| AI | — | — | — | Python services | — | AI consumption | N/A | 🚧 stub |
+
+**Domain Services:** No standalone Domain Services are defined in the current foundation design. Cross-cutting orchestration belongs in Application layer (e.g. Checkout). Domain Services will be added only when logic does not belong to a single Entity or Aggregate Root.
 
-Aggregate Root
+---
+
+## 4. Design Decisions / Reconciliation
+
+| Issue | Current State | Decision | Reason | Impact |
+|-------|---------------|----------|--------|--------|
+| AI as bounded context | Listed in domain-model alongside commerce contexts | AI is **external Python platform** (`ai-services/`), not `modules/` TypeScript code | Architecture ADR-004 separates AI microservices | No `modules/ai/`; AI events are consumption-only from commerce |
+| Seller module | Listed with tentative aggregates | **Defer domain implementation** until business requirements are defined | domain-model §4 states insufficient requirements | `modules/seller/` remains scaffold + README only |
+| ReturnRefund | Listed as planned context | **Out of Foundation scope** | Not enough requirements | No module folder yet |
+| Search / Analytics | Listed as contexts | **Read-side only** — no transactional aggregates in domain layer | CQRS pattern per architecture | Indexers/projections in Infrastructure; domain code deferred |
+| UserCreated event | In event-catalog, missing from original User events list | **Added to User domain** | Align catalog with user lifecycle | `UserCreatedEvent` implemented in `modules/user` |
+| CheckoutStarted / CheckoutCompleted | In event-catalog, missing from original Checkout section | **Added to Checkout domain** | Align catalog with checkout flow | Events implemented in `modules/checkout` |
+| IdentityDisabled | In domain-model, missing from event-catalog | **Documented in both** | Complete identity lifecycle | Added to event-catalog baseline |
+| Money / Address duplication | Same VO names across contexts | **Per-context Value Objects** | DDD bounded context isolation | Each module owns its own `Money`, `Address` types |
+| Domain vs Prisma schema | database-design has tables; domain has aggregates | **Separate models** — map via Repository in Infrastructure | Clean Architecture | No Prisma in domain layer |
 
-Entity
+---
 
-Value Object
+## 5. Core Aggregates
 
-Domain Event
+### Identity
 
-Domain Service
+**Aggregate Root:** Identity
 
-Quy tắc giao tiếp giữa các Context
+| Kind | Names |
+|------|-------|
+| Entities | Credential, ExternalIdentity, RefreshSession |
+| Value Objects | EmailAddress, IdentityId, Provider |
+| Events | IdentityRegistered, IdentityAuthenticated, IdentityDisabled |
+| Invariants | Disabled identity cannot authenticate |
 
-Đây là domain design, không phải database schema.
+### User
 
-2. Bounded Contexts
+**Aggregate Root:** User
 
-Context
+| Kind | Names |
+|------|-------|
+| Entities | UserProfile, UserAddress, UserPreference |
+| Value Objects | UserId, DisplayName, PhoneNumber, Address |
+| Events | UserCreated, UserProfileUpdated |
+| Invariants | User must reference valid identity |
 
-Trách nhiệm
+### Catalog
 
-Identity
+**Aggregate Roots:** Product, Category
 
-Authentication, credentials, identity
+| Kind | Names |
+|------|-------|
+| Product Entities | ProductVariant, ProductImage, ProductAttribute, ProductOption |
+| Value Objects | ProductSku, Money, ProductName, ProductSlug |
+| Events | ProductCreated, ProductUpdated, ProductPublished, ProductPriceChanged |
 
-User
+### Cart
 
-User/customer profile
+**Aggregate Root:** Cart
 
-Catalog
+| Kind | Names |
+|------|-------|
+| Entities | CartItem |
+| Value Objects | CartId, ProductReference, Quantity, Money |
+| Events | CartCreated, CartItemAdded, CartItemRemoved, CartCleared |
 
-Product, variant, category
+### Checkout
 
-Cart
+**Aggregate Root:** CheckoutSession
 
-Shopping cart
+| Kind | Names |
+|------|-------|
+| Entities | CheckoutLine, CheckoutAdjustment |
+| Events | CheckoutStarted, CheckoutCompleted |
+| Role | Orchestration between Cart, Catalog, Inventory, Promotion, User to create Order |
 
-Checkout
+### Order
 
-Checkout orchestration
+**Aggregate Root:** Order
 
-Order
+| Kind | Names |
+|------|-------|
+| Entities | OrderLine, OrderAdjustment, OrderAddress, OrderPaymentReference, OrderShipmentReference |
+| Value Objects | OrderId, OrderNumber, Money, Quantity, Address |
+| Events | OrderCreated, OrderConfirmed, OrderCancelled, OrderCompleted |
+| Invariants | Order must have lines before confirm; quantity and total valid; cannot modify Completed/Cancelled |
 
-Order lifecycle
+### Inventory
 
-Inventory
+**Aggregate Root:** InventoryItem
 
-Stock & reservation
+| Kind | Names |
+|------|-------|
+| Entities | StockReservation, StockAdjustment |
+| Value Objects | Sku, Quantity, ReservationId, WarehouseId |
+| Events | StockAdjusted, StockReserved, StockReservationReleased, StockDepleted |
+| Invariants | Available stock cannot be negative; reservation cannot exceed available |
 
-Payment
+### Payment
 
-Payment lifecycle
+**Aggregate Root:** Payment
 
-Shipping
+| Kind | Names |
+|------|-------|
+| Entities | PaymentAttempt, PaymentTransaction |
+| Value Objects | Money, PaymentReference, PaymentMethod, ProviderReference |
+| Events | PaymentInitiated, PaymentSucceeded, PaymentFailed, PaymentRefunded |
 
-Shipment/fulfillment
+### Shipping
 
-Promotion
+**Aggregate Root:** Shipment
 
-Promotion & coupon
+| Kind | Names |
+|------|-------|
+| Entities | ShipmentItem, TrackingRecord |
+| Value Objects | TrackingNumber, Address, CarrierCode |
+| Events | ShipmentCreated, ShipmentDispatched, ShipmentInTransit, ShipmentDelivered |
 
-Notification
+### Promotion
 
-Notification delivery
+**Aggregate Roots:** Promotion, Coupon
 
-Review
+| Kind | Names |
+|------|-------|
+| Entities | PromotionRule, PromotionBenefit, CouponRedemption |
+| Value Objects | CouponCode, Percentage, Money, DateRange |
+| Events | PromotionActivated, PromotionDeactivated, CouponApplied, CouponUsed |
 
-Product review & rating
+### Notification
 
-Search
+**Aggregate Root:** Notification
 
-Search/read model
+| Kind | Names |
+|------|-------|
+| Entities | NotificationDelivery |
+| Events | NotificationRequested, NotificationSent, NotificationFailed |
 
-CMS
+### Review
 
-Content management
+**Aggregate Root:** Review
 
-Analytics
+| Kind | Names |
+|------|-------|
+| Entities | ReviewMedia |
+| Value Objects | Rating, ReviewText, ProductReference |
+| Events | ReviewCreated, ReviewUpdated, ReviewPublished |
 
-Reporting & analytics
+### CMS
 
-Seller
+**Aggregate Root:** Content
 
-Seller/marketplace
+| Kind | Names |
+|------|-------|
+| Events | ContentCreated, ContentUpdated, ContentPublished |
 
-AI
+---
 
-AI services độc lập
+## 6. Read / Supporting Contexts
 
-ReturnRefund
+### Search
 
-Planned context
+Read Model / CQRS — not a transactional aggregate.
 
-Shared và BuildingBlocks chỉ là supporting packages, không phải Business Context.
+```text
+ProductUpdated → Event → Indexer → OpenSearch → Search API
+```
 
-3. Core Aggregates
+### Analytics
 
-Identity
+Read Models, projections, aggregations. Does not own Order/Product/Payment transactional data.
 
-Aggregate: Identity
+### AI (External)
 
-Entities:
+Python/FastAPI services: Chatbot, Recommendation, Semantic Search, OCR, Fraud Detection, Review Summary, Content Generator.
 
-Credential
+AI does not own commerce transaction state.
 
-ExternalIdentity
+### Seller (Deferred)
 
-RefreshSession
+Planned: Seller, SellerProfile, SellerStore, SellerProductListing — pending business requirements.
 
-Value Objects:
+### ReturnRefund (Planned)
 
-EmailAddress
+Not enough requirements to finalize aggregates.
 
-IdentityId
+---
 
-Provider
+## 7. Cross-Context Rules
 
-Events:
+Modules must not access another context's Entity or Repository directly.
 
-IdentityRegistered
+**Wrong:**
 
-IdentityAuthenticated
-
-IdentityDisabled
-
-User
-
-Aggregate: User
-
-Entities:
-
-UserProfile
-
-UserAddress
-
-UserPreference
-
-Value Objects:
-
-UserId
-
-DisplayName
-
-PhoneNumber
-
-Address
-
-Catalog
-
-Aggregates: Product, Category
-
-Product:
-
-ProductVariant
-
-ProductImage
-
-ProductAttribute
-
-ProductOption
-
-Value Objects:
-
-ProductSku
-
-Money
-
-ProductName
-
-ProductSlug
-
-Events:
-
-ProductCreated
-
-ProductUpdated
-
-ProductPublished
-
-ProductPriceChanged
-
-Cart
-
-Aggregate: Cart
-
-Entities:
-
-CartItem
-
-Value Objects:
-
-CartId
-
-ProductReference
-
-Quantity
-
-Money
-
-Events:
-
-CartCreated
-
-CartItemAdded
-
-CartItemRemoved
-
-CartCleared
-
-Checkout
-
-Aggregate: CheckoutSession
-
-Entities:
-
-CheckoutLine
-
-CheckoutAdjustment
-
-Vai trò: orchestration giữa Cart, Catalog, Inventory, Promotion, User để tạo Order.
-
-Order
-
-Aggregate: Order
-
-Entities:
-
-OrderLine
-
-OrderAdjustment
-
-OrderAddress
-
-OrderPaymentReference
-
-OrderShipmentReference
-
-Value Objects:
-
-OrderId
-
-OrderNumber
-
-Money
-
-Quantity
-
-Address
-
-Events:
-
-OrderCreated
-
-OrderConfirmed
-
-OrderCancelled
-
-OrderCompleted
-
-Invariants chính:
-
-Order phải có line trước khi confirm.
-
-Quantity và total phải hợp lệ.
-
-Không sửa Order đã Completed/Cancelled.
-
-Inventory
-
-Aggregate: InventoryItem
-
-Entities:
-
-StockReservation
-
-StockAdjustment
-
-Value Objects:
-
-Sku
-
-Quantity
-
-ReservationId
-
-WarehouseId
-
-Events:
-
-StockAdjusted
-
-StockReserved
-
-StockReservationReleased
-
-StockDepleted
-
-Invariant: available stock không được âm; reservation không vượt stock có thể reserve.
-
-Payment
-
-Aggregate: Payment
-
-Entities:
-
-PaymentAttempt
-
-PaymentTransaction
-
-Value Objects:
-
-Money
-
-PaymentReference
-
-PaymentMethod
-
-ProviderReference
-
-Events:
-
-PaymentInitiated
-
-PaymentSucceeded
-
-PaymentFailed
-
-PaymentRefunded
-
-Shipping
-
-Aggregate: Shipment
-
-Entities:
-
-ShipmentItem
-
-TrackingRecord
-
-Value Objects:
-
-TrackingNumber
-
-Address
-
-CarrierCode
-
-Events:
-
-ShipmentCreated
-
-ShipmentDispatched
-
-ShipmentInTransit
-
-ShipmentDelivered
-
-Promotion
-
-Aggregates: Promotion, Coupon
-
-Entities:
-
-PromotionRule
-
-PromotionBenefit
-
-CouponRedemption
-
-Value Objects:
-
-CouponCode
-
-Percentage
-
-Money
-
-DateRange
-
-Events:
-
-PromotionActivated
-
-PromotionDeactivated
-
-CouponApplied
-
-CouponUsed
-
-Notification
-
-Aggregate: Notification
-
-Entities:
-
-NotificationDelivery
-
-Events:
-
-NotificationRequested
-
-NotificationSent
-
-NotificationFailed
-
-Review
-
-Aggregate: Review
-
-Entities:
-
-ReviewMedia
-
-Value Objects:
-
-Rating
-
-ReviewText
-
-ProductReference
-
-Events:
-
-ReviewCreated
-
-ReviewUpdated
-
-ReviewPublished
-
-4. Read / Supporting Contexts
-
-Search
-
-Chủ yếu là Read Model/CQRS, không phải transactional Aggregate.
-
-ProductUpdated
-↓
-Event
-↓
-Indexer
-↓
-OpenSearch
-↓
-Search API
-
-Analytics
-
-Chủ yếu dùng Read Models, projections và aggregations.
-
-Không sở hữu transactional data của Order/Product/Payment.
-
-CMS
-
-Aggregate chính: Content
-
-Events:
-
-ContentCreated
-
-ContentUpdated
-
-ContentPublished
-
-Seller
-
-Chưa đủ business requirements để chốt model. Dự kiến:
-
-Seller
-
-SellerProfile
-
-SellerStore
-
-SellerProductListing
-
-AI
-
-AI chạy độc lập bằng Python/FastAPI.
-
-Services:
-
-Chatbot
-
-Recommendation
-
-Semantic Search
-
-OCR
-
-Fraud Detection
-
-Review Summary
-
-Content Generator
-
-Image Search
-
-SEO Generator
-
-AI không sở hữu transaction state của Commerce.
-
-ReturnRefund
-
-Là planned context; chưa đủ requirements để chốt Aggregate.
-
-5. Cross-Context Rules
-
-Không được truy cập Entity/Repository của Context khác.
-
-Sai:
-
+```text
 Order → InventoryRepository
+```
 
-Đúng:
+**Correct:**
 
-OrderCreated
-↓
-Event Bus
-↓
-Inventory Handler
+```text
+OrderCreated → Event Bus → Inventory Handler → StockReserved
+```
 
-Cross-context dùng:
+Cross-context communication uses:
 
-Application Service
+- Application Service (when synchronous contract needed)
+- Public Contract
+- Domain Event
+- Integration Event (future Kafka)
 
-Public Contract
+Use IDs and references — never foreign Entity instances across contexts.
 
-Domain Event
+---
 
-Integration Event
+## 8. Aggregate Rules
 
-Chỉ dùng ID/reference thay vì Entity của Context khác.
+- Aggregate is the consistency boundary
+- Only Aggregate Root is accessed from outside
+- Keep aggregates small
+- Strong consistency invariants enforced inside Aggregate
+- Eventual consistency between contexts
+- Repository interfaces target Aggregate Root
+- Never mutate another context's Aggregate directly
 
-6. Aggregate Rules
+---
 
-Aggregate là consistency boundary.
+## 9. Domain Events & Outbox
 
-Chỉ Aggregate Root được truy cập từ bên ngoài.
+| Event | Owner |
+|-------|-------|
+| OrderCreated | Order |
+| StockReserved | Inventory |
+| PaymentSucceeded | Payment |
+| ReviewCreated | Review |
+| CouponUsed | Promotion |
 
-Giữ Aggregate nhỏ.
+```text
+Change Domain State → Save Outbox → Commit → Worker → Publish Event
+```
 
-Invariant cần strong consistency nằm trong Aggregate.
+Never publish events directly inside a business transaction.
 
-Giữa các Context dùng eventual consistency.
+See [event-catalog.md](./event-catalog.md) for full catalog and integration event mapping.
 
-Repository tập trung vào Aggregate Root.
+---
 
-Không mutate trực tiếp Aggregate khác.
+## 10. CQRS
 
-7. Domain Events & Outbox
+Apply only where read scalability is required:
 
-Các event quan trọng:
+- Search
+- Analytics
+- Dashboard
+- Reporting
 
-Event
+Do not apply CQRS to simple CRUD across the platform.
 
-Owner
+---
 
-OrderCreated
+## 11. Dependency Rule
 
-Order
+```text
+Presentation → Application → Domain
+Infrastructure implements Domain/Application interfaces
+```
 
-StockReserved
+Domain must not depend on: NestJS, Prisma, Redis, OpenSearch, MinIO, Kafka, HTTP clients, payment/shipping providers, LLM providers.
 
-Inventory
+---
 
-PaymentSucceeded
+## 12. Shared Building Blocks
 
-Payment
+Use `@novacommerce/building-blocks` for:
 
-ReviewCreated
+```text
+Result, DomainError, BaseEntity, AggregateRoot, ValueObject,
+DomainEvent (interface), Specification
+```
 
-Review
+Do not duplicate these primitives in modules. Do not put business logic in building-blocks.
 
-CouponUsed
+---
 
-Promotion
+## 13. Domain → Module Mapping
 
-Flow:
-
-Change Domain State
-↓
-Save Outbox
-↓
-Commit
-↓
-Worker
-↓
-Publish Event
-
-Không publish event trực tiếp trong transaction.
-
-8. CQRS
-
-Chỉ áp dụng khi cần:
-
-Search
-
-Analytics
-
-Dashboard
-
-Reporting
-
-Không áp dụng cho CRUD đơn giản.
-
-9. Dependency Rule
-
-Presentation
-↓
-Application
-↓
-Domain
-↑
-Infrastructure
-
-Domain không phụ thuộc:
-
-NestJS
-
-Prisma
-
-Redis
-
-OpenSearch
-
-MinIO
-
-Kafka
-
-HTTP clients
-
-Payment/Shipping providers
-
-LLM providers
-
-Infrastructure implement các interface của Domain/Application.
-
-10. Shared Building Blocks
-
-Có thể chứa:
-
-Result
-
-Error
-
-BaseEntity
-
-AggregateRoot
-
-Specification
-
-DomainEvent
-
-EventBus
-
-Outbox
-
-Logger
-
-Validation
-
-Pagination
-
-ValueObject
-
-Không chứa business logic.
-
-11. Domain → Module Mapping
-
-<module>/
-├── application/
+```text
+modules/<context>/
 ├── domain/
-│ ├── entities/
-│ ├── aggregates/
-│ ├── events/
-│ ├── repositories/
-│ └── value-objects/
-├── infrastructure/
-├── presentation/
-├── contracts/
-└── README.md
+│   ├── aggregates/
+│   ├── entities/
+│   ├── events/
+│   ├── repositories/
+│   ├── value-objects/
+│   └── errors/
+├── application/      (future)
+├── infrastructure/   (future)
+└── presentation/     (future)
+```
 
-Domain phải framework-independent.
+---
 
-12. Implementation Status
+## 14. Implementation Status
 
-Đây là design baseline, chưa phải implementation.
+> Domain layer code exists under `modules/*/domain/` for 13 commerce contexts. Application, Infrastructure, and Presentation layers are **not implemented**.
 
-Hiện repository mới có Outbox model; business domain modules chưa được triển khai.
+| Module | Domain Code | Files | Notes |
+|--------|-------------|------:|-------|
+| identity | ✅ | 12 | Full aggregate + events + repository interface |
+| user | ✅ | 12 | Includes UserCreatedEvent |
+| catalog | ✅ | 17 | Product + Category aggregates |
+| cart | ✅ | 12 | Cart aggregate with line management |
+| checkout | ✅ | 7 | CheckoutSession orchestration root |
+| order | ✅ | 17 | Invariants enforced in aggregate |
+| inventory | ✅ | 13 | Stock reservation invariants |
+| payment | ✅ | 13 | Payment lifecycle events |
+| shipping | ✅ | 12 | Shipment lifecycle |
+| promotion | ✅ | 16 | Promotion + Coupon aggregates |
+| notification | ✅ | 7 | Notification delivery aggregate |
+| review | ✅ | 10 | Review + rating |
+| cms | ✅ | 6 | Content aggregate |
+| search | ⏳ | 0 | Read-side — deferred |
+| analytics | ⏳ | 0 | Read-side — deferred |
+| seller | ⏳ | 0 | Requirements pending |
+| AI | N/A | — | Python `ai-services/api` stub only |
+
+**Build verification:** `pnpm build:modules` compiles all domain TypeScript.
+
+**Tests:** No domain test suite yet — test infrastructure pending.
+
+**Next steps:** Application layer (commands/queries/handlers), Infrastructure repositories (Prisma), Presentation (controllers), Prisma schema sync with database-design.

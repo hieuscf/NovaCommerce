@@ -29,11 +29,12 @@ Last Updated
 | Coding Standards     | ✅ Complete   |     100% | `docs/coding-standards.md`, `.cursor/rules/novacommerce.mdc` |
 | Development Workflow | ✅ Complete   |     100% | `docs/contributing.md` (branch, commit, verification) |
 | Pull Request Process | ✅ Complete   |     100% | `.github/PULL_REQUEST_TEMPLATE.md` (NovaCommerce-specific) |
-| Monorepo Scaffold    | 🚧 In Progress |      55% | apps, packages, workers, ai-services, `modules/` structure |
-| Domain Modeling      | 🚧 Partial    |      80% | `docs/domain-model.md` (draft — pending sign-off) |
+| Monorepo Scaffold    | 🚧 In Progress |      65% | apps, packages, workers, ai-services, `modules/` + domain code |
+| Domain Modeling      | ✅ Complete   |     100% | `docs/domain-model.md` v0.2.0 — audited, reconciliation documented |
+| Domain Implementation | 🚧 In Progress |      65% | 13/16 modules — domain layer only; search/analytics/seller deferred |
 | Database Design      | 🚧 Partial    |      70% | `docs/database-design.md` (draft); Prisma has OutboxMessage only |
 | API Design           | 🚧 Partial    |      70% | `docs/api-guidelines.md` (draft); Gateway `/health` only |
-| Backend              | 🚧 In Progress |       8% | Gateway health endpoint, outbox worker stub, building-blocks |
+| Backend              | 🚧 In Progress |      15% | Gateway health, outbox stub, building-blocks, domain layer (13 modules) |
 | Frontend             | 🚧 In Progress |       5% | Next.js web/admin placeholder pages |
 | AI Platform          | 🚧 In Progress |       5% | FastAPI health endpoint stub |
 | Testing              | ⏳ Pending    |       0% | Standards documented; no test suite yet |
@@ -51,7 +52,7 @@ Last Updated
 - [x] `progress.md`
 - [x] `docker.md`
 - [x] `brand-guidelines.md`
-- [x] `domain-model.md` (draft — pending review)
+- [x] `domain-model.md` (v0.2.0 — Reviewed for Implementation)
 - [x] `database-design.md` (draft — pending Prisma sync)
 - [x] `event-catalog.md` (draft — pending review)
 - [x] `api-guidelines.md` (draft — pending Gateway implementation)
@@ -95,7 +96,8 @@ Last Updated
 | Admin (Next.js) | 🚧 | `apps/admin` — placeholder page |
 | Building blocks | 🚧 | `packages/building-blocks` — DDD abstractions |
 | Database package (Prisma) | 🚧 | `packages/database` — OutboxMessage only |
-| Domain modules (structure) | 🚧 | `modules/` — 16 contexts scaffolded, no business logic |
+| Domain modules | 🚧 | `modules/` — domain layer in 13/16 contexts (154 TS files) |
+| Domain build | ✅ | `pnpm build:modules` |
 | Outbox worker | 🚧 | `workers/outbox-publisher` — stub |
 | AI service (FastAPI) | 🚧 | `ai-services/api` — health endpoint only |
 | Docker Compose | ✅ | `docker-compose.yml`, `docker-compose.dev.yml` |
@@ -112,9 +114,9 @@ Last Updated
 | Component              | Design | Implementation |
 | ---------------------- | ------ | -------------- |
 | Modular Monolith       | ✅     | 🚧 Scaffold    |
-| Clean Architecture     | ✅     | 🚧 building-blocks only |
-| DDD                    | ✅     | 🚧 module folders only |
-| Event Driven           | ✅     | 🚧 Outbox stub + event interfaces |
+| Clean Architecture     | ✅     | 🚧 domain layer in 13 modules |
+| DDD                    | ✅     | 🚧 aggregates/entities/VOs implemented |
+| Event Driven           | ✅     | 🚧 domain events in code; Outbox stub |
 | Outbox Pattern         | ✅     | 🚧 Table only  |
 | CQRS Strategy          | ✅     | ⏳             |
 | AI Architecture        | ✅     | 🚧 Health stub |
@@ -126,22 +128,22 @@ Last Updated
 
 | Module       | Design | Implementation |
 | ------------ | ------ | -------------- |
-| Identity     | ✅     | ⏳ scaffold only |
-| User         | ✅     | ⏳ scaffold only |
-| Catalog      | ✅     | ⏳ scaffold only |
-| Cart         | ✅     | ⏳ scaffold only |
-| Checkout     | ✅     | ⏳ scaffold only |
-| Order        | ✅     | ⏳ scaffold only |
-| Inventory    | ✅     | ⏳ scaffold only |
-| Payment      | ✅     | ⏳ scaffold only |
-| Shipping     | ✅     | ⏳ scaffold only |
-| Promotion    | ✅     | ⏳ scaffold only |
-| Review       | ✅     | ⏳ scaffold only |
-| Search       | ✅     | ⏳ scaffold only |
-| CMS          | ✅     | ⏳ scaffold only |
-| Analytics    | ✅     | ⏳ scaffold only |
-| Notification | ✅     | ⏳ scaffold only |
-| Seller       | ✅     | ⏳ scaffold only |
+| Identity     | ✅     | 🚧 domain only |
+| User         | ✅     | 🚧 domain only |
+| Catalog      | ✅     | 🚧 domain only |
+| Cart         | ✅     | 🚧 domain only |
+| Checkout     | ✅     | 🚧 domain only |
+| Order        | ✅     | 🚧 domain only |
+| Inventory    | ✅     | 🚧 domain only |
+| Payment      | ✅     | 🚧 domain only |
+| Shipping     | ✅     | 🚧 domain only |
+| Promotion    | ✅     | 🚧 domain only |
+| Review       | ✅     | 🚧 domain only |
+| CMS          | ✅     | 🚧 domain only |
+| Notification | ✅     | 🚧 domain only |
+| Search       | ✅     | ⏳ read-side deferred |
+| Analytics    | ✅     | ⏳ read-side deferred |
+| Seller       | ✅     | ⏳ requirements pending |
 | AI           | ✅     | 🚧 Stub        |
 
 Legend: ⏳ Not Started · 🚧 In Progress · ✅ Complete · ❌ Blocked
@@ -200,7 +202,8 @@ Deliverables
 - [x] Root README
 - [x] `modules/` folder structure (16 bounded contexts)
 - [x] `@novacommerce/building-blocks`
-- [~] Domain Model (draft — pending sign-off)
+- [x] Domain Model (v0.2.0 — audited)
+- [x] Domain layer implementation (13 commerce modules)
 - [~] Database Design (draft — pending Prisma sync)
 - [~] Event Catalog (draft — pending sign-off)
 - [~] API Guidelines (draft — pending Gateway implementation)
@@ -254,10 +257,13 @@ Sprint 0 — Architecture & Project Foundation
 - [x] Root README
 - [x] `modules/` structure + building-blocks
 - [x] Coding standards + contributing guide + PR template
+- [x] Domain model audit + domain layer (13 modules)
 
 ### In Progress
 
-- [~] Review & sign-off: domain-model, database-design, event-catalog, api-guidelines
+- [~] Review & sign-off: database-design, event-catalog, api-guidelines
+- [ ] Application layer (commands/queries/handlers)
+- [ ] Infrastructure repositories (Prisma)
 - [ ] Prisma schema sync with database-design.md
 - [ ] In-Memory Event Bus implementation
 
@@ -287,7 +293,8 @@ Sprint 0 — Architecture & Project Foundation
 
 # Next Immediate Goals
 
-1. Review & sign-off foundation design docs (domain, database, events, API).
+1. Application layer for Core Commerce (Identity, Catalog, Order).
 2. Sync Prisma schema with `database-design.md`.
-3. Implement In-Memory Event Bus.
-4. Begin Core Commerce — Identity module.
+3. Infrastructure repositories (Prisma implementations).
+4. Implement In-Memory Event Bus.
+5. Domain unit tests (when test infrastructure added).

@@ -17,7 +17,7 @@
 | Architecture & vision | ✅ | — | `docs/Project Context.md`, `NovaCommerce Architecture.md`, 4 ADRs |
 | Foundation design docs | 🚧 | — | domain-model, database-design, event-catalog, api-guidelines, reponsitory-structure (draft) |
 | Monorepo scaffold | ✅ | 🚧 | `apps/`, `packages/database`, `packages/building-blocks`, `workers/`, `ai-services/`, `modules/` (structure) |
-| Business modules | 🚧 | 🚧 | `modules/` — 16 bounded contexts scaffolded; no business logic yet |
+| Business modules | 🚧 | 🚧 | Domain layer: 13/16 modules implemented; Application/Infra pending |
 | Database (Prisma) | 🚧 | 🚧 | Only `OutboxMessage` model |
 | Event system | 🚧 | 🚧 | Outbox table + worker stub; `IEventBus` / `DomainEvent` in building-blocks (no runtime bus yet) |
 | API (Gateway) | 🚧 | 🚧 | `/health` only — no Swagger, no `/api/v1` |
@@ -83,18 +83,18 @@
 
 ## 2.4 Domain & Architecture
 
-> Design documented in `docs/domain-model.md` (Draft / Foundation Design). `modules/` folder structure exists; domain models not implemented in code yet.
+> Domain design audited in `docs/domain-model.md` v0.2.0. Domain layer implemented for 13 commerce modules; search/analytics/seller deferred.
 
-- [x] Define bounded contexts (17 contexts documented)
-- [x] Define aggregates (documented)
-- [x] Define entities (documented)
-- [x] Define value objects (documented)
-- [x] Define domain services (documented)
-- [x] Define repository interfaces (documented)
-- [x] Define domain events (documented)
-- [~] Complete `docs/domain-model.md` (draft — pending review / sign-off)
-- [x] Create `modules/` per bounded context (folder scaffold only — 16 modules)
-- [ ] Implement domain models in code
+- [x] Define bounded contexts (17 contexts documented — AI external, seller deferred)
+- [x] Define aggregates (documented + audited)
+- [x] Define entities (documented + audited)
+- [x] Define value objects (documented + audited)
+- [x] Define domain services (none required at foundation — documented)
+- [x] Define repository interfaces (documented + implemented as interfaces)
+- [x] Define domain events (documented + aligned with event-catalog)
+- [x] Complete `docs/domain-model.md` (Reviewed for Implementation — audit table + reconciliation)
+- [x] Create `modules/` per bounded context (16 modules)
+- [x] Implement domain models in code (13/16 modules — search/analytics/seller deferred)
 
 ## 2.5 Database
 

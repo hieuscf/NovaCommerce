@@ -1,7 +1,7 @@
 NovaCommerce Event Catalog
 
 > **Version:** 0.1.0  
-> **Status:** Foundation Design  
+> **Status:** Foundation Design — Aligned with domain-model v0.2.0  
 > **Last Updated:** 2026-09-09
 
 ## 1. Purpose
@@ -79,7 +79,9 @@ CreateOrder
 Event	Owner	Ý nghĩa
 IdentityRegistered	Identity	Identity mới được tạo
 IdentityAuthenticated	Identity	Authentication thành công
+IdentityDisabled	Identity	Identity bị vô hiệu hoá
 UserCreated	User	User được tạo
+UserProfileUpdated	User	Profile user được cập nhật
 ProductCreated	Catalog	Product được tạo
 ProductUpdated	Catalog	Product thay đổi
 ProductPublished	Catalog	Product được publish
@@ -326,9 +328,7 @@ P2 event payloads sẽ được chốt khi Search, Analytics và AI use cases đ
 
 13. Current Status
 
-Đây là event design baseline, chưa phải implementation.
-
-Hiện repository mới có Outbox model/worker stub; business event handlers chưa được triển khai hoàn chỉnh.
+Domain Event classes are implemented in `modules/*/domain/events/`. Outbox worker stub exists; event handlers and Event Bus are not yet implemented.
 
 Tiếp theo:
 
