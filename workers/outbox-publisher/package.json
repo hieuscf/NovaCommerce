@@ -1,0 +1,19 @@
+{
+  "name": "@novacommerce/outbox-worker",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start:prod": "node dist/main.js",
+    "start:dev": "tsx watch src/main.ts"
+  },
+  "dependencies": {
+    "@novacommerce/database": "workspace:*",
+    "@prisma/client": "6.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "22.13.10",
+    "tsx": "4.19.3",
+    "typescript": "5.8.2"
+  }
+}

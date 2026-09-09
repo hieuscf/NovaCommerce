@@ -1,0 +1,60 @@
+# Dependencies
+node_modules
+**/node_modules
+
+# Build outputs
+dist
+**/dist
+.next
+**/.next
+out
+**/out
+coverage
+**/.turbo
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+
+# Git & IDE
+.git
+.gitignore
+.github
+.cline
+.idea
+.vscode
+*.swp
+*.swo
+
+# Logs & temp
+logs
+**/*.log
+tmp
+temp
+.cache
+
+# Python
+.venv
+**/.venv
+__pycache__
+**/__pycache__
+*.py[cod]
+*.egg-info
+.pytest_cache
+.mypy_cache
+
+# Tests & docs (not needed in runtime images)
+**/*.spec.ts
+**/*.test.ts
+**/__tests__
+docs
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# OS
+.DS_Store
+Thumbs.db

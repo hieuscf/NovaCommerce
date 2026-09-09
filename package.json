@@ -1,0 +1,22 @@
+{
+  "name": "novacommerce",
+  "version": "0.1.0",
+  "private": true,
+  "description": "NovaCommerce Enterprise E-Commerce Platform",
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "scripts": {
+    "build": "pnpm -r --filter \"./apps/**\" --filter \"./workers/**\" run build",
+    "build:gateway": "pnpm --filter @novacommerce/gateway run build",
+    "build:worker": "pnpm --filter @novacommerce/outbox-worker run build",
+    "build:web": "pnpm --filter @novacommerce/web run build",
+    "build:admin": "pnpm --filter @novacommerce/admin run build",
+    "start:gateway": "pnpm --filter @novacommerce/gateway run start:prod",
+    "start:worker": "pnpm --filter @novacommerce/outbox-worker run start:prod",
+    "db:generate": "pnpm --filter @novacommerce/database run generate",
+    "db:migrate:deploy": "pnpm --filter @novacommerce/database run migrate:deploy"
+  },
+  "packageManager": "pnpm@9.15.4"
+}

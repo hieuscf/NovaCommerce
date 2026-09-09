@@ -1,0 +1,154 @@
+---
+description: NovaCommerce architecture, coding standards, and engineering conventions
+alwaysApply: true
+---
+
+# NovaCommerce — Cursor Rules
+
+Version: 1.0
+
+## Mission
+
+Protect the architecture and long-term maintainability of NovaCommerce.
+
+Optimize for: correctness, maintainability, scalability, readability, testability, enterprise-grade architecture — not speed of writing code.
+
+## Documentation First (Mandatory)
+
+Before writing or changing code:
+
+1. Open `docs/README.md` and follow the **Task-Based Reading Guide**.
+2. Read all **Required Docs** for the current task type (see `.cursor/rules/cursor.md` § Documentation First).
+3. Check `docs/progress.md` for implementation status.
+4. Do not invent names/paths/events that contradict `domain-model.md`, `event-catalog.md`, `database-design.md`, or `api-guidelines.md`.
+5. If docs and code conflict, stop and report — do not silently override either.
+
+## Project Stack
+
+**Backend:** TypeScript, NestJS, Prisma ORM, PostgreSQL, Redis, OpenSearch, MinIO
+
+**Frontend:** Next.js, React, TailwindCSS
+
+**AI Platform:** Python, FastAPI, LangChain, PyTorch, Sentence Transformers
+
+**Architecture:** Modular Monolith, Clean Architecture, DDD, Event Driven, Outbox Pattern, CQRS (where necessary)
+
+## Golden Rules
+
+1. **Never break Clean Architecture.** Dependency direction: Presentation → Application → Domain ← Infrastructure
+2. **Business logic belongs only in Domain.** Never in controllers, DTOs, repositories, Prisma services, or middleware.
+3. **Every feature belongs to exactly one module.** Never duplicate business logic.
+4. **Never access another module's database.** Communicate via Application Services, Domain Events, Public Contracts.
+5. **Every important business action must emit a Domain Event** (UserRegistered, ProductCreated, OrderCreated, etc.).
+6. **Never publish events directly.** Use: Aggregate → Outbox → Worker → Event Bus
+7. **Prisma exists only inside Infrastructure.** Never inject into Controllers, Domain, or Application.
+8. **Repositories are interfaces in Domain/Application.** Implementations in Infrastructure.
+9. **All new APIs require:** validation, authorization, Swagger documentation, tests.
+10. **Never use `any`** unless unavoidable and documented. Prefer `unknown`, generics, discriminated unions.
+
+## Module Standard
+
+```
+module/
+  application/
+  domain/
+  infrastructure/
+  presentation/
+  contracts/
+  events/
+  README.md
+```
+
+Do not create custom layouts.
+
+## Naming Conventions
+
+| Kind | Convention | Example |
+|------|------------|---------|
+| Folders | lowercase | `catalog`, `inventory` |
+| Files | kebab-case | `create-product.command.ts` |
+| Classes | PascalCase | `CreateOrderHandler` |
+| Interfaces | `I` prefix | `IProductRepository` |
+| Events | past tense | `OrderCompletedEvent` |
+| Commands | imperative | `CreateProductCommand` |
+| Queries | descriptive | `GetProductByIdQuery` |
+
+## Layer Responsibilities
+
+**Domain:** Aggregates, Value Objects, business invariants, Domain Events. One Aggregate Root per aggregate.
+
+**Application:** Use cases, coordinate repos/transactions, publish via Outbox, return DTOs/Results. No domain rules.
+
+**Presentation:** Validate input, authenticate, authorize, call Application, return HTTP. Nothing else.
+
+**Infrastructure:** Prisma, Redis, OpenSearch, MinIO, email, SMS, payment/shipping providers. Never leak into Domain.
+
+## Shared Package
+
+Allowed: Result, Error, Logger, EventBus, BaseEntity, AggregateRoot, Pagination, Validation, common utilities.
+
+Forbidden: business logic, module-specific code.
+
+## AI Services
+
+Python services handle chatbot, semantic search, recommendations, OCR, fraud detection, review summary, product description generation.
+
+Communication via REST/gRPC. Business modules must not call LLMs directly.
+
+## Search
+
+Do not search PostgreSQL for user-facing product search. Use: Database → Indexer → OpenSearch → Search API.
+
+## Error Handling
+
+Business errors: `Result.Fail()`. Unexpected failures: throw exceptions. Never use exceptions for validation or business rules.
+
+## Logging
+
+Structured logging with RequestId, CorrelationId, UserId, Module, Duration, ErrorCode. Never use `console.log`.
+
+## Security
+
+Validate input, sanitize output, enforce RBAC, JWT auth, rate limiting, audit logs. Never expose secrets. Never trust client input.
+
+## Performance
+
+Always consider pagination, caching, indexing, batch operations, avoiding N+1. Measure before optimizing.
+
+## Testing
+
+Unit, integration, and E2E tests for public APIs. Target >= 80% coverage. Critical domain logic near 100%.
+
+## Documentation
+
+Every feature updates README, Swagger/OpenAPI, architecture docs (if impacted), and ADR for significant design changes.
+
+## Brand & UI
+
+Follow `docs/brand-guidelines.md` and use tokens from `assets/design-tokens.css` / `assets/design-tokens.json`.
+
+## PR Checklist
+
+- [ ] Builds, lint, type check, tests pass
+- [ ] No circular dependencies or architecture violations
+- [ ] Swagger and documentation updated
+- [ ] No TODOs without linked issue
+- [ ] No commented-out code or committed secrets
+
+## Forbidden
+
+Never bypass architecture, access another module's repository, inject Prisma outside Infrastructure, create circular dependencies, write business logic in controllers, skip tests, disable lint rules, or introduce breaking changes without documentation.
+
+## Decision Hierarchy
+
+1. Domain correctness → 2. Clean Architecture → 3. DDD consistency → 4. Security → 5. Testability → 6. Maintainability → 7. Performance → 8. Simplicity
+
+## Engineering Philosophy
+
+> Design for change, not for today.
+
+> Modules own their business capabilities. Events connect modules.
+
+> AI augments business, never replaces domain rules.
+
+> Every feature moves NovaCommerce closer to an enterprise-grade, event-driven platform that can evolve into microservices without rewriting the domain.

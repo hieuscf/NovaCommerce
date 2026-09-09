@@ -1,0 +1,31 @@
+# syntax=docker/dockerfile:1
+
+ARG PYTHON_VERSION=3.12.9
+
+FROM python:${PYTHON_VERSION}-slim-bookworm AS builder
+WORKDIR /app
+RUN pip install --no-cache-dir --upgrade pip
+COPY ai-services/api/requirements.txt .
+RUN pip wheel --no-cache-dir --wheel-dir /wheels -r requirements.txt
+
+FROM python:${PYTHON_VERSION}-slim-bookworm AS runner
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+WORKDIR /app
+
+RUN groupadd --system --gid 1001 ai \
+  && useradd --system --uid 1001 --gid ai --create-home ai
+
+COPY --from=builder /wheels /wheels
+RUN pip install --no-cache-dir /wheels/* \
+  && rm -rf /wheels
+
+COPY ai-services/api/app ./app
+
+USER ai
+EXPOSE 8000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+  CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')" || exit 1
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
