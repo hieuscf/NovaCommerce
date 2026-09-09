@@ -9,8 +9,11 @@ Provides framework-independent abstractions shared by all bounded contexts:
 - `Result` — operation outcome wrapper
 - `DomainError` — typed domain failure base
 - `BaseEntity` / `AggregateRoot` / `ValueObject` — DDD primitives
-- `DomainEvent` — event contract
-- `IEventBus` / `IOutboxStore` — messaging abstractions (interfaces only)
+- `DomainEvent` — in-process domain fact contract
+- `IntegrationEvent` — cross-context serializable event envelope
+- `IEventBus` / `InMemoryEventBus` — event dispatch abstraction and default in-process transport
+- `IEventHandler` — async handler contract
+- `OutboxPublisher` / `IOutboxRepository` — durable outbox publication orchestration
 - `ISpecification` — composable domain rules
 - Pagination, validation, logging, and caching interfaces
 
@@ -18,10 +21,17 @@ Provides framework-independent abstractions shared by all bounded contexts:
 
 - No business logic (Catalog, Order, Payment, etc.)
 - No NestJS, Prisma, or framework dependencies
-- Implementations of EventBus, Outbox, and repositories belong in module Infrastructure layers
+- Prisma outbox repository implementation lives in `@novacommerce/database`
 
 ## Usage
 
 ```typescript
-import { Result, AggregateRoot, DomainEvent } from '@novacommerce/building-blocks';
+import {
+  Result,
+  AggregateRoot,
+  DomainEvent,
+  IntegrationEvent,
+  InMemoryEventBus,
+  OutboxPublisher,
+} from '@novacommerce/building-blocks';
 ```

@@ -38,7 +38,7 @@ describe('outbox transaction atomicity', () => {
           aggregateId: orderId,
           aggregateType: 'Order',
           eventType: 'OrderCreated',
-          payload: { orderId },
+          payload: { orderNumber: `ORD-${randomUUID().slice(0, 8)}`, customerId: randomUUID() },
         },
       }),
     ]);
@@ -83,7 +83,7 @@ describe('outbox transaction atomicity', () => {
             aggregateId: orderId,
             aggregateType: 'Order',
             eventType: 'OrderCreated',
-            payload: { orderId },
+            payload: { orderNumber: `ORD-${randomUUID().slice(0, 8)}`, customerId: randomUUID() },
           },
         });
       }),

@@ -94,9 +94,15 @@ importers:
       typescript:
         specifier: 5.8.2
         version: 5.8.2
+      vitest:
+        specifier: 3.0.9
+        version: 3.0.9(@types/node@22.13.10)(terser@5.51.2)(tsx@4.19.3)
 
   packages/database:
     dependencies:
+      '@novacommerce/building-blocks':
+        specifier: workspace:*
+        version: link:../building-blocks
       '@prisma/client':
         specifier: 6.5.0
         version: 6.5.0(prisma@6.5.0(typescript@5.8.2))(typescript@5.8.2)
@@ -113,6 +119,9 @@ importers:
 
   workers/outbox-publisher:
     dependencies:
+      '@novacommerce/building-blocks':
+        specifier: workspace:*
+        version: link:../../packages/building-blocks
       '@novacommerce/database':
         specifier: workspace:*
         version: link:../../packages/database
@@ -129,6 +138,9 @@ importers:
       typescript:
         specifier: 5.8.2
         version: 5.8.2
+      vitest:
+        specifier: 3.0.9
+        version: 3.0.9(@types/node@22.13.10)(terser@5.51.2)(tsx@4.19.3)
 
 packages:
 

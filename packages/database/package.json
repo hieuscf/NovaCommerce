@@ -23,6 +23,7 @@
     "test:integration": "vitest run"
   },
   "dependencies": {
+    "@novacommerce/building-blocks": "workspace:*",
     "@prisma/client": "6.5.0"
   },
   "devDependencies": {

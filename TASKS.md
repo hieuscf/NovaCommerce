@@ -19,7 +19,7 @@
 | Monorepo scaffold | ✅ | 🚧 | `apps/`, `packages/database`, `packages/building-blocks`, `workers/`, `ai-services/`, `modules/` (structure) |
 | Business modules | 🚧 | 🚧 | Domain layer: 13/16 modules implemented; Application/Infra pending |
 | Database (Prisma) | ✅ | 🚧 | 46 business tables + Outbox; schema synced with PostgreSQL |
-| Event system | 🚧 | 🚧 | Outbox table + worker stub; `IEventBus` / `DomainEvent` in building-blocks (no runtime bus yet) |
+| Event system | ✅ | 🚧 | Outbox + `InMemoryEventBus` + P0 schemas; module handlers not wired yet |
 | API (Gateway) | 🚧 | 🚧 | `/health` only — no Swagger, no `/api/v1` |
 | Frontend | — | 🚧 | Next.js placeholder pages (web, admin) |
 | AI services | 🚧 | 🚧 | FastAPI `/health` stub |
@@ -115,15 +115,15 @@
 ## 2.6 Event System
 
 - [x] Create Outbox table (`outbox_messages`)
-- [~] Create Outbox worker stub (`workers/outbox-publisher` — polls + marks processed; **no EventBus publish**)
-- [x] Define EventBus abstraction (`@novacommerce/building-blocks` — `IEventBus` interface)
-- [ ] Implement In-Memory Event Bus
+- [x] Create Outbox worker (`workers/outbox-publisher` — polls, deserializes, publishes via `IEventBus`, marks processed only on success)
+- [x] Define EventBus abstraction (`@novacommerce/building-blocks` — `IEventBus` + `IEventHandler`)
+- [x] Implement In-Memory Event Bus (`InMemoryEventBus` in building-blocks)
 - [x] Define Domain Event base model (code) (`DomainEvent` interface in building-blocks)
-- [ ] Define Integration Event model (code)
+- [x] Define Integration Event model (code) (`IntegrationEvent` envelope in building-blocks)
 - [x] Define event naming convention (documented in `event-catalog.md`)
-- [~] Define event versioning (documented — not implemented in code)
-- [~] Complete `docs/event-catalog.md` (foundation design — pending review)
-- [ ] Finalize P0 event payload schemas in code
+- [x] Define event versioning (`eventVersion` field on `IntegrationEvent`)
+- [x] Complete `docs/event-catalog.md` (P0 payloads + implementation status synchronized)
+- [x] Finalize P0 event payload schemas in code (`packages/building-blocks/src/events/p0-events.ts`)
 
 ## 2.7 API
 

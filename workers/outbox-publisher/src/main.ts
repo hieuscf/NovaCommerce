@@ -1,24 +1,22 @@
-import { PrismaClient } from '@prisma/client';
+import {
+  InMemoryEventBus,
+  OutboxPublisher,
+} from '@novacommerce/building-blocks';
+import { PrismaClient, PrismaOutboxRepository } from '@novacommerce/database';
 
 const POLL_INTERVAL_MS = Number(process.env.WORKER_POLL_INTERVAL_MS ?? 5000);
+const BATCH_SIZE = Number(process.env.WORKER_BATCH_SIZE ?? 10);
+
 const prisma = new PrismaClient();
+const eventBus = new InMemoryEventBus();
+const outboxRepository = new PrismaOutboxRepository(prisma);
+const outboxPublisher = new OutboxPublisher(outboxRepository, eventBus, {
+  batchSize: BATCH_SIZE,
+});
 
 let running = true;
 
-async function processOutboxBatch(): Promise<void> {
-  const pending = await prisma.outboxMessage.findMany({
-    where: { processedAt: null },
-    orderBy: { createdAt: 'asc' },
-    take: 10,
-  });
-
-  for (const message of pending) {
-    await prisma.outboxMessage.update({
-      where: { id: message.id },
-      data: { processedAt: new Date() },
-    });
-  }
-}
+export { eventBus, outboxPublisher, outboxRepository, prisma };
 
 async function shutdown(signal: string): Promise<void> {
   if (!running) {
@@ -44,7 +42,10 @@ async function run(): Promise<void> {
 
   while (running) {
     try {
-      await processOutboxBatch();
+      const processedCount = await outboxPublisher.processBatch();
+      if (processedCount > 0) {
+        console.info(`Outbox worker processed ${processedCount} message(s)`);
+      }
     } catch (error) {
       console.error('Outbox worker batch failed', error);
     }

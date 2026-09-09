@@ -34,10 +34,10 @@ Last Updated
 | Domain Implementation | 🚧 In Progress |      65% | 13/16 modules — domain layer only; search/analytics/seller deferred |
 | Database Design      | ✅ Complete   |     100% | `docs/database-design.md` v1.0.0 — synced with Prisma + PostgreSQL (46 tables) |
 | API Design           | 🚧 Partial    |      70% | `docs/api-guidelines.md` (draft); Gateway `/health` only |
-| Backend              | 🚧 In Progress |      15% | Gateway health, outbox stub, building-blocks, domain layer (13 modules) |
+| Backend              | 🚧 In Progress |      20% | Gateway health, Event System foundation, building-blocks, domain layer (13 modules) |
 | Frontend             | 🚧 In Progress |       5% | Next.js web/admin placeholder pages |
 | AI Platform          | 🚧 In Progress |       5% | FastAPI health endpoint stub |
-| Testing              | 🚧 In Progress |      10% | Database integration tests in `packages/database`; no CI yet |
+| Testing              | 🚧 In Progress |      15% | Database + Event System unit/integration tests; no CI yet |
 | Deployment           | 🚧 Partial    |      40% | Docker Compose + `docs/docker.md` — no CI/CD |
 
 ---
@@ -94,11 +94,11 @@ Last Updated
 | API Gateway (NestJS) | 🚧 | `apps/gateway` — health endpoint only |
 | Web Store (Next.js) | 🚧 | `apps/web` — placeholder page |
 | Admin (Next.js) | 🚧 | `apps/admin` — placeholder page |
-| Building blocks | 🚧 | `packages/building-blocks` — DDD abstractions |
+| Building blocks | ✅ | `packages/building-blocks` — DDD abstractions + Event System contracts |
 | Database package (Prisma) | ✅ | `packages/database` — 46 business models + OutboxMessage; migration `20250907000000_init` |
 | Domain modules | 🚧 | `modules/` — domain layer in 13/16 contexts (154 TS files) |
 | Domain build | ✅ | `pnpm build:modules` |
-| Outbox worker | 🚧 | `workers/outbox-publisher` — stub |
+| Outbox worker | ✅ | `workers/outbox-publisher` — polls outbox, publishes via `InMemoryEventBus` |
 | AI service (FastAPI) | 🚧 | `ai-services/api` — health endpoint only |
 | Docker Compose | ✅ | `docker-compose.yml`, `docker-compose.dev.yml` |
 | Dockerfiles | ✅ | Root + per-service Dockerfiles |
@@ -116,8 +116,8 @@ Last Updated
 | Modular Monolith       | ✅     | 🚧 Scaffold    |
 | Clean Architecture     | ✅     | 🚧 domain layer in 13 modules |
 | DDD                    | ✅     | 🚧 aggregates/entities/VOs implemented |
-| Event Driven           | ✅     | 🚧 domain events in code; Outbox stub |
-| Outbox Pattern         | ✅     | 🚧 Table only  |
+| Event Driven           | ✅     | 🚧 domain events in code; Event System foundation complete |
+| Outbox Pattern         | ✅     | ✅ Table + Publisher (at-least-once) |
 | CQRS Strategy          | ✅     | ⏳             |
 | AI Architecture        | ✅     | 🚧 Health stub |
 | Future Kafka Migration | ✅     | ⏳             |
@@ -205,7 +205,7 @@ Deliverables
 - [x] Domain Model (v0.2.0 — audited)
 - [x] Domain layer implementation (13 commerce modules)
 - [x] Database Design (v1.0.0 — Prisma/PostgreSQL audit complete)
-- [~] Event Catalog (draft — pending sign-off)
+- [x] Event Catalog (P0 payloads + Event System implementation synchronized)
 - [~] API Guidelines (draft — pending Gateway implementation)
 - [~] Repository Structure doc (draft — filename typo)
 
@@ -261,10 +261,10 @@ Sprint 0 — Architecture & Project Foundation
 
 ### In Progress
 
-- [~] Review & sign-off: event-catalog, api-guidelines
+- [~] Review & sign-off: api-guidelines
 - [ ] Application layer (commands/queries/handlers)
 - [ ] Infrastructure repositories (Prisma)
-- [ ] In-Memory Event Bus implementation
+- [ ] Wire module event handlers to `InMemoryEventBus`
 
 ---
 
@@ -294,5 +294,5 @@ Sprint 0 — Architecture & Project Foundation
 
 1. Application layer for Core Commerce (Identity, Catalog, Order).
 2. Infrastructure repositories (Prisma implementations per module).
-3. Implement In-Memory Event Bus.
+3. Wire Application handlers to Event Bus and Outbox.
 4. Expand test coverage (domain unit tests, CI pipeline).

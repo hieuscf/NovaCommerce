@@ -99,7 +99,7 @@ BEGIN
   Save OutboxMessage
 COMMIT
   → Outbox Worker polls unpublished messages
-  → Event Bus (future: Kafka)
+  → InMemoryEventBus (future: Kafka transport)
 ```
 
 ### OutboxMessage fields
@@ -116,7 +116,9 @@ COMMIT
 | `retryCount` | `retry_count` | Publish retry counter |
 | `lastError` | `last_error` | Last publish failure message |
 
-Worker: `workers/outbox-publisher` polls `processed_at IS NULL`.
+Worker: `workers/outbox-publisher` polls `processed_at IS NULL`, deserializes to `IntegrationEvent`, publishes via `IEventBus`, and sets `processed_at` only after successful publish.
+
+Repository: `PrismaOutboxRepository` in this package implements `IOutboxRepository`.
 
 ## Architecture Rules
 

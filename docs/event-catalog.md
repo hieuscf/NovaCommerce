@@ -173,38 +173,37 @@ Order chỉ phản ứng với business event; Payment không sửa trực tiế
 
 6. Event Payload
 
-Mỗi event nên có envelope tối thiểu:
+Mỗi integration event có envelope tối thiểu (implemented in `@novacommerce/building-blocks` as `IntegrationEvent`):
 
-eventId
-eventType
-aggregateType
-aggregateId
-occurredAt
-payload
-metadata
-
-Metadata có thể chứa:
-
-correlationId
-causationId
-requestId
-version
+- `eventId` — unique event identity (outbox message id at publish time)
+- `eventType` — dot-notation integration name (e.g. `order.created`)
+- `eventVersion` — explicit contract version (integer, e.g. `1`)
+- `aggregateType` — aggregate root type (e.g. `Order`)
+- `aggregateId` — aggregate identity
+- `occurredAt` — ISO-8601 timestamp
+- `payload` — plain serializable data
+- `metadata` (optional) — `correlationId`, `causationId`, `requestId`
 
 Ví dụ:
 
+```json
 {
   "eventId": "uuid",
   "eventType": "order.created",
+  "eventVersion": 1,
   "aggregateType": "Order",
   "aggregateId": "order-id",
-  "occurredAt": "timestamp",
-  "payload": {},
+  "occurredAt": "2026-01-01T00:00:00.000Z",
+  "payload": {
+    "orderNumber": "ORD-001",
+    "customerId": "customer-id"
+  },
   "metadata": {
     "correlationId": "uuid",
-    "causationId": "uuid",
-    "version": 1
+    "causationId": "uuid"
   }
 }
+```
 
 Payload không chứa Entity object của Context khác.
 
@@ -280,12 +279,11 @@ Không giả định event delivery chỉ xảy ra một lần.
 
 Event là public contract khi đã dùng giữa services.
 
-Khi thay đổi breaking:
+Version được biểu diễn bằng trường `eventVersion` trên envelope (ví dụ `1`, `2`). Consumer validate `eventType` + `eventVersion` trước khi xử lý payload.
 
-order.created.v1
-order.created.v2
+Khi thay đổi breaking, tăng `eventVersion` — không silently thay đổi payload của version đang được consumer sử dụng.
 
-Không silently thay đổi payload của event đang được consumer sử dụng.
+Ví dụ: `order.created` v1 và `order.created` v2 cùng `eventType`, khác `eventVersion` và payload schema.
 
 11. Event Ownership
 
@@ -303,12 +301,17 @@ Consumer chỉ subscribe; không trở thành owner của event.
 
 12. Initial Priority
 P0 — Core Commerce
-OrderCreated
-StockReserved
-PaymentSucceeded
-ProductUpdated
-CartItemAdded
-CheckoutCompleted
+
+| Domain Event | Integration Event Type | Version | Aggregate | Payload (required fields) |
+| --- | --- | ---: | --- | --- |
+| OrderCreated | `order.created` | 1 | Order | `orderNumber`, `customerId` |
+| StockReserved | `inventory.stock_reserved` | 1 | InventoryItem | `orderId`, `quantity` |
+| PaymentSucceeded | `payment.completed` | 1 | Payment | `orderId` |
+| ProductUpdated | `catalog.product_updated` | 1 | Product | `name` |
+| CartItemAdded | `cart.item_added` | 1 | Cart | `productId`, `quantity` |
+| CheckoutCompleted | `checkout.completed` | 1 | CheckoutSession | `orderId` |
+
+Typed schemas: `packages/building-blocks/src/events/p0-events.ts`
 P1 — Commerce Extensions
 OrderConfirmed
 OrderCancelled
@@ -328,14 +331,21 @@ P2 event payloads sẽ được chốt khi Search, Analytics và AI use cases đ
 
 13. Current Status
 
-Domain Event classes are implemented in `modules/*/domain/events/`. Outbox worker stub exists; event handlers and Event Bus are not yet implemented.
+| Component | Status |
+| --- | --- |
+| Domain Event classes | ✅ `modules/*/domain/events/` |
+| `DomainEvent` interface | ✅ `@novacommerce/building-blocks` |
+| `IntegrationEvent` envelope | ✅ `@novacommerce/building-blocks` |
+| P0 payload schemas (v1) | ✅ `@novacommerce/building-blocks` |
+| `IEventBus` + `InMemoryEventBus` | ✅ `@novacommerce/building-blocks` |
+| Outbox table | ✅ `outbox_messages` |
+| Outbox Publisher | ✅ `workers/outbox-publisher` — publish via `IEventBus`, mark processed only on success |
+| Module event handlers | ⏳ Not yet wired in Application layer |
+
+Delivery semantics: **at-least-once**. A crash after publish but before marking processed may cause duplicate delivery — consumers must be idempotent.
 
 Tiếp theo:
 
-Chốt payload cho P0 events.
-Implement Domain Events trong Aggregates.
-Implement Event Bus.
-Hoàn thiện Outbox Publisher.
-Viết Integration/Event Contract Tests.
-Khi chuyển Kafka, map Domain Event → Integration Event.
-```
+- Wire module Application handlers to `InMemoryEventBus`.
+- Persist integration events to Outbox from Application use cases.
+- When migrating to Kafka, replace `InMemoryEventBus` transport without changing envelope contracts.
