@@ -19,9 +19,13 @@ Before writing or changing code:
 
 1. Open `docs/README.md` and follow the **Task-Based Reading Guide**.
 2. Read all **Required Docs** for the current task type (see `.cursor/rules/cursor.md` § Documentation First).
-3. Check `docs/progress.md` for implementation status.
-4. Do not invent names/paths/events that contradict `domain-model.md`, `event-catalog.md`, `database-design.md`, or `api-guidelines.md`.
-5. If docs and code conflict, stop and report — do not silently override either.
+3. Read `docs/coding-standards.md` for architecture, naming, and layer rules.
+4. Read `docs/contributing.md` for workflow, branch, commit, and PR requirements.
+5. Check `docs/progress.md` for implementation status.
+6. Do not invent names/paths/events that contradict `domain-model.md`, `event-catalog.md`, `database-design.md`, or `api-guidelines.md`.
+7. If docs and code conflict, stop and report — do not silently override either.
+
+> **Canonical standards:** `docs/coding-standards.md` (developer docs) and this file (agent enforcement) must stay aligned.
 
 ## Project Stack
 
@@ -101,7 +105,7 @@ Do not search PostgreSQL for user-facing product search. Use: Database → Index
 
 ## Error Handling
 
-Business errors: `Result.Fail()`. Unexpected failures: throw exceptions. Never use exceptions for validation or business rules.
+Business errors: `Result.fail()` (from `@novacommerce/building-blocks`). Unexpected failures: throw exceptions. Never use exceptions for validation or business rules.
 
 ## Logging
 

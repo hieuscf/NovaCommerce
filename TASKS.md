@@ -6,7 +6,7 @@
 > **Primary Language:** TypeScript
 > **AI Platform:** Python
 > **Last Updated:** 2026-09-09
-> **Phase:** Foundation — design docs ~80%, code ~5%
+> **Phase:** Foundation — design docs ~80%, code ~10%
 
 ---
 
@@ -16,17 +16,17 @@
 | ---- | --- | ---- | ----- |
 | Architecture & vision | ✅ | — | `docs/Project Context.md`, `NovaCommerce Architecture.md`, 4 ADRs |
 | Foundation design docs | 🚧 | — | domain-model, database-design, event-catalog, api-guidelines, reponsitory-structure (draft) |
-| Monorepo scaffold | ✅ | 🚧 | `apps/`, `packages/database`, `workers/`, `ai-services/` |
-| Business modules | — | ⏳ | **`modules/` does not exist** |
+| Monorepo scaffold | ✅ | 🚧 | `apps/`, `packages/database`, `packages/building-blocks`, `workers/`, `ai-services/`, `modules/` (structure) |
+| Business modules | 🚧 | 🚧 | `modules/` — 16 bounded contexts scaffolded; no business logic yet |
 | Database (Prisma) | 🚧 | 🚧 | Only `OutboxMessage` model |
-| Event system | 🚧 | 🚧 | Outbox table + worker stub (no EventBus) |
+| Event system | 🚧 | 🚧 | Outbox table + worker stub; `IEventBus` / `DomainEvent` in building-blocks (no runtime bus yet) |
 | API (Gateway) | 🚧 | 🚧 | `/health` only — no Swagger, no `/api/v1` |
 | Frontend | — | 🚧 | Next.js placeholder pages (web, admin) |
 | AI services | 🚧 | 🚧 | FastAPI `/health` stub |
 | Tests | — | ⏳ | No app tests |
 | CI/CD | — | ⏳ | No GitHub Actions workflows |
 
-**Key gaps:** root `README.md`, Prisma ↔ database-design sync, `modules/` creation, EventBus implementation, NovaCommerce PR template.
+**Key gaps:** Prisma ↔ database-design sync, In-Memory EventBus implementation, test/CI infrastructure, foundation design doc sign-off.
 
 ---
 
@@ -59,31 +59,31 @@
 
 - [x] Initialize pnpm monorepo
 - [x] Create `apps/` (gateway, web, admin)
-- [x] Create `packages/` (`@novacommerce/database` only)
+- [x] Create `packages/` (`@novacommerce/database`, `@novacommerce/building-blocks`)
 - [x] Create `workers/` (`outbox-publisher` only)
 - [x] Create `ai-services/` (FastAPI stub)
 - [x] Create base application scaffolds
 - [x] Create repository Docker configuration
 - [x] Create `.env.example`
-- [~] Complete `docs/reponsitory-structure.md` (doc exists — filename typo; describes aspirational layout incl. `modules/` not yet created)
-- [ ] Create `modules/` folder per repository structure
-- [ ] Create `packages/shared` or `packages/building-blocks`
-- [ ] Complete root `README.md` (currently placeholder)
+- [~] Complete `docs/reponsitory-structure.md` (doc exists — filename typo; `modules/` scaffold now matches doc)
+- [x] Create `modules/` folder per repository structure (16 contexts, Clean Architecture layers, README per module)
+- [x] Create `packages/building-blocks` (`Result`, `DomainError`, `BaseEntity`, `AggregateRoot`, `ValueObject`, `DomainEvent`, `IEventBus`, `IOutboxStore`, etc.)
+- [x] Complete root `README.md` (project intro, architecture, stack, development, docs links)
 
 ## 2.3 Development Standards
 
-- [~] Define coding standards (in `.cursor/rules/novacommerce.mdc` — not yet in `docs/`)
-- [ ] Create `docs/coding-standards.md`
-- [ ] Define development workflow
-- [ ] Create `docs/contributing.md`
-- [ ] Define branch strategy
-- [ ] Define commit conventions
-- [~] Define Pull Request requirements (`.github/PULL_REQUEST_TEMPLATE.md` exists — Superpowers template, needs NovaCommerce rewrite)
-- [ ] Sync `docs/progress.md` with repo reality
+- [x] Define coding standards (`docs/coding-standards.md` + `.cursor/rules/novacommerce.mdc`)
+- [x] Create `docs/coding-standards.md`
+- [x] Define development workflow (`docs/contributing.md`)
+- [x] Create `docs/contributing.md`
+- [x] Define branch strategy (`master` + `feature/*`, `fix/*`, `docs/*`, etc.)
+- [x] Define commit conventions (Conventional Commits)
+- [x] Define Pull Request requirements (`.github/PULL_REQUEST_TEMPLATE.md` — NovaCommerce-specific)
+- [x] Sync `docs/progress.md` with repo reality
 
 ## 2.4 Domain & Architecture
 
-> Design documented in `docs/domain-model.md` (Draft / Foundation Design). No code in `modules/` yet.
+> Design documented in `docs/domain-model.md` (Draft / Foundation Design). `modules/` folder structure exists; domain models not implemented in code yet.
 
 - [x] Define bounded contexts (17 contexts documented)
 - [x] Define aggregates (documented)
@@ -93,7 +93,7 @@
 - [x] Define repository interfaces (documented)
 - [x] Define domain events (documented)
 - [~] Complete `docs/domain-model.md` (draft — pending review / sign-off)
-- [ ] Create `modules/` per bounded context
+- [x] Create `modules/` per bounded context (folder scaffold only — 16 modules)
 - [ ] Implement domain models in code
 
 ## 2.5 Database
@@ -114,9 +114,9 @@
 
 - [x] Create Outbox table (`outbox_messages`)
 - [~] Create Outbox worker stub (`workers/outbox-publisher` — polls + marks processed; **no EventBus publish**)
-- [ ] Define EventBus abstraction
+- [x] Define EventBus abstraction (`@novacommerce/building-blocks` — `IEventBus` interface)
 - [ ] Implement In-Memory Event Bus
-- [ ] Define Domain Event base model (code)
+- [x] Define Domain Event base model (code) (`DomainEvent` interface in building-blocks)
 - [ ] Define Integration Event model (code)
 - [x] Define event naming convention (documented in `event-catalog.md`)
 - [~] Define event versioning (documented — not implemented in code)
@@ -694,7 +694,7 @@ Trước mỗi Pull Request, kiểm tra:
 
 **Objective:** Architecture & Project Foundation
 
-**Status:** 🚧 ~85% documentation — pending review, sign-off, and code alignment
+**Status:** 🚧 ~90% documentation — pending review, sign-off, and remaining code alignment
 
 ### Completed
 
@@ -709,6 +709,12 @@ Trước mỗi Pull Request, kiểm tra:
 - [x] Docker Compose + Dockerfiles + `docs/docker.md`
 - [x] `.env.example`
 - [x] Foundation design docs written (see Current Tasks)
+- [x] Root `README.md` (setup guide, architecture, docs links)
+- [x] `modules/` folder structure (16 bounded contexts per repository-structure doc)
+- [x] `@novacommerce/building-blocks` (DDD/Clean Architecture abstractions)
+- [x] Development standards (`docs/coding-standards.md`, `docs/contributing.md`)
+- [x] PR template (`.github/PULL_REQUEST_TEMPLATE.md` — NovaCommerce-specific)
+- [x] Sync `docs/progress.md` with repo reality
 
 ### Current Tasks
 
@@ -717,11 +723,8 @@ Trước mỗi Pull Request, kiểm tra:
 - [~] Review & sign-off `docs/event-catalog.md`
 - [~] Review & sign-off `docs/api-guidelines.md`
 - [~] Review & sign-off `docs/reponsitory-structure.md` (fix filename typo optional)
-- [ ] Sync `docs/progress.md` with repo reality
-- [ ] Complete root `README.md` (setup guide)
-- [ ] Rewrite `.github/PULL_REQUEST_TEMPLATE.md` for NovaCommerce
-- [ ] Create `modules/` folder structure per repository-structure doc
 - [ ] Begin Prisma schema sync with `database-design.md`
+- [ ] Implement In-Memory Event Bus (building-blocks interface exists)
 
 ### Exit Criteria
 
@@ -731,8 +734,8 @@ Sprint 0 hoàn thành khi:
 - [~] Database Design documented (draft exists — **needs Prisma sync**)
 - [~] Event Catalog documented (draft exists — **needs approval**)
 - [~] API Guidelines documented (draft exists — **needs Gateway implementation**)
-- [~] Repository Structure documented (draft exists — **needs `modules/` created**)
-- [ ] Root README có hướng dẫn setup
+- [~] Repository Structure documented (draft exists — **`modules/` scaffold aligned**)
+- [x] Root README có hướng dẫn setup
 - [~] Monorepo có thể chạy local (scaffold builds; full stack via Docker)
 - [x] Docker environment hoạt động
 

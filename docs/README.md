@@ -22,7 +22,9 @@ Tài liệu chính thức của NovaCommerce. AI agents và developers **phải 
 | 6 | [database-design.md](./database-design.md) | Schema, ERD, module DB ownership |
 | 7 | [event-catalog.md](./event-catalog.md) | Domain events, payloads, consumers |
 | 8 | [api-guidelines.md](./api-guidelines.md) | REST conventions, errors, versioning |
-| 9 | [progress.md](./progress.md) | Trạng thái dự án, sprint, milestones |
+| 9 | [coding-standards.md](./coding-standards.md) | Architecture rules, naming, layer responsibilities |
+| 10 | [contributing.md](./contributing.md) | Workflow, branches, commits, PR process |
+| 11 | [progress.md](./progress.md) | Trạng thái dự án, sprint, milestones |
 
 ---
 
@@ -52,6 +54,13 @@ Tài liệu chính thức của NovaCommerce. AI agents và developers **phải 
 | [api-guidelines.md](./api-guidelines.md) | REST API standards, auth, pagination, idempotency, OpenAPI |
 | [reponsitory-structure.md](./reponsitory-structure.md) | pnpm monorepo: `apps/`, `modules/`, `packages/`, `workers/` |
 
+### Development Standards
+
+| Document | Description |
+|----------|-------------|
+| [coding-standards.md](./coding-standards.md) | Clean Architecture, DDD, naming, layers, events, testing targets |
+| [contributing.md](./contributing.md) | Contribution flow, branch strategy, commits, verification commands |
+
 ### Operations & Brand
 
 | Document | Description |
@@ -76,7 +85,7 @@ Tài liệu chính thức của NovaCommerce. AI agents và developers **phải 
 
 | Task | Required Docs | Optional |
 |------|---------------|----------|
-| **Any code change** | `Project Context.md`, `NovaCommerce Architecture.md`, `reponsitory-structure.md` | `progress.md` |
+| **Any code change** | `Project Context.md`, `NovaCommerce Architecture.md`, `reponsitory-structure.md`, `coding-standards.md` | `progress.md`, `contributing.md` |
 | **New module / bounded context** | + `domain-model.md`, `database-design.md`, `event-catalog.md` | ADR-001 |
 | **Domain logic (aggregate, VO, event)** | + `domain-model.md`, `event-catalog.md` | `database-design.md` |
 | **Database / Prisma / migration** | + `domain-model.md`, `database-design.md` | ADR-003 |
@@ -93,7 +102,9 @@ Tài liệu chính thức của NovaCommerce. AI agents và developers **phải 
 
 | Resource | Location | Purpose |
 |----------|----------|---------|
-| Cursor rules | `.cursor/rules/novacommerce.mdc` | Architecture & coding conventions |
+| Coding standards | `docs/coding-standards.md` | Official architecture & code rules |
+| Contributing guide | `docs/contributing.md` | Workflow, branches, commits, PRs |
+| Cursor rules | `.cursor/rules/novacommerce.mdc` | AI agent enforcement (synced with coding-standards) |
 | Doc-first protocol | `.cursor/rules/cursor.md` | Mandatory doc reading before code |
 | Agent instructions | `.cursor/cursorcustominstructions.md` | Agent workflow overview |
 | Design tokens | `assets/design-tokens.json`, `assets/design-tokens.css` | Brand colors, spacing, typography |
@@ -105,7 +116,6 @@ Tài liệu chính thức của NovaCommerce. AI agents và developers **phải 
 
 Chưa có — sẽ bổ sung trong các sprint tiếp theo:
 
-- `coding-standards.md`
 - `testing-strategy.md`
 - `security.md`
 - `deployment.md`

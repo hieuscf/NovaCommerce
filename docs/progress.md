@@ -26,17 +26,18 @@ Last Updated
 | ADR                  | ✅ Complete   |     100% | 4 ADRs in `docs/architecture/adrs/` |
 | Brand Guidelines     | ✅ Complete   |     100% | `docs/brand-guidelines.md` + `assets/design-tokens.*` |
 | Agent / Cursor Setup | ✅ Complete   |     100% | `.cursor/rules/novacommerce.mdc`, skills |
-| Coding Standards     | 🚧 Partial    |      30% | Rules in `.cursor/rules/` — chưa có `docs/coding-standards.md` |
-| Development Workflow | 🚧 Partial    |      20% | `.github/PULL_REQUEST_TEMPLATE.md` — chưa có workflow doc |
-| Monorepo Scaffold    | 🚧 In Progress |      40% | pnpm workspace, apps, packages, workers, ai-services |
-| Domain Modeling      | ⏳ Pending    |       0% | Chưa có `docs/domain-model.md` |
-| Database Design      | 🚧 Partial    |      10% | Prisma outbox table only — chưa có ERD doc |
-| API Design           | ⏳ Pending    |       0% | Chưa có `docs/api-guidelines.md` |
-| Backend              | 🚧 In Progress |       5% | Gateway health endpoint, outbox worker stub |
+| Coding Standards     | ✅ Complete   |     100% | `docs/coding-standards.md`, `.cursor/rules/novacommerce.mdc` |
+| Development Workflow | ✅ Complete   |     100% | `docs/contributing.md` (branch, commit, verification) |
+| Pull Request Process | ✅ Complete   |     100% | `.github/PULL_REQUEST_TEMPLATE.md` (NovaCommerce-specific) |
+| Monorepo Scaffold    | 🚧 In Progress |      55% | apps, packages, workers, ai-services, `modules/` structure |
+| Domain Modeling      | 🚧 Partial    |      80% | `docs/domain-model.md` (draft — pending sign-off) |
+| Database Design      | 🚧 Partial    |      70% | `docs/database-design.md` (draft); Prisma has OutboxMessage only |
+| API Design           | 🚧 Partial    |      70% | `docs/api-guidelines.md` (draft); Gateway `/health` only |
+| Backend              | 🚧 In Progress |       8% | Gateway health endpoint, outbox worker stub, building-blocks |
 | Frontend             | 🚧 In Progress |       5% | Next.js web/admin placeholder pages |
 | AI Platform          | 🚧 In Progress |       5% | FastAPI health endpoint stub |
-| Testing              | ⏳ Pending    |       0% | Chưa có test suite |
-| Deployment           | 🚧 Partial    |      40% | Docker Compose + `docs/docker.md` — chưa có CI/CD |
+| Testing              | ⏳ Pending    |       0% | Standards documented; no test suite yet |
+| Deployment           | 🚧 Partial    |      40% | Docker Compose + `docs/docker.md` — no CI/CD |
 
 ---
 
@@ -50,40 +51,37 @@ Last Updated
 - [x] `progress.md`
 - [x] `docker.md`
 - [x] `brand-guidelines.md`
+- [x] `domain-model.md` (draft — pending review)
+- [x] `database-design.md` (draft — pending Prisma sync)
+- [x] `event-catalog.md` (draft — pending review)
+- [x] `api-guidelines.md` (draft — pending Gateway implementation)
+- [x] `reponsitory-structure.md` (draft — filename typo)
+- [x] `coding-standards.md`
+- [x] `contributing.md`
+- [x] `docs/README.md` (documentation index)
+- [x] Root `README.md`
 - [x] ADR-001 Modular Monolith
 - [x] ADR-002 Event Bus + Outbox
 - [x] ADR-003 Prisma + PostgreSQL
 - [x] ADR-004 Python AI Services
 - [x] Agent rules (`.cursor/rules/novacommerce.mdc`)
 - [x] Agent instructions (`.cursor/cursorcustominstructions.md`)
+- [x] PR template (`.github/PULL_REQUEST_TEMPLATE.md`)
 - [x] Design tokens (`assets/design-tokens.json`, `assets/design-tokens.css`)
-
-## Partial (exists outside `docs/` or incomplete)
-
-- [~] Coding standards → `.cursor/rules/novacommerce.mdc` (chưa tách sang `docs/`)
-- [~] PR workflow → `.github/PULL_REQUEST_TEMPLATE.md` (chưa có `contributing.md`)
 
 ## Planned
 
-- [ ] `domain-model.md`
-- [ ] `event-catalog.md`
-- [ ] `api-guidelines.md`
-- [ ] `database-design.md`
-- [ ] `coding-standards.md`
 - [ ] `testing-strategy.md`
 - [ ] `security.md`
 - [ ] `deployment.md`
 - [ ] `monitoring.md`
-- [ ] `repository-structure.md`
 - [ ] `local-development.md`
-- [ ] `docs/README.md` (index điều hướng)
-- [ ] Root `README.md` (hiện chỉ placeholder)
 
 ## Removed / Not applicable
 
-- ~~`clinerules.md`~~ — không tồn tại, đã thay bằng `.cursor/rules/`
-- ~~`.clinecustominstructions`~~ — không tồn tại, đã thay bằng `.cursor/cursorcustominstructions.md`
-- ~~`architecture.md`~~ — tên thực tế là `NovaCommerce Architecture.md`
+- ~~`clinerules.md`~~ — replaced by `.cursor/rules/`
+- ~~`.clinecustominstructions`~~ — replaced by `.cursor/cursorcustominstructions.md`
+- ~~`architecture.md`~~ — actual name: `NovaCommerce Architecture.md`
 
 ---
 
@@ -95,26 +93,28 @@ Last Updated
 | API Gateway (NestJS) | 🚧 | `apps/gateway` — health endpoint only |
 | Web Store (Next.js) | 🚧 | `apps/web` — placeholder page |
 | Admin (Next.js) | 🚧 | `apps/admin` — placeholder page |
+| Building blocks | 🚧 | `packages/building-blocks` — DDD abstractions |
 | Database package (Prisma) | 🚧 | `packages/database` — OutboxMessage only |
+| Domain modules (structure) | 🚧 | `modules/` — 16 contexts scaffolded, no business logic |
 | Outbox worker | 🚧 | `workers/outbox-publisher` — stub |
 | AI service (FastAPI) | 🚧 | `ai-services/api` — health endpoint only |
 | Docker Compose | ✅ | `docker-compose.yml`, `docker-compose.dev.yml` |
 | Dockerfiles | ✅ | Root + per-service Dockerfiles |
-| GitHub Actions CI | ⏳ | Chưa có workflows |
-| Domain modules | ⏳ | Chưa có `modules/` business logic |
+| GitHub Actions CI | ⏳ | No `.github/workflows/` |
+| Development standards | ✅ | `coding-standards.md`, `contributing.md`, PR template |
 
 ---
 
 # Architecture Status
 
-> Trạng thái **thiết kế** (documented & accepted), chưa phải implementation.
+> Design documented and accepted. Implementation in early scaffold phase.
 
 | Component              | Design | Implementation |
 | ---------------------- | ------ | -------------- |
 | Modular Monolith       | ✅     | 🚧 Scaffold    |
-| Clean Architecture     | ✅     | ⏳             |
-| DDD                    | ✅     | ⏳             |
-| Event Driven           | ✅     | 🚧 Outbox stub |
+| Clean Architecture     | ✅     | 🚧 building-blocks only |
+| DDD                    | ✅     | 🚧 module folders only |
+| Event Driven           | ✅     | 🚧 Outbox stub + event interfaces |
 | Outbox Pattern         | ✅     | 🚧 Table only  |
 | CQRS Strategy          | ✅     | ⏳             |
 | AI Architecture        | ✅     | 🚧 Health stub |
@@ -126,30 +126,25 @@ Last Updated
 
 | Module       | Design | Implementation |
 | ------------ | ------ | -------------- |
-| Identity     | ⏳     | ⏳             |
-| User         | ⏳     | ⏳             |
-| Catalog      | ⏳     | ⏳             |
-| Cart         | ⏳     | ⏳             |
-| Checkout     | ⏳     | ⏳             |
-| Order        | ⏳     | ⏳             |
-| Inventory    | ⏳     | ⏳             |
-| Payment      | ⏳     | ⏳             |
-| Shipping     | ⏳     | ⏳             |
-| Promotion    | ⏳     | ⏳             |
-| Review       | ⏳     | ⏳             |
-| Search       | ⏳     | ⏳             |
-| CMS          | ⏳     | ⏳             |
-| Analytics    | ⏳     | ⏳             |
-| Notification | ⏳     | ⏳             |
-| Seller       | ⏳     | ⏳             |
-| AI           | ⏳     | 🚧 Stub        |
+| Identity     | ✅     | ⏳ scaffold only |
+| User         | ✅     | ⏳ scaffold only |
+| Catalog      | ✅     | ⏳ scaffold only |
+| Cart         | ✅     | ⏳ scaffold only |
+| Checkout     | ✅     | ⏳ scaffold only |
+| Order        | ✅     | ⏳ scaffold only |
+| Inventory    | ✅     | ⏳ scaffold only |
+| Payment      | ✅     | ⏳ scaffold only |
+| Shipping     | ✅     | ⏳ scaffold only |
+| Promotion    | ✅     | ⏳ scaffold only |
+| Review       | ✅     | ⏳ scaffold only |
+| Search       | ✅     | ⏳ scaffold only |
+| CMS          | ✅     | ⏳ scaffold only |
+| Analytics    | ✅     | ⏳ scaffold only |
+| Notification | ✅     | ⏳ scaffold only |
+| Seller       | ✅     | ⏳ scaffold only |
+| AI           | ✅     | 🚧 Stub        |
 
-Legend
-
-- ⏳ Not Started
-- 🚧 In Progress
-- ✅ Completed
-- ❌ Blocked
+Legend: ⏳ Not Started · 🚧 In Progress · ✅ Complete · ❌ Blocked
 
 ---
 
@@ -187,9 +182,7 @@ Legend
 
 ## Milestone 1 — Foundation
 
-Status
-
-🚧
+Status: 🚧
 
 Deliverables
 
@@ -201,100 +194,72 @@ Deliverables
 - [x] Monorepo Scaffold
 - [x] Docker Environment
 - [x] Agent / Cursor Rules
-- [ ] Domain Model
-- [ ] Database Design (ERD doc)
-- [ ] Event Catalog
-- [ ] API Standards
-- [ ] Repository Structure doc
+- [x] Coding Standards (`docs/coding-standards.md`)
+- [x] Contributing Guide (`docs/contributing.md`)
+- [x] PR Template (NovaCommerce-specific)
+- [x] Root README
+- [x] `modules/` folder structure (16 bounded contexts)
+- [x] `@novacommerce/building-blocks`
+- [~] Domain Model (draft — pending sign-off)
+- [~] Database Design (draft — pending Prisma sync)
+- [~] Event Catalog (draft — pending sign-off)
+- [~] API Guidelines (draft — pending Gateway implementation)
+- [~] Repository Structure doc (draft — filename typo)
 
 ---
 
 ## Milestone 2 — Core Commerce
 
-Status
+Status: ⏳
 
-⏳
-
-Modules
-
-- Identity
-- Catalog
-- Inventory
-- Cart
-- Checkout
-- Order
+Modules: Identity, Catalog, Inventory, Cart, Checkout, Order
 
 ---
 
 ## Milestone 3 — Commerce Extensions
 
-Status
+Status: ⏳
 
-⏳
-
-Modules
-
-- Payment
-- Shipping
-- Promotion
-- Notification
-- Review
+Modules: Payment, Shipping, Promotion, Notification, Review
 
 ---
 
 ## Milestone 4 — Intelligence
 
-Status
+Status: ⏳
 
-⏳
-
-Modules
-
-- Search
-- Analytics
-- AI Platform
+Modules: Search, Analytics, AI Platform
 
 ---
 
 ## Milestone 5 — Scale
 
-Status
+Status: ⏳
 
-⏳
-
-Objectives
-
-- Kafka
-- Microservices
-- Kubernetes
-- Horizontal Scaling
+Objectives: Kafka, Microservices, Kubernetes, Horizontal Scaling
 
 ---
 
 # Current Sprint
 
-Sprint 0
+Sprint 0 — Architecture & Project Foundation
 
-Objective
+### Completed
 
-Architecture & Project Foundation
-
-Tasks
-
-- [x] Vision
-- [x] Architecture
-- [x] ADR
-- [x] Technical Context
+- [x] Vision, Architecture, ADR, Technical Context
 - [x] Brand Guidelines + Design Tokens
 - [x] Cursor / Agent Rules
-- [x] Monorepo Scaffold (`apps/`, `packages/`, `workers/`, `ai-services/`)
+- [x] Monorepo Scaffold
 - [x] Docker Compose + Dockerfiles
-- [ ] Domain Model
-- [ ] ER Diagram + `database-design.md`
-- [ ] Event Catalog
-- [ ] API Standards
-- [ ] `repository-structure.md`
-- [ ] Root `README.md`
+- [x] Root README
+- [x] `modules/` structure + building-blocks
+- [x] Coding standards + contributing guide + PR template
+
+### In Progress
+
+- [~] Review & sign-off: domain-model, database-design, event-catalog, api-guidelines
+- [ ] Prisma schema sync with database-design.md
+- [ ] In-Memory Event Bus implementation
 
 ---
 
@@ -322,9 +287,7 @@ Tasks
 
 # Next Immediate Goals
 
-1. Hoàn thành `domain-model.md`.
-2. Thiết kế `database-design.md` và ERD (đồng bộ với Prisma schema).
-3. Xây dựng `event-catalog.md`.
-4. Chuẩn hóa `api-guidelines.md`.
-5. Viết `repository-structure.md` mô tả monorepo hiện tại.
-6. Mở rộng root `README.md` với hướng dẫn setup nhanh.
+1. Review & sign-off foundation design docs (domain, database, events, API).
+2. Sync Prisma schema with `database-design.md`.
+3. Implement In-Memory Event Bus.
+4. Begin Core Commerce — Identity module.
