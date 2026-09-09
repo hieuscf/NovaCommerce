@@ -14,13 +14,20 @@
   "scripts": {
     "generate": "prisma generate",
     "migrate:deploy": "prisma migrate deploy",
-    "build": "tsc -p tsconfig.json"
+    "migrate:dev": "prisma migrate dev",
+    "validate": "prisma validate",
+    "format": "prisma format",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:integration": "vitest run"
   },
   "dependencies": {
     "@prisma/client": "6.5.0"
   },
   "devDependencies": {
     "prisma": "6.5.0",
-    "typescript": "5.8.2"
+    "typescript": "5.8.2",
+    "vitest": "3.0.9"
   }
 }

@@ -32,12 +32,12 @@ Last Updated
 | Monorepo Scaffold    | 🚧 In Progress |      65% | apps, packages, workers, ai-services, `modules/` + domain code |
 | Domain Modeling      | ✅ Complete   |     100% | `docs/domain-model.md` v0.2.0 — audited, reconciliation documented |
 | Domain Implementation | 🚧 In Progress |      65% | 13/16 modules — domain layer only; search/analytics/seller deferred |
-| Database Design      | 🚧 Partial    |      70% | `docs/database-design.md` (draft); Prisma has OutboxMessage only |
+| Database Design      | ✅ Complete   |     100% | `docs/database-design.md` v1.0.0 — synced with Prisma + PostgreSQL (46 tables) |
 | API Design           | 🚧 Partial    |      70% | `docs/api-guidelines.md` (draft); Gateway `/health` only |
 | Backend              | 🚧 In Progress |      15% | Gateway health, outbox stub, building-blocks, domain layer (13 modules) |
 | Frontend             | 🚧 In Progress |       5% | Next.js web/admin placeholder pages |
 | AI Platform          | 🚧 In Progress |       5% | FastAPI health endpoint stub |
-| Testing              | ⏳ Pending    |       0% | Standards documented; no test suite yet |
+| Testing              | 🚧 In Progress |      10% | Database integration tests in `packages/database`; no CI yet |
 | Deployment           | 🚧 Partial    |      40% | Docker Compose + `docs/docker.md` — no CI/CD |
 
 ---
@@ -53,7 +53,7 @@ Last Updated
 - [x] `docker.md`
 - [x] `brand-guidelines.md`
 - [x] `domain-model.md` (v0.2.0 — Reviewed for Implementation)
-- [x] `database-design.md` (draft — pending Prisma sync)
+- [x] `database-design.md` (v1.0.0 — synchronized with Prisma schema and PostgreSQL)
 - [x] `event-catalog.md` (draft — pending review)
 - [x] `api-guidelines.md` (draft — pending Gateway implementation)
 - [x] `reponsitory-structure.md` (draft — filename typo)
@@ -95,7 +95,7 @@ Last Updated
 | Web Store (Next.js) | 🚧 | `apps/web` — placeholder page |
 | Admin (Next.js) | 🚧 | `apps/admin` — placeholder page |
 | Building blocks | 🚧 | `packages/building-blocks` — DDD abstractions |
-| Database package (Prisma) | 🚧 | `packages/database` — OutboxMessage only |
+| Database package (Prisma) | ✅ | `packages/database` — 46 business models + OutboxMessage; migration `20250907000000_init` |
 | Domain modules | 🚧 | `modules/` — domain layer in 13/16 contexts (154 TS files) |
 | Domain build | ✅ | `pnpm build:modules` |
 | Outbox worker | 🚧 | `workers/outbox-publisher` — stub |
@@ -204,7 +204,7 @@ Deliverables
 - [x] `@novacommerce/building-blocks`
 - [x] Domain Model (v0.2.0 — audited)
 - [x] Domain layer implementation (13 commerce modules)
-- [~] Database Design (draft — pending Prisma sync)
+- [x] Database Design (v1.0.0 — Prisma/PostgreSQL audit complete)
 - [~] Event Catalog (draft — pending sign-off)
 - [~] API Guidelines (draft — pending Gateway implementation)
 - [~] Repository Structure doc (draft — filename typo)
@@ -261,10 +261,9 @@ Sprint 0 — Architecture & Project Foundation
 
 ### In Progress
 
-- [~] Review & sign-off: database-design, event-catalog, api-guidelines
+- [~] Review & sign-off: event-catalog, api-guidelines
 - [ ] Application layer (commands/queries/handlers)
 - [ ] Infrastructure repositories (Prisma)
-- [ ] Prisma schema sync with database-design.md
 - [ ] In-Memory Event Bus implementation
 
 ---
@@ -294,7 +293,6 @@ Sprint 0 — Architecture & Project Foundation
 # Next Immediate Goals
 
 1. Application layer for Core Commerce (Identity, Catalog, Order).
-2. Sync Prisma schema with `database-design.md`.
-3. Infrastructure repositories (Prisma implementations).
-4. Implement In-Memory Event Bus.
-5. Domain unit tests (when test infrastructure added).
+2. Infrastructure repositories (Prisma implementations per module).
+3. Implement In-Memory Event Bus.
+4. Expand test coverage (domain unit tests, CI pipeline).

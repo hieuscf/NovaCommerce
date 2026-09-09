@@ -18,7 +18,7 @@
 | Foundation design docs | 🚧 | — | domain-model, database-design, event-catalog, api-guidelines, reponsitory-structure (draft) |
 | Monorepo scaffold | ✅ | 🚧 | `apps/`, `packages/database`, `packages/building-blocks`, `workers/`, `ai-services/`, `modules/` (structure) |
 | Business modules | 🚧 | 🚧 | Domain layer: 13/16 modules implemented; Application/Infra pending |
-| Database (Prisma) | 🚧 | 🚧 | Only `OutboxMessage` model |
+| Database (Prisma) | ✅ | 🚧 | 46 business tables + Outbox; schema synced with PostgreSQL |
 | Event system | 🚧 | 🚧 | Outbox table + worker stub; `IEventBus` / `DomainEvent` in building-blocks (no runtime bus yet) |
 | API (Gateway) | 🚧 | 🚧 | `/health` only — no Swagger, no `/api/v1` |
 | Frontend | — | 🚧 | Next.js placeholder pages (web, admin) |
@@ -26,7 +26,7 @@
 | Tests | — | ⏳ | No app tests |
 | CI/CD | — | ⏳ | No GitHub Actions workflows |
 
-**Key gaps:** Prisma ↔ database-design sync, In-Memory EventBus implementation, test/CI infrastructure, foundation design doc sign-off.
+**Key gaps:** Module Infrastructure repositories (Prisma), In-Memory EventBus implementation, test/CI infrastructure, foundation design doc sign-off.
 
 ---
 
@@ -98,17 +98,19 @@
 
 ## 2.5 Database
 
-> Logical design in `docs/database-design.md`. Prisma has **OutboxMessage only**.
+> Canonical schema: `docs/database-design.md` ↔ `packages/database/prisma/schema.prisma` ↔ PostgreSQL (46 application tables + `outbox_messages`).
 
-- [~] Create Prisma foundation (`packages/database` — `OutboxMessage` + init migration)
+- [x] Create Prisma foundation (`packages/database` — full schema + `20250907000000_init` migration)
 - [x] Define module database models (documented)
 - [x] Define database constraints (documented)
 - [x] Define indexes (documented)
 - [x] Define logical domain separation (documented)
-- [~] Complete ERD (logical design in doc — no standalone diagram file)
-- [~] Complete `docs/database-design.md` (foundation design — pending review)
-- [ ] Synchronize `database-design.md` with Prisma schema
-- [ ] Implement business tables in Prisma
+- [x] Complete ERD (in `docs/database-design.md`)
+- [x] Complete `docs/database-design.md` (v1.0.0 — synchronized with Prisma)
+- [x] Synchronize `database-design.md` with Prisma schema
+- [x] Implement business tables in Prisma (46 models)
+- [x] Database integration tests (`packages/database` — constraints + outbox atomicity)
+- [ ] Module Infrastructure repositories (Prisma implementations per bounded context)
 
 ## 2.6 Event System
 
@@ -723,7 +725,7 @@ Trước mỗi Pull Request, kiểm tra:
 - [~] Review & sign-off `docs/event-catalog.md`
 - [~] Review & sign-off `docs/api-guidelines.md`
 - [~] Review & sign-off `docs/reponsitory-structure.md` (fix filename typo optional)
-- [ ] Begin Prisma schema sync with `database-design.md`
+- [x] Prisma schema sync with `database-design.md` (audited 2026-09-09 — PostgreSQL ↔ Prisma empty diff)
 - [ ] Implement In-Memory Event Bus (building-blocks interface exists)
 
 ### Exit Criteria
@@ -731,7 +733,7 @@ Trước mỗi Pull Request, kiểm tra:
 Sprint 0 hoàn thành khi:
 
 - [~] Domain Model documented (draft exists — **needs approval**)
-- [~] Database Design documented (draft exists — **needs Prisma sync**)
+- [x] Database Design documented and synced with Prisma/PostgreSQL (v1.0.0)
 - [~] Event Catalog documented (draft exists — **needs approval**)
 - [~] API Guidelines documented (draft exists — **needs Gateway implementation**)
 - [~] Repository Structure documented (draft exists — **`modules/` scaffold aligned**)
