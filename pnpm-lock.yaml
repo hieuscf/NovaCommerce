@@ -89,6 +89,12 @@ importers:
         specifier: 5.8.2
         version: 5.8.2
 
+  packages/building-blocks:
+    devDependencies:
+      typescript:
+        specifier: 5.8.2
+        version: 5.8.2
+
   packages/database:
     dependencies:
       '@prisma/client':
