@@ -33,8 +33,8 @@ Last Updated
 | Domain Modeling      | ✅ Complete   |     100% | `docs/domain-model.md` v0.2.0 — audited, reconciliation documented |
 | Domain Implementation | 🚧 In Progress |      65% | 13/16 modules — domain layer only; search/analytics/seller deferred |
 | Database Design      | ✅ Complete   |     100% | `docs/database-design.md` v1.0.0 — synced with Prisma + PostgreSQL (46 tables) |
-| API Design           | 🚧 Partial    |      70% | `docs/api-guidelines.md` (draft); Gateway `/health` only |
-| Backend              | 🚧 In Progress |      20% | Gateway health, Event System foundation, building-blocks, domain layer (13 modules) |
+| API Design           | ✅ Complete   |     100% | `docs/api-guidelines.md` synchronized with Gateway infrastructure |
+| Backend              | 🚧 In Progress |      30% | Gateway `/api/v1` + OpenAPI, Event System foundation, domain layer (13 modules) |
 | Frontend             | 🚧 In Progress |       5% | Next.js web/admin placeholder pages |
 | AI Platform          | 🚧 In Progress |       5% | FastAPI health endpoint stub |
 | Testing              | 🚧 In Progress |      15% | Database + Event System unit/integration tests; no CI yet |
@@ -91,7 +91,7 @@ Last Updated
 | Item | Status | Location |
 | ---- | ------ | -------- |
 | pnpm monorepo | ✅ | `package.json`, `pnpm-workspace.yaml` |
-| API Gateway (NestJS) | 🚧 | `apps/gateway` — health endpoint only |
+| API Gateway (NestJS) | ✅ | `apps/gateway` — `/health`, `/ready`, `/api/v1`, OpenAPI |
 | Web Store (Next.js) | 🚧 | `apps/web` — placeholder page |
 | Admin (Next.js) | 🚧 | `apps/admin` — placeholder page |
 | Building blocks | ✅ | `packages/building-blocks` — DDD abstractions + Event System contracts |
@@ -261,7 +261,7 @@ Sprint 0 — Architecture & Project Foundation
 
 ### In Progress
 
-- [~] Review & sign-off: api-guidelines
+- [x] API Gateway infrastructure (`/api/v1`, OpenAPI, auth/authz wiring)
 - [ ] Application layer (commands/queries/handlers)
 - [ ] Infrastructure repositories (Prisma)
 - [ ] Wire module event handlers to `InMemoryEventBus`

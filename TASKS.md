@@ -20,7 +20,7 @@
 | Business modules | 🚧 | 🚧 | Domain layer: 13/16 modules implemented; Application/Infra pending |
 | Database (Prisma) | ✅ | 🚧 | 46 business tables + Outbox; schema synced with PostgreSQL |
 | Event system | ✅ | 🚧 | Outbox + `InMemoryEventBus` + P0 schemas; module handlers not wired yet |
-| API (Gateway) | 🚧 | 🚧 | `/health` only — no Swagger, no `/api/v1` |
+| API (Gateway) | ✅ | 🚧 | `/api/v1` + OpenAPI + auth wiring; business endpoints pending |
 | Frontend | — | 🚧 | Next.js placeholder pages (web, admin) |
 | AI services | 🚧 | 🚧 | FastAPI `/health` stub |
 | Tests | — | ⏳ | No app tests |
@@ -135,10 +135,10 @@
 - [x] Define pagination (documented)
 - [x] Define authentication flow (documented)
 - [x] Define authorization flow (documented)
-- [~] Complete `docs/api-guidelines.md` (foundation standard — pending review)
-- [ ] Implement `/api/v1` routing in Gateway
-- [ ] Configure Swagger / OpenAPI
-- [ ] Wire Gateway to `@novacommerce/database` (dep declared but unused)
+- [x] Complete `docs/api-guidelines.md` (implementation status synchronized)
+- [x] Implement `/api/v1` routing in Gateway (`apps/gateway` — v1 module, global prefix, infrastructure endpoints)
+- [x] Configure Swagger / OpenAPI (`/openapi.json`, Swagger UI at `/docs`, bearer JWT scheme)
+- [x] Wire Gateway to `@novacommerce/database` (`PrismaService` lifecycle + `/ready` probe; no business queries in routes)
 
 ## 2.8 Infrastructure
 
@@ -723,7 +723,7 @@ Trước mỗi Pull Request, kiểm tra:
 - [~] Review & sign-off `docs/domain-model.md`
 - [~] Review & sign-off `docs/database-design.md` + ERD
 - [~] Review & sign-off `docs/event-catalog.md`
-- [~] Review & sign-off `docs/api-guidelines.md`
+- [x] API Gateway infrastructure (`/api/v1`, OpenAPI, auth/authz wiring)
 - [~] Review & sign-off `docs/reponsitory-structure.md` (fix filename typo optional)
 - [x] Prisma schema sync with `database-design.md` (audited 2026-09-09 — PostgreSQL ↔ Prisma empty diff)
 - [ ] Implement In-Memory Event Bus (building-blocks interface exists)

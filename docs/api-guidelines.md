@@ -353,4 +353,31 @@ API chỉ là boundary của hệ thống. Business rules nằm trong Applicatio
 Thiết kế API phải giữ được ba mục tiêu:
 
 Stable Contract → Low Coupling → Microservices Ready
-```
+
+## 24. Implementation Status
+
+| Component | Status | Location |
+| --- | --- | --- |
+| Liveness probe | ✅ Implemented | `GET /health` |
+| Readiness probe | ✅ Implemented | `GET /ready` (database ping) |
+| API v1 prefix | ✅ Implemented | `GET /api/v1` |
+| Response envelope | ✅ Implemented | `{ data, meta }` interceptor |
+| Error envelope | ✅ Implemented | `{ error: { code, message, details?, requestId } }` filter |
+| Request ID | ✅ Implemented | `x-request-id` header (generated if absent) |
+| Correlation ID | ✅ Implemented | `x-correlation-id` header (defaults to requestId) |
+| JWT authentication | ✅ Wired | Global `JwtAuthGuard` + `@Public()` bypass |
+| Authorization | ✅ Wired | `PermissionsGuard` + `@RequirePermissions()` |
+| OpenAPI | ✅ Implemented | `GET /openapi.json`, Swagger UI at `/docs` |
+| Pagination DTO | ✅ Implemented | `PaginationQueryDto` (offset pagination) |
+| Business endpoints | ⏳ Planned | Catalog, Order, Cart, etc. — Application layer pending |
+
+### Implemented v1 endpoints (infrastructure)
+
+| Method | Path | Auth | Description |
+| --- | --- | --- | --- |
+| GET | `/api/v1` | Public | API root metadata |
+| GET | `/api/v1/me` | Bearer JWT | Authenticated principal |
+| GET | `/api/v1/admin/status` | Bearer JWT + `admin:read` | Authorization demo |
+| POST | `/api/v1/_meta/echo` | Public | DTO validation infrastructure endpoint |
+
+Delivery semantics: Gateway remains a thin HTTP adapter. Database access is limited to infrastructure lifecycle/readiness — business persistence belongs in Application/Infrastructure modules.

@@ -20,8 +20,8 @@
     "db:validate": "pnpm --filter @novacommerce/database run validate",
     "db:test": "pnpm --filter @novacommerce/database run test",
     "build:modules": "pnpm --filter @novacommerce/building-blocks run build && tsc -p modules/tsconfig.json",
-    "typecheck": "pnpm --filter @novacommerce/building-blocks run typecheck && pnpm --filter @novacommerce/database run typecheck && pnpm --filter @novacommerce/outbox-worker run typecheck",
-    "test": "pnpm --filter @novacommerce/building-blocks run test && pnpm --filter @novacommerce/database run test"
+    "typecheck": "pnpm --filter @novacommerce/building-blocks run typecheck && pnpm --filter @novacommerce/database run typecheck && pnpm --filter @novacommerce/outbox-worker run typecheck && pnpm --filter @novacommerce/gateway run typecheck",
+    "test": "pnpm --filter @novacommerce/building-blocks run test && pnpm --filter @novacommerce/gateway run test && pnpm --filter @novacommerce/database run test"
   },
   "packageManager": "pnpm@9.15.4"
 }
