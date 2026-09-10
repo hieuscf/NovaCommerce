@@ -331,7 +331,21 @@ Ensure PostgreSQL is healthy before migrate runs.
 ```bash
 docker compose logs api
 curl -v http://localhost:3000/health
+curl -v http://localhost:3000/ready
 ```
+
+**Application health endpoints**
+
+| Endpoint | Purpose | Checks |
+|----------|---------|--------|
+| `GET /health` | Liveness (Docker HEALTHCHECK) | Process only |
+| `GET /health/live` | Liveness alias | Process only |
+| `GET /ready` | Readiness | PostgreSQL, Redis, OpenSearch, MinIO |
+| `GET /health/ready` | Readiness alias | Same as `/ready` |
+
+Readiness returns HTTP `503` with `{ status: "degraded", checks: { ... } }` when any dependency is unavailable. No credentials or connection strings are included in responses.
+
+**Required API environment variables** (validated at startup): `NODE_ENV`, `PORT`, `DATABASE_URL`, `REDIS_URL`, `OPENSEARCH_URL`, `MINIO_ENDPOINT`, `MINIO_ACCESS_KEY`, `MINIO_SECRET_KEY`.
 
 ### Worker not processing
 

@@ -1,23 +1,27 @@
+import swc from 'unplugin-swc';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
     environment: 'node',
     include: ['src/**/*.test.ts'],
+    setupFiles: ['./vitest.setup.ts'],
     testTimeout: 30_000,
+    globals: false,
   },
-  esbuild: {
-    tsconfigRaw: {
-      compilerOptions: {
-        target: 'ES2022',
-        module: 'ESNext',
-        moduleResolution: 'node',
-        strict: true,
-        esModuleInterop: true,
-        skipLibCheck: true,
-        experimentalDecorators: true,
-        emitDecoratorMetadata: true,
+  plugins: [
+    swc.vite({
+      module: { type: 'es6' },
+      jsc: {
+        parser: {
+          syntax: 'typescript',
+          decorators: true,
+        },
+        transform: {
+          legacyDecorator: true,
+          decoratorMetadata: true,
+        },
       },
-    },
-  },
+    }),
+  ],
 });

@@ -12,7 +12,7 @@ Status
 
 Last Updated
 
-2026-09-09
+2026-09-10
 
 ---
 
@@ -34,11 +34,11 @@ Last Updated
 | Domain Implementation | 🚧 In Progress |      65% | 13/16 modules — domain layer only; search/analytics/seller deferred |
 | Database Design      | ✅ Complete   |     100% | `docs/database-design.md` v1.0.0 — synced with Prisma + PostgreSQL (46 tables) |
 | API Design           | ✅ Complete   |     100% | `docs/api-guidelines.md` synchronized with Gateway infrastructure |
-| Backend              | 🚧 In Progress |      30% | Gateway `/api/v1` + OpenAPI, Event System foundation, domain layer (13 modules) |
+| Backend              | 🚧 In Progress |      35% | Gateway `/api/v1` + OpenAPI, infrastructure integration (Redis/OpenSearch/MinIO), Event System |
 | Frontend             | 🚧 In Progress |       5% | Next.js web/admin placeholder pages |
 | AI Platform          | 🚧 In Progress |       5% | FastAPI health endpoint stub |
-| Testing              | 🚧 In Progress |      15% | Database + Event System unit/integration tests; no CI yet |
-| Deployment           | 🚧 Partial    |      40% | Docker Compose + `docs/docker.md` — no CI/CD |
+| Testing              | 🚧 In Progress |      20% | Database + Event System + Infrastructure + Gateway health tests; no CI yet |
+| Deployment           | 🚧 Partial    |      50% | Docker Compose + app-level health/readiness + typed env validation |
 
 ---
 
@@ -154,10 +154,12 @@ Legend: ⏳ Not Started · 🚧 In Progress · ✅ Complete · ❌ Blocked
 
 | Item           | Docker Config | App Integration |
 | -------------- | ------------- | --------------- |
-| PostgreSQL     | ✅            | 🚧 Outbox only  |
-| Redis          | ✅            | ⏳              |
-| OpenSearch     | ✅            | ⏳              |
-| MinIO          | ✅            | ⏳              |
+| PostgreSQL     | ✅            | ✅ Prisma + readiness probe |
+| Redis          | ✅            | ✅ `RedisCacheService` → `ICache` |
+| OpenSearch     | ✅            | ✅ `OpenSearchClientService` → `ISearchClient` |
+| MinIO          | ✅            | ✅ `MinioStorageService` → `IObjectStorage` |
+| Env validation | —             | ✅ `validateAppConfig` fail-fast |
+| App health     | ✅ image HEALTHCHECK | ✅ `/health`, `/health/live`, `/ready`, `/health/ready` |
 | Docker         | ✅            | ✅              |
 | GitHub Actions | ⏳            | ⏳              |
 | Monitoring     | ⏳            | ⏳              |

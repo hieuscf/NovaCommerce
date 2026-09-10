@@ -19,6 +19,7 @@
     "@nestjs/swagger": "11.0.2",
     "@novacommerce/building-blocks": "workspace:*",
     "@novacommerce/database": "workspace:*",
+    "@novacommerce/infrastructure": "workspace:*",
     "class-transformer": "0.5.1",
     "class-validator": "0.14.1",
     "reflect-metadata": "0.2.2",
@@ -27,11 +28,13 @@
   "devDependencies": {
     "@nestjs/cli": "11.0.5",
     "@nestjs/testing": "11.0.12",
+    "@swc/core": "^1.16.2",
     "@types/express": "5.0.0",
     "@types/node": "22.13.10",
     "@types/supertest": "6.0.2",
     "supertest": "7.0.0",
     "typescript": "5.8.2",
+    "unplugin-swc": "^1.6.0",
     "vitest": "3.0.9"
   }
 }

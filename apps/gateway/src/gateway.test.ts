@@ -12,7 +12,6 @@ describe('Gateway API', () => {
   let jwtAuthService: JwtAuthService;
 
   beforeAll(async () => {
-    process.env.JWT_SECRET = 'test-secret';
     app = await createTestApp();
     jwtAuthService = app.get(JwtAuthService);
   });

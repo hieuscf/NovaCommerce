@@ -1,0 +1,30 @@
+{
+  "name": "@novacommerce/infrastructure",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@novacommerce/building-blocks": "workspace:*",
+    "@opensearch-project/opensearch": "2.13.0",
+    "ioredis": "5.6.0",
+    "minio": "8.0.5"
+  },
+  "devDependencies": {
+    "@types/node": "22.13.10",
+    "typescript": "5.8.2",
+    "vitest": "3.0.9"
+  }
+}

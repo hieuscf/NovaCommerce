@@ -150,11 +150,11 @@
 - [x] OpenSearch container
 - [x] MinIO container
 - [x] Configure health checks (Docker/infra level + image HEALTHCHECK on api/ai)
-- [ ] Integrate Redis in application code
-- [ ] Integrate OpenSearch in application code
-- [ ] Integrate MinIO in application code
-- [ ] Configure application-level health checks (DB/Redis probes)
-- [ ] Configure environment validation (config module)
+- [x] Integrate Redis in application code (`@novacommerce/infrastructure` RedisCacheService → `ICache`, Gateway DI)
+- [x] Integrate OpenSearch in application code (`OpenSearchClientService` → `ISearchClient`, Gateway DI)
+- [x] Integrate MinIO in application code (`MinioStorageService` → `IObjectStorage`, bucket init on startup)
+- [x] Configure application-level health checks (`/health`, `/health/live`, `/ready`, `/health/ready` with DB/Redis/OpenSearch/MinIO probes)
+- [x] Configure environment validation (`validateAppConfig` fail-fast typed config)
 
 ---
 

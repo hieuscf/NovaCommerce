@@ -2,16 +2,18 @@ import 'reflect-metadata';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule } from '@nestjs/swagger';
+import { loadAppConfig } from '@novacommerce/infrastructure';
 import { AppModule } from './app.module';
 import { API_V1_PREFIX } from './common/constants';
 import { createOpenApiDocument } from './config/swagger.config';
 
 async function bootstrap(): Promise<void> {
+  const config = loadAppConfig();
   const app = await NestFactory.create(AppModule);
   app.enableShutdownHooks();
 
   app.setGlobalPrefix(API_V1_PREFIX, {
-    exclude: ['health', 'ready', 'openapi.json', 'docs'],
+    exclude: ['health', 'health/live', 'health/ready', 'ready', 'openapi.json', 'docs'],
   });
 
   app.useGlobalPipes(
@@ -39,8 +41,7 @@ async function bootstrap(): Promise<void> {
     useGlobalPrefix: false,
   });
 
-  const port = Number(process.env.PORT ?? 3000);
-  await app.listen(port, '0.0.0.0');
+  await app.listen(config.port, '0.0.0.0');
 }
 
 bootstrap().catch((error: unknown) => {

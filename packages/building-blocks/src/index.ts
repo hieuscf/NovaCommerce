@@ -58,3 +58,28 @@ export {
 export type { ILogger, LogContext } from './logging';
 export type { SecurityContext } from './security';
 export type { ICache } from './caching';
+export type {
+  ISearchClient,
+  SearchDeleteDocumentInput,
+  SearchHealthResult,
+  SearchHealthStatus,
+  SearchHit,
+  SearchIndexDocumentInput,
+  SearchQueryInput,
+  SearchResult,
+  SearchUpdateDocumentInput,
+} from './search';
+export type {
+  DeleteObjectInput,
+  DownloadObjectInput,
+  IObjectStorage,
+  ObjectReference,
+  StoredObject,
+  UploadObjectInput,
+} from './object-storage';
+export { ObjectStoragePaths } from './object-storage';
+export {
+  AvailabilityError,
+  ConfigurationError,
+  InfrastructureError,
+} from './errors';

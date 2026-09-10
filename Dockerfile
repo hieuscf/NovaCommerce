@@ -12,16 +12,29 @@ WORKDIR /app
 FROM base AS deps
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/gateway/package.json ./apps/gateway/
+COPY packages/building-blocks/package.json ./packages/building-blocks/
 COPY packages/database/package.json ./packages/database/
+COPY packages/infrastructure/package.json ./packages/infrastructure/
 RUN pnpm install --frozen-lockfile
 
 FROM deps AS build
 COPY tsconfig.base.json ./
+COPY packages/building-blocks ./packages/building-blocks
 COPY packages/database ./packages/database
+COPY packages/infrastructure ./packages/infrastructure
 COPY apps/gateway ./apps/gateway
 ENV DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder"
+ENV NODE_ENV="production"
+ENV PORT="3000"
+ENV REDIS_URL="redis://placeholder:6379/0"
+ENV OPENSEARCH_URL="http://placeholder:9200"
+ENV MINIO_ENDPOINT="placeholder:9000"
+ENV MINIO_ACCESS_KEY="placeholder"
+ENV MINIO_SECRET_KEY="placeholder"
+RUN pnpm --filter @novacommerce/building-blocks run build
 RUN pnpm --filter @novacommerce/database run generate
 RUN pnpm --filter @novacommerce/database run build
+RUN pnpm --filter @novacommerce/infrastructure run build
 RUN pnpm --filter @novacommerce/gateway run build
 RUN pnpm deploy --filter @novacommerce/gateway --prod /prod/gateway
 
