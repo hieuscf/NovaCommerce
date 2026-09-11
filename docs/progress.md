@@ -129,7 +129,7 @@ Last Updated
 | Module       | Design | Implementation |
 | ------------ | ------ | -------------- |
 | Identity     | ✅     | ✅ auth, RBAC, audit, tests |
-| User         | ✅     | 🚧 domain only |
+| User         | ✅     | ✅ profile, addresses, preferences, API, tests |
 | Catalog      | ✅     | 🚧 domain only |
 | Cart         | ✅     | 🚧 domain only |
 | Checkout     | ✅     | 🚧 domain only |

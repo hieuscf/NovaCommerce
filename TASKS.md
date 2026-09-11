@@ -180,13 +180,13 @@
 
 ## 3.2 User
 
-- [ ] Define User domain
-- [ ] Implement customer profile
-- [ ] Implement addresses
-- [ ] Implement customer preferences
-- [ ] Implement account management
-- [ ] Add User events
-- [ ] Add User tests
+- [x] Define User domain
+- [x] Implement customer profile
+- [x] Implement addresses
+- [x] Implement customer preferences
+- [x] Implement account management
+- [x] Add User events
+- [x] Add User tests
 
 ## 3.3 Catalog
 
