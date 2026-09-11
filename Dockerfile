@@ -20,6 +20,7 @@ RUN pnpm install --frozen-lockfile
 FROM deps AS build
 COPY tsconfig.base.json ./
 COPY modules/identity ./modules/identity
+COPY modules/user ./modules/user
 COPY modules/tsconfig.json ./modules/tsconfig.json
 COPY packages/building-blocks ./packages/building-blocks
 COPY packages/database ./packages/database
