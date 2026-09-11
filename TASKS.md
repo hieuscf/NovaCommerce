@@ -164,19 +164,19 @@
 
 ## 3.1 Identity
 
-- [ ] Define Identity domain model
-- [ ] Define User authentication
-- [ ] Implement registration
-- [ ] Implement login
-- [ ] Implement logout
-- [ ] Implement JWT access token
-- [ ] Implement refresh token
-- [ ] Implement password management
-- [ ] Implement OAuth2 / OIDC foundation
-- [ ] Implement RBAC
-- [ ] Implement permission model
-- [ ] Add audit logging
-- [ ] Add Identity tests
+- [x] Define Identity domain model
+- [x] Define User authentication
+- [x] Implement registration
+- [x] Implement login
+- [x] Implement logout
+- [x] Implement JWT access token
+- [x] Implement refresh token
+- [x] Implement password management
+- [x] Implement OAuth2 / OIDC foundation
+- [x] Implement RBAC
+- [x] Implement permission model
+- [x] Add audit logging
+- [x] Add Identity tests
 
 ## 3.2 User
 

@@ -34,10 +34,10 @@ Last Updated
 | Domain Implementation | 🚧 In Progress |      65% | 13/16 modules — domain layer only; search/analytics/seller deferred |
 | Database Design      | ✅ Complete   |     100% | `docs/database-design.md` v1.0.0 — synced with Prisma + PostgreSQL (46 tables) |
 | API Design           | ✅ Complete   |     100% | `docs/api-guidelines.md` synchronized with Gateway infrastructure |
-| Backend              | 🚧 In Progress |      35% | Gateway `/api/v1` + OpenAPI, infrastructure integration (Redis/OpenSearch/MinIO), Event System |
+| Backend              | 🚧 In Progress |      45% | Gateway `/api/v1` + Identity module (auth/RBAC), infrastructure integration, Event System |
 | Frontend             | 🚧 In Progress |       5% | Next.js web/admin placeholder pages |
 | AI Platform          | 🚧 In Progress |       5% | FastAPI health endpoint stub |
-| Testing              | 🚧 In Progress |      20% | Database + Event System + Infrastructure + Gateway health tests; no CI yet |
+| Testing              | 🚧 In Progress |      30% | Database + Event System + Infrastructure + Gateway + Identity tests; no CI yet |
 | Deployment           | 🚧 Partial    |      50% | Docker Compose + app-level health/readiness + typed env validation |
 
 ---
@@ -73,7 +73,7 @@ Last Updated
 ## Planned
 
 - [ ] `testing-strategy.md`
-- [ ] `security.md`
+- [x] `security.md` (Identity foundation)
 - [ ] `deployment.md`
 - [ ] `monitoring.md`
 - [ ] `local-development.md`
@@ -128,7 +128,7 @@ Last Updated
 
 | Module       | Design | Implementation |
 | ------------ | ------ | -------------- |
-| Identity     | ✅     | 🚧 domain only |
+| Identity     | ✅     | ✅ auth, RBAC, audit, tests |
 | User         | ✅     | 🚧 domain only |
 | Catalog      | ✅     | 🚧 domain only |
 | Cart         | ✅     | 🚧 domain only |

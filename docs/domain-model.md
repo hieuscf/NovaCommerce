@@ -68,7 +68,7 @@ Audit date: 2026-09-09. Cross-checked against `event-catalog.md`, `database-desi
 
 | Context | Aggregates | Entities | Value Objects | Domain Services | Repositories | Events | Invariants | Code |
 |---------|------------|----------|---------------|-----------------|--------------|--------|------------|------|
-| Identity | Identity | Credential, ExternalIdentity, RefreshSession | EmailAddress, IdentityId, Provider | — | IIdentityRepository | 3 | Active/disabled identity | ✅ |
+| Identity | Identity | Credential, ExternalIdentity, RefreshSession, Role, Permission, PasswordResetToken | EmailAddress, IdentityId, Provider, AccountStatus, PlainPassword, PermissionKey | — | IIdentityRepository, IRoleRepository, IPermissionRepository | 10+ | Account status transitions; disabled cannot authenticate | ✅ |
 | User | User | UserProfile, UserAddress, UserPreference | UserId, DisplayName, PhoneNumber, Address | — | IUserRepository | 2 | Valid profile refs | ✅ |
 | Catalog | Product, Category | ProductVariant, ProductImage, ProductAttribute, ProductOption | ProductSku, Money, ProductName, ProductSlug | — | IProductRepository, ICategoryRepository | 4 | Publish/price rules | ✅ |
 | Cart | Cart | CartItem | CartId, ProductReference, Quantity, Money | — | ICartRepository | 4 | Valid quantities | ✅ |
@@ -114,10 +114,10 @@ Audit date: 2026-09-09. Cross-checked against `event-catalog.md`, `database-desi
 
 | Kind | Names |
 |------|-------|
-| Entities | Credential, ExternalIdentity, RefreshSession |
-| Value Objects | EmailAddress, IdentityId, Provider |
-| Events | IdentityRegistered, IdentityAuthenticated, IdentityDisabled |
-| Invariants | Disabled identity cannot authenticate |
+| Entities | Credential, ExternalIdentity, RefreshSession, Role, Permission, PasswordResetToken |
+| Value Objects | EmailAddress, IdentityId, Provider, AccountStatus, PlainPassword, PermissionKey |
+| Events | IdentityRegistered, IdentityAuthenticated, IdentityDisabled, PasswordChanged, PasswordResetRequested, PasswordResetCompleted, UserLoggedOut, RefreshTokenRotated, RoleAssigned, RoleRevoked |
+| Invariants | Non-ACTIVE accounts cannot authenticate; refresh token rotation revokes prior session |
 
 ### User
 
@@ -391,7 +391,7 @@ modules/<context>/
 
 | Module | Domain Code | Files | Notes |
 |--------|-------------|------:|-------|
-| identity | ✅ | 12 | Full aggregate + events + repository interface |
+| identity | ✅ | 40+ | Full auth/RBAC domain + application + infrastructure; presentation wired in gateway |
 | user | ✅ | 12 | Includes UserCreatedEvent |
 | catalog | ✅ | 17 | Product + Category aggregates |
 | cart | ✅ | 12 | Cart aggregate with line management |

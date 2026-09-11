@@ -80,6 +80,13 @@ Event	Owner	Ý nghĩa
 IdentityRegistered	Identity	Identity mới được tạo
 IdentityAuthenticated	Identity	Authentication thành công
 IdentityDisabled	Identity	Identity bị vô hiệu hoá
+PasswordChanged	Identity	Mật khẩu đã đổi
+PasswordResetRequested	Identity	Yêu cầu reset mật khẩu
+PasswordResetCompleted	Identity	Reset mật khẩu hoàn tất
+UserLoggedOut	Identity	Phiên refresh bị thu hồi
+RefreshTokenRotated	Identity	Refresh token được rotate
+RoleAssigned	Identity	Role gán cho identity
+RoleRevoked	Identity	Role bị gỡ khỏi identity
 UserCreated	User	User được tạo
 UserProfileUpdated	User	Profile user được cập nhật
 ProductCreated	Catalog	Product được tạo

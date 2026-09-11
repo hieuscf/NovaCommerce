@@ -139,6 +139,7 @@ All business tables include:
 |--------|------|-------------|
 | `id` | UUID | PK |
 | `email` | TEXT | NOT NULL, UNIQUE |
+| `status` | ENUM | `ACTIVE`, `INACTIVE`, `LOCKED`, `SUSPENDED`, `PENDING_VERIFICATION` |
 | `disabled` | BOOLEAN | NOT NULL, DEFAULT false |
 | `created_at` | TIMESTAMP(3) | NOT NULL |
 | `updated_at` | TIMESTAMP(3) | NOT NULL |
@@ -176,8 +177,24 @@ Unique: `(provider_name, provider_external_id)`
 | `token_hash` | TEXT | NOT NULL |
 | `expires_at` | TIMESTAMP(3) | NOT NULL |
 | `revoked` | BOOLEAN | NOT NULL, DEFAULT false |
+| `revoked_at` | TIMESTAMP(3) | NULL |
+| `replaced_by` | UUID | NULL |
+| `user_agent` | TEXT | NULL |
+| `ip_address` | TEXT | NULL |
 | `created_at` | TIMESTAMP(3) | NOT NULL |
 | `updated_at` | TIMESTAMP(3) | NOT NULL |
+
+#### `roles`, `permissions`, `identity_roles`, `role_permissions`
+
+RBAC model: identities receive roles; roles receive permissions. Permission key format: `resource:action`.
+
+#### `password_reset_tokens`
+
+One-time reset tokens (stored hashed) with `expires_at` and `used_at`.
+
+#### `audit_logs`
+
+Security audit trail: `actor_id`, `action`, `resource`, `resource_id`, request/correlation metadata. No secrets.
 
 ---
 
