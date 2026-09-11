@@ -1,0 +1,15 @@
+export const IDENTITY_TOKENS = {
+  IDENTITY_REPOSITORY: Symbol('IIdentityRepository'),
+  ROLE_REPOSITORY: Symbol('IRoleRepository'),
+  PERMISSION_REPOSITORY: Symbol('IPermissionRepository'),
+  REFRESH_SESSION_REPOSITORY: Symbol('IRefreshSessionRepository'),
+  PASSWORD_RESET_TOKEN_REPOSITORY: Symbol('IPasswordResetTokenRepository'),
+  PASSWORD_HASHER: Symbol('IPasswordHasher'),
+  ACCESS_TOKEN_SERVICE: Symbol('IAccessTokenService'),
+  REFRESH_TOKEN_STORE: Symbol('IRefreshTokenStore'),
+  AUTHORIZATION_SERVICE: Symbol('IAuthorizationService'),
+  AUDIT_LOGGER: Symbol('IAuditLogger'),
+  OUTBOX_STORE: Symbol('IOutboxStore'),
+  OAUTH_STATE_STORE: Symbol('IOAuthStateStore'),
+  OAUTH_PROVIDERS: Symbol('IOAuthProvider[]'),
+} as const;
