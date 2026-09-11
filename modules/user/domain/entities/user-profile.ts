@@ -18,12 +18,48 @@ export class UserProfile extends BaseEntity<string> {
     return new UserProfile(id, new Date(), new Date(), displayName, phoneNumber, avatarUrl);
   }
 
+  static reconstitute(props: {
+    id: string;
+    displayName: DisplayName;
+    phoneNumber?: PhoneNumber;
+    avatarUrl?: string;
+    createdAt: Date;
+    updatedAt: Date;
+  }): UserProfile {
+    return new UserProfile(
+      props.id,
+      props.createdAt,
+      props.updatedAt,
+      props.displayName,
+      props.phoneNumber,
+      props.avatarUrl,
+    );
+  }
+
   updateDisplayName(displayName: DisplayName): void {
     this.displayName = displayName;
     this.updatedAt = new Date();
   }
 
-  getDisplayName(): DisplayName { return this.displayName; }
-  getPhoneNumber(): PhoneNumber | undefined { return this.phoneNumber; }
-  getAvatarUrl(): string | undefined { return this.avatarUrl; }
+  updatePhoneNumber(phoneNumber?: PhoneNumber): void {
+    this.phoneNumber = phoneNumber;
+    this.updatedAt = new Date();
+  }
+
+  updateAvatarUrl(avatarUrl?: string): void {
+    this.avatarUrl = avatarUrl?.trim() || undefined;
+    this.updatedAt = new Date();
+  }
+
+  getDisplayName(): DisplayName {
+    return this.displayName;
+  }
+
+  getPhoneNumber(): PhoneNumber | undefined {
+    return this.phoneNumber;
+  }
+
+  getAvatarUrl(): string | undefined {
+    return this.avatarUrl;
+  }
 }
