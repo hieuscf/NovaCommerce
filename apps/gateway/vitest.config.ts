@@ -1,10 +1,24 @@
+import path from 'node:path';
 import swc from 'unplugin-swc';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      '@novacommerce/building-blocks': path.resolve(
+        __dirname,
+        '../../packages/building-blocks/src/index.ts',
+      ),
+      '@novacommerce/database': path.resolve(__dirname, '../../packages/database/src/index.ts'),
+      '@novacommerce/infrastructure': path.resolve(
+        __dirname,
+        '../../packages/infrastructure/src/index.ts',
+      ),
+    },
+  },
   test: {
     environment: 'node',
-    include: ['src/**/*.test.ts'],
+    include: ['src/**/*.test.ts', '../../modules/identity/**/*.test.ts'],
     setupFiles: ['./vitest.setup.ts'],
     testTimeout: 30_000,
     globals: false,

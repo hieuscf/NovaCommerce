@@ -15,6 +15,7 @@ import { MinioModule } from './infrastructure/minio/minio.module';
 import { OpenSearchModule } from './infrastructure/opensearch/opensearch.module';
 import { RedisModule } from './infrastructure/redis/redis.module';
 import { HealthController } from './health.controller';
+import { IdentityModule } from './identity/identity.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { HealthController } from './health.controller';
     MinioModule,
     HealthProbeModule,
     AuthModule,
+    IdentityModule,
     V1Module,
   ],
   controllers: [HealthController],
