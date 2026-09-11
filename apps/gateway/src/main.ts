@@ -34,11 +34,20 @@ async function bootstrap(): Promise<void> {
   }
 
   const openApiConfig = createOpenApiDocument();
-  const document = SwaggerModule.createDocument(app, openApiConfig);
+  const document = SwaggerModule.createDocument(app, openApiConfig, {
+    operationIdFactory: (controllerKey: string, methodKey: string) =>
+      `${controllerKey}_${methodKey}`,
+  });
 
   SwaggerModule.setup('docs', app, document, {
     jsonDocumentUrl: 'openapi.json',
     useGlobalPrefix: false,
+    swaggerOptions: {
+      persistAuthorization: true,
+      tagsSorter: 'alpha',
+      operationsSorter: 'alpha',
+      docExpansion: 'none',
+    },
   });
 
   await app.listen(config.port, '0.0.0.0');

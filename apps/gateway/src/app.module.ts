@@ -16,6 +16,7 @@ import { OpenSearchModule } from './infrastructure/opensearch/opensearch.module'
 import { RedisModule } from './infrastructure/redis/redis.module';
 import { HealthController } from './health.controller';
 import { IdentityModule } from './identity/identity.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { IdentityModule } from './identity/identity.module';
     HealthProbeModule,
     AuthModule,
     IdentityModule,
+    UserModule,
     V1Module,
   ],
   controllers: [HealthController],

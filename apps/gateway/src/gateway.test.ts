@@ -97,11 +97,12 @@ describe('Gateway API', () => {
     const config = createOpenApiDocument();
 
     expect(config.info?.title).toBe('NovaCommerce API');
-    expect(config.servers?.[0]?.url).toBe('/api/v1');
+    expect(config.servers?.[0]?.url).toBe('http://localhost:3000/api/v1');
     expect(config.components?.securitySchemes?.bearer).toMatchObject({
       type: 'http',
       scheme: 'bearer',
     });
+    expect(config.tags?.some((tag) => tag.name === 'users')).toBe(true);
   });
 
   it('GET /openapi.json is served when Swagger is enabled', async () => {
@@ -113,6 +114,11 @@ describe('Gateway API', () => {
       expect(response.status).toBe(200);
       expect(response.body.openapi).toBeDefined();
       expect(response.body.paths['/api/v1']).toBeDefined();
+      expect(response.body.paths['/api/v1/users/me']).toBeDefined();
+      expect(response.body.paths['/api/v1/users/me/addresses']).toBeDefined();
+      expect(response.body.paths['/api/v1/users/me/preferences']).toBeDefined();
+      expect(response.body.paths['/api/v1/users/me'].get.tags).toContain('users');
+      expect(response.body.paths['/api/v1/users/me'].post.tags).toContain('users');
     } finally {
       await swaggerApp.close();
     }

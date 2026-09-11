@@ -85,11 +85,20 @@ export async function createTestApp(
 
   if (options.enableSwagger) {
     const openApiConfig = createOpenApiDocument();
-    const document = SwaggerModule.createDocument(app, openApiConfig);
+    const document = SwaggerModule.createDocument(app, openApiConfig, {
+      operationIdFactory: (controllerKey: string, methodKey: string) =>
+        `${controllerKey}_${methodKey}`,
+    });
 
     SwaggerModule.setup('docs', app, document, {
       jsonDocumentUrl: 'openapi.json',
       useGlobalPrefix: false,
+      swaggerOptions: {
+        persistAuthorization: true,
+        tagsSorter: 'alpha',
+        operationsSorter: 'alpha',
+        docExpansion: 'none',
+      },
     });
   }
 
