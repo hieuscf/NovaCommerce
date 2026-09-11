@@ -5,7 +5,7 @@ export class Credential extends BaseEntity<string> {
     id: string,
     createdAt: Date,
     updatedAt: Date,
-    private readonly passwordHash: string,
+    private passwordHash: string,
     private readonly algorithm: string,
   ) {
     super(id, createdAt, updatedAt);
@@ -15,6 +15,32 @@ export class Credential extends BaseEntity<string> {
     return new Credential(id, new Date(), new Date(), passwordHash, algorithm);
   }
 
-  getPasswordHash(): string { return this.passwordHash; }
-  getAlgorithm(): string { return this.algorithm; }
+  static reconstitute(props: {
+    id: string;
+    passwordHash: string;
+    algorithm: string;
+    createdAt: Date;
+    updatedAt: Date;
+  }): Credential {
+    return new Credential(
+      props.id,
+      props.createdAt,
+      props.updatedAt,
+      props.passwordHash,
+      props.algorithm,
+    );
+  }
+
+  updatePasswordHash(passwordHash: string): void {
+    this.passwordHash = passwordHash;
+    this.updatedAt = new Date();
+  }
+
+  getPasswordHash(): string {
+    return this.passwordHash;
+  }
+
+  getAlgorithm(): string {
+    return this.algorithm;
+  }
 }

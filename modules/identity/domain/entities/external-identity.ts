@@ -1,5 +1,5 @@
 import { BaseEntity } from '@novacommerce/building-blocks';
-import type { Provider } from '../value-objects/provider';
+import { Provider } from '../value-objects/provider';
 
 export class ExternalIdentity extends BaseEntity<string> {
   private constructor(
@@ -14,6 +14,22 @@ export class ExternalIdentity extends BaseEntity<string> {
 
   static create(id: string, provider: Provider, externalUserId: string): ExternalIdentity {
     return new ExternalIdentity(id, new Date(), new Date(), provider, externalUserId);
+  }
+
+  static reconstitute(props: {
+    id: string;
+    providerName: string;
+    providerExternalId?: string;
+    createdAt: Date;
+    updatedAt: Date;
+  }): ExternalIdentity {
+    return new ExternalIdentity(
+      props.id,
+      props.createdAt,
+      props.updatedAt,
+      Provider.create(props.providerName, props.providerExternalId),
+      props.providerExternalId ?? props.providerName,
+    );
   }
 
   getProvider(): Provider { return this.provider; }
