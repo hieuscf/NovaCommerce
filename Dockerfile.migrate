@@ -1,20 +1,10 @@
 # syntax=docker/dockerfile:1
 
 ARG NODE_VERSION=22.14.0
-ARG PNPM_VERSION=9.15.4
 
-FROM node:${NODE_VERSION}-alpine3.21 AS base
-ENV PNPM_HOME="/pnpm"
-ENV PATH="${PNPM_HOME}:${PATH}"
-RUN corepack enable && corepack prepare pnpm@${PNPM_VERSION} --activate
+FROM node:${NODE_VERSION}-alpine3.21
 WORKDIR /app
-
-FROM base AS deps
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY packages/database/package.json ./packages/database/
-RUN pnpm install --frozen-lockfile
-
-FROM deps AS migrate
-COPY packages/database ./packages/database
+RUN npm install -g prisma@6.5.0
+COPY packages/database/prisma ./prisma
 ENV NODE_ENV=production
-ENTRYPOINT ["pnpm", "--filter", "@novacommerce/database", "run", "migrate:deploy"]
+ENTRYPOINT ["prisma", "migrate", "deploy", "--schema=/app/prisma/schema.prisma"]
