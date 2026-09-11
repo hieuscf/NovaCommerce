@@ -12,10 +12,12 @@
     }
   },
   "scripts": {
-    "generate": "prisma generate",
-    "migrate:deploy": "prisma migrate deploy",
-    "migrate:dev": "prisma migrate dev",
-    "validate": "prisma validate",
+    "generate": "dotenv -o -e ../../.env -- prisma generate",
+    "migrate:deploy": "dotenv -o -e ../../.env -- prisma migrate deploy",
+    "migrate:deploy:docker": "prisma migrate deploy",
+    "seed:dev": "dotenv -o -e ../../.env -- prisma db execute --file prisma/migrations/20250910000000_identity_rbac_audit/seed_permissions.sql && dotenv -o -e ../../.env -- prisma db execute --file prisma/seed/seed_admin_user.sql",
+    "migrate:dev": "dotenv -o -e ../../.env -- prisma migrate dev",
+    "validate": "dotenv -o -e ../../.env -- prisma validate",
     "format": "prisma format",
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
@@ -27,6 +29,7 @@
     "@prisma/client": "6.5.0"
   },
   "devDependencies": {
+    "dotenv-cli": "8.0.0",
     "prisma": "6.5.0",
     "typescript": "5.8.2",
     "vitest": "3.0.9"

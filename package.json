@@ -17,6 +17,7 @@
     "start:worker": "pnpm --filter @novacommerce/outbox-worker run start:prod",
     "db:generate": "pnpm --filter @novacommerce/database run generate",
     "db:migrate:deploy": "pnpm --filter @novacommerce/database run migrate:deploy",
+    "db:seed:dev": "pnpm --filter @novacommerce/database run seed:dev",
     "db:validate": "pnpm --filter @novacommerce/database run validate",
     "db:test": "pnpm --filter @novacommerce/database run test",
     "build:modules": "pnpm --filter @novacommerce/building-blocks run build && tsc -p modules/tsconfig.json",

@@ -83,16 +83,28 @@ enum ContentStatus {
 // Identity
 // =============================================================================
 
-model Identity {
-  id        String   @id @default(uuid()) @db.Uuid
-  email     String   @unique
-  disabled  Boolean  @default(false)
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+enum IdentityStatus {
+  ACTIVE
+  INACTIVE
+  LOCKED
+  SUSPENDED
+  PENDING_VERIFICATION
+}
 
-  credentials        Credential[]
-  externalIdentities ExternalIdentity[]
-  refreshSessions    RefreshSession[]
+model Identity {
+  id        String         @id @default(uuid()) @db.Uuid
+  email     String         @unique
+  status    IdentityStatus @default(PENDING_VERIFICATION)
+  disabled  Boolean        @default(false)
+  createdAt DateTime       @default(now()) @map("created_at")
+  updatedAt DateTime       @updatedAt @map("updated_at")
+
+  credentials         Credential[]
+  externalIdentities  ExternalIdentity[]
+  refreshSessions     RefreshSession[]
+  passwordResetTokens PasswordResetToken[]
+  roles               IdentityRole[]
+  auditLogs           AuditLog[]
 
   @@map("identities")
 }
@@ -127,13 +139,17 @@ model ExternalIdentity {
 }
 
 model RefreshSession {
-  id         String   @id @default(uuid()) @db.Uuid
-  identityId String   @map("identity_id") @db.Uuid
-  tokenHash  String   @map("token_hash")
-  expiresAt  DateTime @map("expires_at")
-  revoked    Boolean  @default(false)
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
+  id         String    @id @default(uuid()) @db.Uuid
+  identityId String    @map("identity_id") @db.Uuid
+  tokenHash  String    @map("token_hash")
+  expiresAt  DateTime  @map("expires_at")
+  revoked    Boolean   @default(false)
+  revokedAt  DateTime? @map("revoked_at")
+  replacedBy String?   @map("replaced_by") @db.Uuid
+  userAgent  String?   @map("user_agent")
+  ipAddress  String?   @map("ip_address")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
 
   identity Identity @relation(fields: [identityId], references: [id], onDelete: Cascade)
 
@@ -141,6 +157,93 @@ model RefreshSession {
   @@index([tokenHash])
   @@index([expiresAt])
   @@map("refresh_sessions")
+}
+
+model Role {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  permissions RolePermission[]
+  identities  IdentityRole[]
+
+  @@map("roles")
+}
+
+model Permission {
+  id        String   @id @default(uuid()) @db.Uuid
+  key       String   @unique
+  resource  String
+  action    String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  roles RolePermission[]
+
+  @@map("permissions")
+}
+
+model IdentityRole {
+  identityId String @map("identity_id") @db.Uuid
+  roleId     String @map("role_id") @db.Uuid
+
+  identity Identity @relation(fields: [identityId], references: [id], onDelete: Cascade)
+  role     Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([identityId, roleId])
+  @@index([roleId])
+  @@map("identity_roles")
+}
+
+model RolePermission {
+  roleId       String @map("role_id") @db.Uuid
+  permissionId String @map("permission_id") @db.Uuid
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@index([permissionId])
+  @@map("role_permissions")
+}
+
+model PasswordResetToken {
+  id         String    @id @default(uuid()) @db.Uuid
+  identityId String    @map("identity_id") @db.Uuid
+  tokenHash  String    @map("token_hash")
+  expiresAt  DateTime  @map("expires_at")
+  usedAt     DateTime? @map("used_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+
+  identity Identity @relation(fields: [identityId], references: [id], onDelete: Cascade)
+
+  @@index([identityId])
+  @@index([tokenHash])
+  @@index([expiresAt])
+  @@map("password_reset_tokens")
+}
+
+model AuditLog {
+  id            String   @id @default(uuid()) @db.Uuid
+  actorId       String?  @map("actor_id") @db.Uuid
+  action        String
+  resource      String
+  resourceId    String?  @map("resource_id")
+  requestId     String?  @map("request_id")
+  correlationId String?  @map("correlation_id")
+  ipAddress     String?  @map("ip_address")
+  userAgent     String?  @map("user_agent")
+  metadata      Json?
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  identity Identity? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([actorId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("audit_logs")
 }
 
 // =============================================================================

@@ -2,7 +2,11 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": "./src",
+    "baseUrl": ".",
+    "paths": {
+      "@novacommerce/building-blocks": ["../building-blocks/dist/index.d.ts"]
+    }
   },
   "include": ["src/**/*"],
   "exclude": ["src/**/*.integration.test.ts", "src/test/**"]

@@ -27,7 +27,7 @@ packages/database/
 Set `DATABASE_URL` in the environment (see root `.env.example`):
 
 ```text
-DATABASE_URL=postgresql://novacommerce:change-me@localhost:5432/novacommerce?schema=public
+DATABASE_URL=postgresql://novacommerce:change-me@localhost:5433/novacommerce?schema=public
 ```
 
 For local infrastructure:
