@@ -33,7 +33,10 @@ import { CreateOrderFromCheckoutHandler } from '../../../../modules/order/applic
 import { PrismaOutboxStore as OrderOutboxStore } from '../../../../modules/order/infrastructure/prisma/prisma-outbox-store';
 import { PrismaOrderRepository } from '../../../../modules/order/infrastructure/repositories/prisma-order-repository';
 import { StubPaymentInitiationService } from '../../../../modules/payment/infrastructure/services/stub-payment-initiation.service';
+import { CalculateDiscountHandler } from '../../../../modules/promotion/application/handlers/calculate-discount.handler';
 import { EvaluatePromotionService } from '../../../../modules/promotion/application/services/evaluate-promotion.service';
+import { PromotionContextService } from '../../../../modules/promotion/application/services/promotion-context.service';
+import { PrismaOutboxStore as PromotionOutboxStore } from '../../../../modules/promotion/infrastructure/prisma/prisma-outbox-store';
 import { PrismaCouponRepository } from '../../../../modules/promotion/infrastructure/repositories/prisma-coupon-repository';
 import { PrismaPromotionRepository } from '../../../../modules/promotion/infrastructure/repositories/prisma-promotion-repository';
 import { AddAddressHandler } from '../../../../modules/user/application/handlers/add-address.handler';
@@ -115,10 +118,12 @@ describeIfDatabase('Core Commerce Flow (integration)', () => {
     const createProductHandler = new CreateProductHandler(productRepository);
     const createInventoryItemHandler = new CreateInventoryItemHandler(inventoryRepository);
     const addCartItemHandler = new AddCartItemHandler(userRepository, cartRepository);
-    const promotionEvaluationService = new EvaluatePromotionService(
-      new PrismaCouponRepository(prisma),
-      new PrismaPromotionRepository(prisma),
-    );
+    const promotionOutboxStore = new PromotionOutboxStore(prisma);
+    const couponRepository = new PrismaCouponRepository(prisma, promotionOutboxStore);
+    const promotionRepository = new PrismaPromotionRepository(prisma, promotionOutboxStore);
+    const promotionContextService = new PromotionContextService(couponRepository, promotionRepository);
+    const calculateDiscountHandler = new CalculateDiscountHandler(promotionContextService);
+    const promotionEvaluationService = new EvaluatePromotionService(calculateDiscountHandler);
     const startCheckoutHandler = new StartCheckoutHandler(
       userRepository,
       cartRepository,
