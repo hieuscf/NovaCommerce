@@ -130,7 +130,7 @@ Last Updated
 | ------------ | ------ | -------------- |
 | Identity     | ✅     | ✅ auth, RBAC, audit, tests |
 | User         | ✅     | ✅ profile, addresses, preferences, API, tests |
-| Catalog      | ✅     | 🚧 domain only |
+| Catalog      | ✅     | ✅ products, categories, API, events, tests |
 | Cart         | ✅     | 🚧 domain only |
 | Checkout     | ✅     | 🚧 domain only |
 | Order        | ✅     | 🚧 domain only |

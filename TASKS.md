@@ -190,21 +190,21 @@
 
 ## 3.3 Catalog
 
-- [ ] Define Product aggregate
-- [ ] Define Product Variant
-- [ ] Define Category
-- [ ] Define Brand
-- [ ] Define Attribute
-- [ ] Define Product Image
-- [ ] Implement product CRUD
-- [ ] Implement category management
-- [ ] Implement product publishing
-- [ ] Implement product status
-- [ ] Implement product pricing foundation
-- [ ] Implement catalog API
-- [ ] Emit `ProductCreated`
-- [ ] Emit `ProductUpdated`
-- [ ] Add Catalog tests
+- [x] Define Product aggregate
+- [x] Define Product Variant
+- [x] Define Category
+- [ ] Define Brand *(deferred — not in approved `domain-model.md`)*
+- [x] Define Attribute
+- [x] Define Product Image
+- [x] Implement product CRUD
+- [x] Implement category management
+- [x] Implement product publishing
+- [x] Implement product status
+- [x] Implement product pricing foundation
+- [x] Implement catalog API
+- [x] Emit `ProductCreated`
+- [x] Emit `ProductUpdated`
+- [x] Add Catalog tests
 
 ## 3.4 Inventory
 
