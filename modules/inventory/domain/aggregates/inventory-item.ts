@@ -39,15 +39,18 @@ export class InventoryItem extends AggregateRoot<string> {
     return this.onHand.value - this.reserved.value;
   }
 
-  adjust(delta: Quantity, reason: string, adjustmentId: string): Result<void, InventoryDomainError> {
-    const newOnHand = this.onHand.value + delta.value;
+  adjust(delta: number, reason: string, adjustmentId: string): Result<void, InventoryDomainError> {
+    if (!Number.isFinite(delta) || delta === 0) {
+      return Result.fail(new InventoryDomainError('Adjustment delta must be a non-zero number', 'INVALID_QUANTITY'));
+    }
+    const newOnHand = this.onHand.value + delta;
     if (newOnHand < 0) {
       return Result.fail(new InventoryDomainError('Available stock cannot be negative', 'INSUFFICIENT_STOCK'));
     }
     this.onHand = Quantity.create(newOnHand);
     this.adjustments.push(StockAdjustment.create(adjustmentId, delta, reason));
     this.updatedAt = new Date();
-    this.addDomainEvent(new StockAdjustedEvent(this.id, new Date(), { delta: delta.value, reason }));
+    this.addDomainEvent(new StockAdjustedEvent(this.id, new Date(), { delta, reason }));
     if (this.onHand.value === 0) {
       this.addDomainEvent(new StockDepletedEvent(this.id, new Date(), {}));
     }
@@ -82,8 +85,35 @@ export class InventoryItem extends AggregateRoot<string> {
     return Result.ok(undefined);
   }
 
+  releaseReservationsForOrder(orderId: string): Result<readonly ReservationId[], InventoryDomainError> {
+    const active = this.reservations.filter(
+      (r) => r.getOrderId() === orderId && r.getStatus() === ReservationStatus.ACTIVE,
+    );
+    if (active.length === 0) {
+      return Result.fail(new InventoryDomainError('No active reservations for order', 'RESERVATION_NOT_FOUND'));
+    }
+
+    const releasedIds: ReservationId[] = [];
+    for (const reservation of active) {
+      reservation.release();
+      this.reserved = Quantity.create(this.reserved.value - reservation.getQuantity().value);
+      releasedIds.push(reservation.getReservationId());
+      this.addDomainEvent(
+        new StockReservationReleasedEvent(this.id, new Date(), {
+          reservationId: reservation.getReservationId().value,
+        }),
+      );
+    }
+
+    this.updatedAt = new Date();
+    return Result.ok(releasedIds);
+  }
+
   getSku(): Sku { return this.sku; }
+  getWarehouseId(): WarehouseId { return this.warehouseId; }
   getOnHand(): Quantity { return this.onHand; }
   getReserved(): Quantity { return this.reserved; }
   getAvailableQuantity(): number { return this.getAvailable(); }
+  getReservations(): readonly StockReservation[] { return this.reservations; }
+  getAdjustments(): readonly StockAdjustment[] { return this.adjustments; }
 }

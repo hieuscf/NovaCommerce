@@ -15,6 +15,26 @@ export class StockReservation extends BaseEntity<string> {
     return new StockReservation(id, new Date(), new Date(), reservationId, orderId, quantity, ReservationStatus.ACTIVE);
   }
 
+  static reconstitute(props: {
+    id: string;
+    reservationId: ReservationId;
+    orderId: string;
+    quantity: Quantity;
+    status: ReservationStatus;
+    createdAt: Date;
+    updatedAt: Date;
+  }): StockReservation {
+    return new StockReservation(
+      props.id,
+      props.createdAt,
+      props.updatedAt,
+      props.reservationId,
+      props.orderId,
+      props.quantity,
+      props.status,
+    );
+  }
+
   release(): void { this.status = ReservationStatus.RELEASED; this.updatedAt = new Date(); }
   getReservationId(): ReservationId { return this.reservationId; }
   getOrderId(): string { return this.orderId; }
