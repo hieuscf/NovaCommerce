@@ -24,6 +24,7 @@ import { CartModule } from './cart/cart.module';
 import { CheckoutModule } from './checkout/checkout.module';
 import { OrderModule } from './order/order.module';
 import { PaymentModule } from './payment/payment.module';
+import { ShippingModule } from './shipping/shipping.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { PaymentModule } from './payment/payment.module';
     CartModule,
     OrderModule,
     PaymentModule,
+    ShippingModule,
     CheckoutModule,
     V1Module,
   ],

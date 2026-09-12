@@ -29,6 +29,7 @@ export default defineConfig({
       '../../modules/checkout/**/*.test.ts',
       '../../modules/order/**/*.test.ts',
       '../../modules/payment/**/*.test.ts',
+      '../../modules/shipping/**/*.test.ts',
       '../../modules/promotion/**/*.test.ts',
     ],
     setupFiles: ['./vitest.setup.ts'],
