@@ -59,4 +59,5 @@ export class CheckoutSession extends AggregateRoot<string> {
   getLines(): readonly CheckoutLine[] { return this.lines; }
   getAdjustments(): readonly CheckoutAdjustment[] { return this.adjustments; }
   getCartId(): string { return this.cartId; }
+  getCustomerId(): string | undefined { return this.customerId; }
 }
