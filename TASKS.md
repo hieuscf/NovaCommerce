@@ -248,18 +248,18 @@
 
 ## 3.7 Order
 
-- [ ] Define Order aggregate
-- [ ] Define Order Item
-- [ ] Define Order status
-- [ ] Define Order lifecycle
-- [ ] Implement order creation
-- [ ] Implement order cancellation
-- [ ] Implement order query
-- [ ] Implement order history
-- [ ] Emit `OrderCreated`
-- [ ] Emit order status events
-- [ ] Persist Outbox message in same transaction
-- [ ] Add Order tests
+- [x] Define Order aggregate
+- [x] Define Order Item
+- [x] Define Order status
+- [x] Define Order lifecycle
+- [x] Implement order creation
+- [x] Implement order cancellation
+- [x] Implement order query
+- [x] Implement order history
+- [x] Emit `OrderCreated`
+- [x] Emit order status events
+- [x] Persist Outbox message in same transaction
+- [x] Add Order tests
 
 ## 3.8 Core Commerce Flow
 

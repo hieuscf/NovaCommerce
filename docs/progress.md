@@ -133,7 +133,7 @@ Last Updated
 | Catalog      | ✅     | ✅ products, categories, API, events, tests |
 | Cart         | ✅     | ✅ cart lifecycle, persistence, Redis cache, API, tests |
 | Checkout     | ✅     | ✅ orchestration, API, tests (payment handoff via stub) |
-| Order        | ✅     | 🚧 domain + minimal create-from-checkout handler |
+| Order        | ✅     | ✅ lifecycle, create-from-checkout, query/history/cancel API, outbox, tests |
 | Inventory    | ✅     | ✅ stock, reservations, API, events, tests |
 | Payment      | ✅     | 🚧 domain + stub initiation contract (VNPAY/MOMO/PayPal) |
 | Shipping     | ✅     | 🚧 domain only |
@@ -217,7 +217,7 @@ Deliverables
 
 Status: 🚧
 
-Modules: Identity, Catalog, Inventory, Cart, Checkout (✅), Order (partial)
+Modules: Identity, Catalog, Inventory, Cart, Checkout (✅), Order (✅)
 
 ---
 
