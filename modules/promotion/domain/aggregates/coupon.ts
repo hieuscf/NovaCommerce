@@ -54,5 +54,6 @@ export class Coupon extends AggregateRoot<string> {
   }
 
   getCode(): CouponCode { return this.code; }
+  getPromotionId(): string { return this.promotionId; }
   getRedemptions(): readonly CouponRedemption[] { return this.redemptions; }
 }
