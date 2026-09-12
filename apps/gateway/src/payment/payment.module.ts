@@ -65,6 +65,10 @@ import { PaymentsController } from './controllers/payments.controller';
       useExisting: PaymentInitiationService,
     },
   ],
-  exports: [PAYMENT_TOKENS.PAYMENT_INITIATION_SERVICE, PAYMENT_TOKENS.PAYMENT_REPOSITORY],
+  exports: [
+    PAYMENT_TOKENS.PAYMENT_INITIATION_SERVICE,
+    PAYMENT_TOKENS.PAYMENT_REPOSITORY,
+    RefundPaymentHandler,
+  ],
 })
 export class PaymentModule {}

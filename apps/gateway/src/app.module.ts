@@ -27,6 +27,8 @@ import { PaymentModule } from './payment/payment.module';
 import { ShippingModule } from './shipping/shipping.module';
 import { PromotionModule } from './promotion/promotion.module';
 import { NotificationModule } from './notification/notification.module';
+import { ReviewModule } from './review/review.module';
+import { ReturnRefundModule } from './return-refund/return-refund.module';
 
 @Module({
   imports: [
@@ -48,6 +50,8 @@ import { NotificationModule } from './notification/notification.module';
     ShippingModule,
     PromotionModule,
     NotificationModule,
+    ReviewModule,
+    ReturnRefundModule,
     CheckoutModule,
     V1Module,
   ],
