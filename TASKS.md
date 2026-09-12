@@ -236,15 +236,15 @@
 
 ## 3.6 Checkout
 
-- [ ] Define Checkout flow
-- [ ] Validate cart
-- [ ] Validate inventory
-- [ ] Calculate totals
-- [ ] Apply promotion
-- [ ] Validate customer information
-- [ ] Create checkout application service
-- [ ] Implement checkout API
-- [ ] Add Checkout tests
+- [x] Define Checkout flow
+- [x] Validate cart
+- [x] Validate inventory
+- [x] Calculate totals
+- [x] Apply promotion
+- [x] Validate customer information
+- [x] Create checkout application service
+- [x] Implement checkout API
+- [x] Add Checkout tests
 
 ## 3.7 Order
 

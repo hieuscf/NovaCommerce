@@ -12,7 +12,7 @@ Status
 
 Last Updated
 
-2026-09-10
+2026-09-12
 
 ---
 
@@ -34,10 +34,10 @@ Last Updated
 | Domain Implementation | 🚧 In Progress |      65% | 13/16 modules — domain layer only; search/analytics/seller deferred |
 | Database Design      | ✅ Complete   |     100% | `docs/database-design.md` v1.0.0 — synced with Prisma + PostgreSQL (46 tables) |
 | API Design           | ✅ Complete   |     100% | `docs/api-guidelines.md` synchronized with Gateway infrastructure |
-| Backend              | 🚧 In Progress |      45% | Gateway `/api/v1` + Identity module (auth/RBAC), infrastructure integration, Event System |
+| Backend              | 🚧 In Progress |      55% | Gateway `/api/v1` + Identity, Catalog, Inventory, Cart, Checkout modules |
 | Frontend             | 🚧 In Progress |       5% | Next.js web/admin placeholder pages |
 | AI Platform          | 🚧 In Progress |       5% | FastAPI health endpoint stub |
-| Testing              | 🚧 In Progress |      30% | Database + Event System + Infrastructure + Gateway + Identity tests; no CI yet |
+| Testing              | 🚧 In Progress |      35% | Database + Event System + Infrastructure + Gateway + module handler tests; no CI yet |
 | Deployment           | 🚧 Partial    |      50% | Docker Compose + app-level health/readiness + typed env validation |
 
 ---
@@ -132,12 +132,12 @@ Last Updated
 | User         | ✅     | ✅ profile, addresses, preferences, API, tests |
 | Catalog      | ✅     | ✅ products, categories, API, events, tests |
 | Cart         | ✅     | ✅ cart lifecycle, persistence, Redis cache, API, tests |
-| Checkout     | ✅     | 🚧 domain only |
-| Order        | ✅     | 🚧 domain only |
+| Checkout     | ✅     | ✅ orchestration, API, tests (payment handoff via stub) |
+| Order        | ✅     | 🚧 domain + minimal create-from-checkout handler |
 | Inventory    | ✅     | ✅ stock, reservations, API, events, tests |
-| Payment      | ✅     | 🚧 domain only |
+| Payment      | ✅     | 🚧 domain + stub initiation contract (VNPAY/MOMO/PayPal) |
 | Shipping     | ✅     | 🚧 domain only |
-| Promotion    | ✅     | 🚧 domain only |
+| Promotion    | ✅     | 🚧 domain + checkout evaluation service |
 | Review       | ✅     | 🚧 domain only |
 | CMS          | ✅     | 🚧 domain only |
 | Notification | ✅     | 🚧 domain only |
@@ -215,9 +215,9 @@ Deliverables
 
 ## Milestone 2 — Core Commerce
 
-Status: ⏳
+Status: 🚧
 
-Modules: Identity, Catalog, Inventory, Cart, Checkout, Order
+Modules: Identity, Catalog, Inventory, Cart, Checkout (✅), Order (partial)
 
 ---
 
