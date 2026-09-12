@@ -34,7 +34,7 @@ Last Updated
 | Domain Implementation | 🚧 In Progress |      65% | 13/16 modules — domain layer only; search/analytics/seller deferred |
 | Database Design      | ✅ Complete   |     100% | `docs/database-design.md` v1.0.0 — synced with Prisma + PostgreSQL (46 tables) |
 | API Design           | ✅ Complete   |     100% | `docs/api-guidelines.md` synchronized with Gateway infrastructure |
-| Backend              | 🚧 In Progress |      55% | Gateway `/api/v1` + Identity, Catalog, Inventory, Cart, Checkout modules |
+| Backend              | 🚧 In Progress |      65% | Gateway `/api/v1` + Core Commerce Flow (Identity → Order → Inventory events) |
 | Frontend             | 🚧 In Progress |       5% | Next.js web/admin placeholder pages |
 | AI Platform          | 🚧 In Progress |       5% | FastAPI health endpoint stub |
 | Testing              | 🚧 In Progress |      35% | Database + Event System + Infrastructure + Gateway + module handler tests; no CI yet |
@@ -215,9 +215,11 @@ Deliverables
 
 ## Milestone 2 — Core Commerce
 
-Status: 🚧
+Status: ✅ Core Commerce Flow complete (integration E2E verified)
 
 Modules: Identity, Catalog, Inventory, Cart, Checkout (✅), Order (✅)
+
+Core Commerce Flow: register → catalog → cart → checkout → order → `OrderCreated` → inventory reservation → `StockReserved` → outbox → event bus (worker + gateway handlers wired to `order.created`).
 
 ---
 
@@ -266,7 +268,7 @@ Sprint 0 — Architecture & Project Foundation
 - [x] API Gateway infrastructure (`/api/v1`, OpenAPI, auth/authz wiring)
 - [ ] Application layer (commands/queries/handlers)
 - [ ] Infrastructure repositories (Prisma)
-- [ ] Wire module event handlers to `InMemoryEventBus`
+- [x] Wire module event handlers to `InMemoryEventBus` (Inventory `OrderCreated` → `order.created`)
 
 ---
 

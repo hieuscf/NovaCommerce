@@ -263,15 +263,15 @@
 
 ## 3.8 Core Commerce Flow
 
-- [ ] Register customer
-- [ ] Create product
-- [ ] Add product to cart
-- [ ] Checkout cart
-- [ ] Create order
-- [ ] Reserve inventory
-- [ ] Publish domain events
-- [ ] Process Outbox
-- [ ] Verify complete checkout flow with E2E test
+- [x] Register customer
+- [x] Create product
+- [x] Add product to cart
+- [x] Checkout cart
+- [x] Create order
+- [x] Reserve inventory
+- [x] Publish domain events
+- [x] Process Outbox
+- [x] Verify complete checkout flow with E2E test
 
 ---
 
