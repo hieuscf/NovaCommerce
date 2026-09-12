@@ -208,18 +208,18 @@
 
 ## 3.4 Inventory
 
-- [ ] Define Inventory aggregate
-- [ ] Define Stock Item
-- [ ] Define Warehouse
-- [ ] Define Stock Reservation
-- [ ] Implement stock management
-- [ ] Implement stock reservation
-- [ ] Implement stock release
-- [ ] Implement stock adjustment
-- [ ] Handle `OrderCreated`
-- [ ] Emit `StockReserved`
-- [ ] Emit stock release event
-- [ ] Add Inventory tests
+- [x] Define Inventory aggregate
+- [x] Define Stock Item
+- [x] Define Warehouse
+- [x] Define Stock Reservation
+- [x] Implement stock management
+- [x] Implement stock reservation
+- [x] Implement stock release
+- [x] Implement stock adjustment
+- [x] Handle `OrderCreated`
+- [x] Emit `StockReserved`
+- [x] Emit stock release event
+- [x] Add Inventory tests
 
 ## 3.5 Cart
 

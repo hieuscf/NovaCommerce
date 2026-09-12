@@ -134,7 +134,7 @@ Last Updated
 | Cart         | ✅     | 🚧 domain only |
 | Checkout     | ✅     | 🚧 domain only |
 | Order        | ✅     | 🚧 domain only |
-| Inventory    | ✅     | 🚧 domain only |
+| Inventory    | ✅     | ✅ stock, reservations, API, events, tests |
 | Payment      | ✅     | 🚧 domain only |
 | Shipping     | ✅     | 🚧 domain only |
 | Promotion    | ✅     | 🚧 domain only |
