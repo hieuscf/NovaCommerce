@@ -23,6 +23,7 @@ import { UserModule } from './user/user.module';
 import { CartModule } from './cart/cart.module';
 import { CheckoutModule } from './checkout/checkout.module';
 import { OrderModule } from './order/order.module';
+import { PaymentModule } from './payment/payment.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { OrderModule } from './order/order.module';
     InventoryModule,
     CartModule,
     OrderModule,
+    PaymentModule,
     CheckoutModule,
     V1Module,
   ],

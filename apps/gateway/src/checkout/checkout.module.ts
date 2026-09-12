@@ -9,7 +9,7 @@ import { PrismaCheckoutSessionRepository } from '../../../../modules/checkout/in
 import { INVENTORY_TOKENS } from '../../../../modules/inventory/contracts/tokens';
 import { ORDER_TOKENS } from '../../../../modules/order/contracts/tokens';
 import { PAYMENT_TOKENS } from '../../../../modules/payment/contracts/tokens';
-import { StubPaymentInitiationService } from '../../../../modules/payment/infrastructure/services/stub-payment-initiation.service';
+import { PaymentModule } from '../payment/payment.module';
 import { PROMOTION_TOKENS } from '../../../../modules/promotion/contracts/tokens';
 import { EvaluatePromotionService } from '../../../../modules/promotion/application/services/evaluate-promotion.service';
 import { PrismaCouponRepository } from '../../../../modules/promotion/infrastructure/repositories/prisma-coupon-repository';
@@ -24,7 +24,7 @@ import { PrismaService } from '../infrastructure/database/prisma.service';
 import { CheckoutController } from './controllers/checkout.controller';
 
 @Module({
-  imports: [UserModule, CartModule, CatalogModule, InventoryModule, OrderModule],
+  imports: [UserModule, CartModule, CatalogModule, InventoryModule, OrderModule, PaymentModule],
   controllers: [CheckoutController],
   providers: [
     {
@@ -61,14 +61,6 @@ import { CheckoutController } from './controllers/checkout.controller';
     {
       provide: PROMOTION_TOKENS.PROMOTION_EVALUATION_SERVICE,
       useExisting: EvaluatePromotionService,
-    },
-    {
-      provide: StubPaymentInitiationService,
-      useFactory: () => new StubPaymentInitiationService(),
-    },
-    {
-      provide: PAYMENT_TOKENS.PAYMENT_INITIATION_SERVICE,
-      useExisting: StubPaymentInitiationService,
     },
     {
       provide: StartCheckoutHandler,
