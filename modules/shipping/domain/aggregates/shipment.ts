@@ -50,10 +50,13 @@ export class Shipment extends AggregateRoot<string> {
     if (this.status !== ShipmentStatus.CREATED) {
       return Result.fail(new ShippingDomainError('Shipment cannot be dispatched', 'INVALID_SHIPMENT_STATE'));
     }
+    if (this.items.length === 0) {
+      return Result.fail(new ShippingDomainError('Shipment must contain at least one item', 'SHIPMENT_ITEMS_REQUIRED'));
+    }
     this.trackingNumber = trackingNumber;
     this.status = ShipmentStatus.DISPATCHED;
     this.updatedAt = new Date();
-    this.addDomainEvent(new ShipmentDispatchedEvent(this.id, new Date(), {}));
+    this.addDomainEvent(new ShipmentDispatchedEvent(this.id, new Date(), { trackingNumber: trackingNumber.value }));
     return Result.ok(undefined);
   }
 
@@ -79,7 +82,11 @@ export class Shipment extends AggregateRoot<string> {
     return Result.ok(undefined);
   }
 
+  getOrderId(): string { return this.orderId; }
+  getCarrierCode(): CarrierCode { return this.carrierCode; }
+  getDestination(): Address { return this.destination; }
   getStatus(): ShipmentStatus { return this.status; }
   getTrackingNumber(): TrackingNumber | undefined { return this.trackingNumber; }
   getItems(): readonly ShipmentItem[] { return this.items; }
+  getTrackingRecords(): readonly TrackingRecord[] { return this.trackingRecords; }
 }

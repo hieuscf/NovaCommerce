@@ -1,6 +1,8 @@
 import type { DomainEvent } from '@novacommerce/building-blocks';
 
-export type ShipmentDispatchedPayload = Record<string, never>;
+export interface ShipmentDispatchedPayload {
+  readonly trackingNumber: string;
+}
 
 export class ShipmentDispatchedEvent implements DomainEvent {
   readonly eventName = 'ShipmentDispatched';
