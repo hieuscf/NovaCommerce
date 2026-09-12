@@ -67,6 +67,41 @@ export class Product extends AggregateRoot<string> {
     return Result.ok(undefined);
   }
 
+  updateDetails(props: {
+    name?: ProductName;
+    slug?: ProductSlug;
+    categoryId?: string | null;
+  }): Result<void, CatalogDomainError> {
+    if (this.status === ProductStatus.ARCHIVED) {
+      return Result.fail(new CatalogDomainError('Cannot update archived product', 'PRODUCT_ARCHIVED'));
+    }
+
+    let changed = false;
+
+    if (props.name && props.name.value !== this.name.value) {
+      this.name = props.name;
+      changed = true;
+    }
+
+    if (props.slug && props.slug.value !== this.slug.value) {
+      this.slug = props.slug;
+      changed = true;
+    }
+
+    if (props.categoryId !== undefined && props.categoryId !== this.categoryId) {
+      this.categoryId = props.categoryId ?? undefined;
+      changed = true;
+    }
+
+    if (!changed) {
+      return Result.ok(undefined);
+    }
+
+    this.updatedAt = new Date();
+    this.addDomainEvent(new ProductUpdatedEvent(this.id, new Date(), { name: this.name.value }));
+    return Result.ok(undefined);
+  }
+
   publish(): Result<void, CatalogDomainError> {
     if (this.status === ProductStatus.PUBLISHED) {
       return Result.fail(new CatalogDomainError('Product is already published', 'PRODUCT_ALREADY_PUBLISHED'));
@@ -80,13 +115,57 @@ export class Product extends AggregateRoot<string> {
     return Result.ok(undefined);
   }
 
-  addVariant(variant: ProductVariant): void { this.variants.push(variant); this.updatedAt = new Date(); }
-  addImage(image: ProductImage): void { this.images.push(image); this.updatedAt = new Date(); }
+  unpublish(): Result<void, CatalogDomainError> {
+    if (this.status !== ProductStatus.PUBLISHED) {
+      return Result.fail(new CatalogDomainError('Product is not published', 'PRODUCT_NOT_PUBLISHED'));
+    }
+    this.status = ProductStatus.DRAFT;
+    this.updatedAt = new Date();
+    this.addDomainEvent(new ProductUpdatedEvent(this.id, new Date(), { name: this.name.value }));
+    return Result.ok(undefined);
+  }
+
+  archive(): Result<void, CatalogDomainError> {
+    if (this.status === ProductStatus.ARCHIVED) {
+      return Result.fail(new CatalogDomainError('Product is already archived', 'PRODUCT_ALREADY_ARCHIVED'));
+    }
+    this.status = ProductStatus.ARCHIVED;
+    this.updatedAt = new Date();
+    this.addDomainEvent(new ProductUpdatedEvent(this.id, new Date(), { name: this.name.value }));
+    return Result.ok(undefined);
+  }
+
+  addVariant(variant: ProductVariant): Result<void, CatalogDomainError> {
+    if (this.status === ProductStatus.ARCHIVED) {
+      return Result.fail(new CatalogDomainError('Cannot add variant to archived product', 'PRODUCT_ARCHIVED'));
+    }
+    const duplicateSku = this.variants.some((item) => item.getSku().value === variant.getSku().value);
+    if (duplicateSku) {
+      return Result.fail(new CatalogDomainError('Variant SKU already exists on product', 'DUPLICATE_VARIANT_SKU'));
+    }
+    this.variants.push(variant);
+    this.updatedAt = new Date();
+    this.addDomainEvent(new ProductUpdatedEvent(this.id, new Date(), { name: this.name.value }));
+    return Result.ok(undefined);
+  }
+
+  addImage(image: ProductImage): Result<void, CatalogDomainError> {
+    if (this.status === ProductStatus.ARCHIVED) {
+      return Result.fail(new CatalogDomainError('Cannot add image to archived product', 'PRODUCT_ARCHIVED'));
+    }
+    this.images.push(image);
+    this.updatedAt = new Date();
+    this.addDomainEvent(new ProductUpdatedEvent(this.id, new Date(), { name: this.name.value }));
+    return Result.ok(undefined);
+  }
 
   getName(): ProductName { return this.name; }
   getSlug(): ProductSlug { return this.slug; }
   getBasePrice(): Money { return this.basePrice; }
   getStatus(): ProductStatus { return this.status; }
+  getCategoryId(): string | undefined { return this.categoryId; }
   getVariants(): readonly ProductVariant[] { return this.variants; }
   getImages(): readonly ProductImage[] { return this.images; }
+  getAttributes(): readonly ProductAttribute[] { return this.attributes; }
+  getOptions(): readonly ProductOption[] { return this.options; }
 }

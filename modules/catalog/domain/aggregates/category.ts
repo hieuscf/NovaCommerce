@@ -24,6 +24,24 @@ export class Category extends AggregateRoot<string> {
     return Result.ok(undefined);
   }
 
+  updateSlug(slug: string): Result<void, CatalogDomainError> {
+    if (!slug?.trim()) {
+      return Result.fail(new CatalogDomainError('Category slug is required', 'INVALID_CATEGORY_SLUG'));
+    }
+    this.slug = slug.trim();
+    this.updatedAt = new Date();
+    return Result.ok(undefined);
+  }
+
+  changeParent(parentId?: string): Result<void, CatalogDomainError> {
+    if (parentId === this.id) {
+      return Result.fail(new CatalogDomainError('Category cannot be its own parent', 'CATEGORY_HIERARCHY_ERROR'));
+    }
+    this.parentId = parentId;
+    this.updatedAt = new Date();
+    return Result.ok(undefined);
+  }
+
   getName(): string { return this.name; }
   getSlug(): string { return this.slug; }
   getParentId(): string | undefined { return this.parentId; }
