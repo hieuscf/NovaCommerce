@@ -332,25 +332,25 @@
 
 ## 4.5 Review
 
-- [ ] Define Review domain
-- [ ] Define Review aggregate
-- [ ] Implement product reviews
-- [ ] Implement rating
-- [ ] Implement review moderation
-- [ ] Implement review images
-- [ ] Emit `ReviewCreated`
-- [ ] Add Review tests
+- [x] Define Review domain
+- [x] Define Review aggregate
+- [x] Implement product reviews
+- [x] Implement rating
+- [x] Implement review moderation
+- [x] Implement review images
+- [x] Emit `ReviewCreated`
+- [x] Add Review tests
 
 ## 4.6 Returns & Refunds
 
-- [ ] Define Return/Refund domain
-- [ ] Define return request
-- [ ] Define return status
-- [ ] Define refund flow
-- [ ] Integrate Order
-- [ ] Integrate Payment
-- [ ] Emit return/refund events
-- [ ] Add tests
+- [x] Define Return/Refund domain
+- [x] Define return request
+- [x] Define return status
+- [x] Define refund flow
+- [x] Integrate Order
+- [x] Integrate Payment
+- [x] Emit return/refund events
+- [x] Add tests
 
 ---
 

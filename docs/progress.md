@@ -138,7 +138,8 @@ Last Updated
 | Payment      | ✅     | ✅ intent/confirm/fail/refund, provider abstraction, outbox, API, tests |
 | Shipping     | ✅     | ✅ quotes, create, track, dispatch, provider abstraction, outbox, API, tests |
 | Promotion    | ✅     | ✅ validation, discount calculation, usage limits, outbox, API, tests |
-| Review       | ✅     | 🚧 domain only |
+| Review       | ✅     | ✅ product reviews, rating, moderation, images, API, outbox, tests |
+| ReturnRefund | ✅     | ✅ return requests, refund flow, Order/Payment integration, outbox, API, tests |
 | CMS          | ✅     | 🚧 domain only |
 | Notification | ✅     | ✅ event handlers, templates, email/push channels, worker, retry, tests |
 | Search       | ✅     | ⏳ read-side deferred |
@@ -225,9 +226,9 @@ Core Commerce Flow: register → catalog → cart → checkout → order → `Or
 
 ## Milestone 3 — Commerce Extensions
 
-Status: 🚧 Notification complete; Review pending
+Status: ✅ Commerce Extensions complete
 
-Modules: Payment (✅), Shipping (✅), Promotion (✅), Notification (✅), Review
+Modules: Payment (✅), Shipping (✅), Promotion (✅), Notification (✅), Review (✅), ReturnRefund (✅)
 
 ---
 
