@@ -92,5 +92,6 @@ import { PrismaService } from '../infrastructure/database/prisma.service';
       inject: [USER_TOKENS.USER_REPOSITORY],
     },
   ],
+  exports: [USER_TOKENS.USER_REPOSITORY],
 })
 export class UserModule {}

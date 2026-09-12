@@ -20,6 +20,7 @@ import { IdentityModule } from './identity/identity.module';
 import { CatalogModule } from './catalog/catalog.module';
 import { InventoryModule } from './inventory/inventory.module';
 import { UserModule } from './user/user.module';
+import { CartModule } from './cart/cart.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { UserModule } from './user/user.module';
     UserModule,
     CatalogModule,
     InventoryModule,
+    CartModule,
     V1Module,
   ],
   controllers: [HealthController],
