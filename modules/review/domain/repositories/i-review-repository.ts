@@ -1,8 +1,12 @@
-import type { Review } from '../aggregates/review';
-import type { ProductReference } from '../value-objects/product-reference';
+import type { Review, ReviewStatus } from '../aggregates/review';
+
+export interface ListReviewsByProductQuery {
+  readonly productId: string;
+  readonly status?: ReviewStatus;
+}
 
 export interface IReviewRepository {
   findById(id: string): Promise<Review | null>;
-  findByProduct(productReference: ProductReference): Promise<Review[]>;
+  findByProduct(query: ListReviewsByProductQuery): Promise<Review[]>;
   save(review: Review): Promise<void>;
 }

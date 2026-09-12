@@ -62,9 +62,20 @@ export class Review extends AggregateRoot<string> {
     return Result.ok(undefined);
   }
 
-  addMedia(item: ReviewMedia): void { this.media.push(item); this.updatedAt = new Date(); }
+  addMedia(item: ReviewMedia): Result<void, ReviewDomainError> {
+    if (this.status === ReviewStatus.PUBLISHED) {
+      return Result.fail(new ReviewDomainError('Published review cannot accept media', 'REVIEW_PUBLISHED'));
+    }
+
+    this.media.push(item);
+    this.updatedAt = new Date();
+    return Result.ok(undefined);
+  }
+
   getRating(): Rating { return this.rating; }
   getText(): ReviewText { return this.text; }
   getStatus(): ReviewStatus { return this.status; }
   getProductReference(): ProductReference { return this.productReference; }
+  getCustomerId(): string { return this.customerId; }
+  getMedia(): readonly ReviewMedia[] { return this.media; }
 }
