@@ -1,6 +1,16 @@
 import type { DomainEvent } from '@novacommerce/building-blocks';
 
-export interface OrderCreatedPayload { readonly orderNumber: string; readonly customerId: string }
+export interface OrderCreatedLinePayload {
+  readonly sku: string;
+  readonly quantity: number;
+  readonly warehouseId: string;
+}
+
+export interface OrderCreatedPayload {
+  readonly orderNumber: string;
+  readonly customerId: string;
+  readonly lines?: readonly OrderCreatedLinePayload[];
+}
 
 export class OrderCreatedEvent implements DomainEvent {
   readonly eventName = 'OrderCreated';

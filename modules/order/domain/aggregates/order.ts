@@ -10,8 +10,10 @@ import { OrderCompletedEvent } from '../events/order-completed.event';
 import { OrderConfirmedEvent } from '../events/order-confirmed.event';
 import { OrderCreatedEvent } from '../events/order-created.event';
 import type { Money } from '../value-objects/money';
+import type { Quantity } from '../value-objects/quantity';
 import type { OrderId } from '../value-objects/order-id';
 import type { OrderNumber } from '../value-objects/order-number';
+import type { OrderCreatedLinePayload } from '../events/order-created.event';
 
 export enum OrderStatus { PENDING = 'pending', CONFIRMED = 'confirmed', CANCELLED = 'cancelled', COMPLETED = 'completed' }
 
@@ -35,6 +37,65 @@ export class Order extends AggregateRoot<string> {
     const now = new Date();
     const order = new Order(id.value, now, now, orderNumber, customerId.trim(), OrderStatus.PENDING, total);
     order.addDomainEvent(new OrderCreatedEvent(id.value, now, { orderNumber: orderNumber.value, customerId: customerId.trim() }));
+    return Result.ok(order);
+  }
+
+  static createFromCheckout(props: {
+    id: OrderId;
+    orderNumber: OrderNumber;
+    customerId: string;
+    total: Money;
+    lines: readonly {
+      lineId: string;
+      productId: string;
+      variantId?: string;
+      quantity: Quantity;
+      unitPrice: Money;
+      sku: string;
+      warehouseId: string;
+    }[];
+  }): Result<Order, OrderDomainError> {
+    if (!props.customerId?.trim()) {
+      return Result.fail(new OrderDomainError('Customer id is required', 'INVALID_CUSTOMER_ID'));
+    }
+    if (props.lines.length === 0) {
+      return Result.fail(new OrderDomainError('Order must have lines', 'ORDER_NO_LINES'));
+    }
+
+    const now = new Date();
+    const order = new Order(
+      props.id.value,
+      now,
+      now,
+      props.orderNumber,
+      props.customerId.trim(),
+      OrderStatus.PENDING,
+      props.total,
+    );
+
+    for (const line of props.lines) {
+      const addLineResult = order.addLine(
+        OrderLine.create(line.lineId, line.productId, line.quantity, line.unitPrice, line.variantId),
+      );
+      if (addLineResult.isFailure) {
+        return Result.fail(addLineResult.getError());
+      }
+    }
+
+    const eventLines: OrderCreatedLinePayload[] = props.lines.map((line) => ({
+      sku: line.sku,
+      quantity: line.quantity.value,
+      warehouseId: line.warehouseId,
+    }));
+
+    order.addDomainEvent(
+      new OrderCreatedEvent(props.id.value, now, {
+        orderNumber: props.orderNumber.value,
+        customerId: props.customerId.trim(),
+        lines: eventLines,
+      }),
+    );
+
     return Result.ok(order);
   }
 
