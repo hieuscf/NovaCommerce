@@ -21,14 +21,17 @@ describe('Inventory event flow', () => {
 
     const orderCreatedHandler = new OrderCreatedHandler(reserveStockHandler);
     const eventBus = new InMemoryEventBus();
-    eventBus.subscribe('OrderCreated', async (event) => {
+    eventBus.subscribe('order.created', async (event) => {
       await orderCreatedHandler.handle(event);
     });
 
     await eventBus.publish({
-      eventName: 'OrderCreated',
+      eventId: '55555555-5555-5555-5555-555555555555',
+      eventType: 'order.created',
+      eventVersion: 1,
       aggregateId: '33333333-3333-3333-3333-333333333333',
-      occurredOn: new Date(),
+      aggregateType: 'Order',
+      occurredAt: new Date().toISOString(),
       payload: {
         orderNumber: 'ORD-1001',
         customerId: '44444444-4444-4444-4444-444444444444',
