@@ -54,8 +54,51 @@ export class Promotion extends AggregateRoot<string> {
     return Result.ok(undefined);
   }
 
-  isActive(): boolean { return this.active; }
-  getDateRange(): DateRange { return this.dateRange; }
-  getRules(): readonly PromotionRule[] { return this.rules; }
-  getBenefits(): readonly PromotionBenefit[] { return this.benefits; }
+  getName(): string {
+    return this.name;
+  }
+
+  isActive(): boolean {
+    return this.active;
+  }
+
+  getDateRange(): DateRange {
+    return this.dateRange;
+  }
+
+  getRules(): readonly PromotionRule[] {
+    return this.rules;
+  }
+
+  getBenefits(): readonly PromotionBenefit[] {
+    return this.benefits;
+  }
+
+  ensureApplicable(at: Date, subtotalAmount: number): Result<void, PromotionDomainError> {
+    if (!this.active) {
+      return Result.fail(new PromotionDomainError('Promotion is not active', 'PROMOTION_NOT_ACTIVE'));
+    }
+    if (!this.dateRange.contains(at)) {
+      return Result.fail(new PromotionDomainError('Promotion is not valid for current date', 'PROMOTION_EXPIRED'));
+    }
+    for (const rule of this.rules) {
+      if (!rule.isEligible({ subtotalAmount })) {
+        return Result.fail(new PromotionDomainError('Promotion rules are not satisfied', 'PROMOTION_RULE_NOT_SATISFIED'));
+      }
+    }
+    return Result.ok(undefined);
+  }
+
+  calculateDiscount(subtotalAmount: number): Result<number, PromotionDomainError> {
+    if (this.benefits.length === 0) {
+      return Result.fail(new PromotionDomainError('Promotion has no benefits', 'PROMOTION_NO_BENEFITS'));
+    }
+
+    const discountAmount = this.benefits.reduce(
+      (total, benefit) => total + benefit.calculateDiscount(subtotalAmount),
+      0,
+    );
+
+    return Result.ok(Math.min(subtotalAmount, discountAmount));
+  }
 }
