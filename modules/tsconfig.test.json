@@ -1,0 +1,14 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "@novacommerce/building-blocks": ["../packages/building-blocks/dist/index.d.ts"],
+      "@prisma/client": ["../node_modules/.pnpm/@prisma+client@6.5.0_prisma@6.5.0_typescript@5.8.2__typescript@5.8.2/node_modules/@prisma/client"],
+      "vitest": ["../node_modules/vitest/dist/index.d.ts"],
+      "vitest/*": ["../node_modules/vitest/*"]
+    }
+  },
+  "include": ["**/*.test.ts"]
+}

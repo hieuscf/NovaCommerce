@@ -6,7 +6,11 @@ settings:
 
 importers:
 
-  .: {}
+  .:
+    devDependencies:
+      vitest:
+        specifier: 3.0.9
+        version: 3.0.9(@types/node@22.13.10)(terser@5.51.2)(tsx@4.19.3)
 
   apps/admin:
     dependencies:
