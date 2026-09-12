@@ -49,6 +49,12 @@ export class Payment extends AggregateRoot<string> {
     if (this.status === PaymentStatus.SUCCEEDED) {
       return Result.fail(new PaymentDomainError('Payment already succeeded', 'PAYMENT_ALREADY_SUCCEEDED'));
     }
+    if (this.status === PaymentStatus.FAILED) {
+      return Result.fail(new PaymentDomainError('Failed payment cannot succeed', 'PAYMENT_ALREADY_FAILED'));
+    }
+    if (this.status === PaymentStatus.REFUNDED) {
+      return Result.fail(new PaymentDomainError('Refunded payment cannot succeed', 'PAYMENT_NOT_CONFIRMABLE'));
+    }
     this.status = PaymentStatus.SUCCEEDED;
     this.transactions.push(transaction);
     const attempt = this.attempts[this.attempts.length - 1];
@@ -59,11 +65,24 @@ export class Payment extends AggregateRoot<string> {
   }
 
   markFailed(reason: string): Result<void, PaymentDomainError> {
+    if (this.status === PaymentStatus.SUCCEEDED) {
+      return Result.fail(new PaymentDomainError('Succeeded payment cannot fail', 'PAYMENT_ALREADY_SUCCEEDED'));
+    }
+    if (this.status === PaymentStatus.REFUNDED) {
+      return Result.fail(new PaymentDomainError('Refunded payment cannot fail', 'PAYMENT_ALREADY_REFUNDED'));
+    }
+    if (this.status === PaymentStatus.FAILED) {
+      return Result.fail(new PaymentDomainError('Payment already failed', 'PAYMENT_ALREADY_FAILED'));
+    }
+    if (!reason?.trim()) {
+      return Result.fail(new PaymentDomainError('Failure reason is required', 'INVALID_FAILURE_REASON'));
+    }
+    const normalizedReason = reason.trim();
     this.status = PaymentStatus.FAILED;
     const attempt = this.attempts[this.attempts.length - 1];
-    if (attempt) attempt.markFailed(reason);
+    if (attempt) attempt.markFailed(normalizedReason);
     this.updatedAt = new Date();
-    this.addDomainEvent(new PaymentFailedEvent(this.id, new Date(), { reason }));
+    this.addDomainEvent(new PaymentFailedEvent(this.id, new Date(), { reason: normalizedReason }));
     return Result.ok(undefined);
   }
 
@@ -81,4 +100,7 @@ export class Payment extends AggregateRoot<string> {
   getStatus(): PaymentStatus { return this.status; }
   getAmount(): Money { return this.amount; }
   getOrderId(): string { return this.orderId; }
+  getMethod(): PaymentMethod { return this.method; }
+  getAttempts(): readonly PaymentAttempt[] { return this.attempts; }
+  getTransactions(): readonly PaymentTransaction[] { return this.transactions; }
 }

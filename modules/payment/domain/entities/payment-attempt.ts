@@ -12,7 +12,18 @@ export class PaymentAttempt extends BaseEntity<string> {
     return new PaymentAttempt(id, new Date(), new Date(), PaymentAttemptStatus.PENDING);
   }
 
+  static reconstitute(props: {
+    id: string;
+    status: PaymentAttemptStatus;
+    failureReason?: string;
+    createdAt: Date;
+    updatedAt: Date;
+  }): PaymentAttempt {
+    return new PaymentAttempt(props.id, props.createdAt, props.updatedAt, props.status, props.failureReason);
+  }
+
   markSucceeded(): void { this.status = PaymentAttemptStatus.SUCCEEDED; this.updatedAt = new Date(); }
   markFailed(reason: string): void { this.status = PaymentAttemptStatus.FAILED; this.failureReason = reason; this.updatedAt = new Date(); }
   getStatus(): PaymentAttemptStatus { return this.status; }
+  getFailureReason(): string | undefined { return this.failureReason; }
 }
