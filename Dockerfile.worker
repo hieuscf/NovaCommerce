@@ -18,6 +18,9 @@ RUN pnpm install --frozen-lockfile
 
 FROM deps AS build
 COPY tsconfig.base.json ./
+COPY modules/inventory ./modules/inventory
+COPY modules/notification ./modules/notification
+COPY modules/tsconfig.json ./modules/tsconfig.json
 COPY packages/building-blocks ./packages/building-blocks
 COPY packages/database ./packages/database
 COPY workers/outbox-publisher ./workers/outbox-publisher
