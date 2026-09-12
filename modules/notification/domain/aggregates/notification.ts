@@ -13,18 +13,31 @@ export class Notification extends AggregateRoot<string> {
     private template: string, private payload: Record<string, string>,
   ) { super(id, createdAt, updatedAt); }
 
-  static request(id: string, template: string, payload: Record<string, string>, delivery: NotificationDelivery): Result<Notification, NotificationDomainError> {
+  static request(
+    id: string,
+    template: string,
+    payload: Record<string, string>,
+    deliveries: readonly NotificationDelivery[],
+  ): Result<Notification, NotificationDomainError> {
     if (!template?.trim()) {
       return Result.fail(new NotificationDomainError('Template is required', 'INVALID_TEMPLATE'));
     }
+    if (deliveries.length === 0) {
+      return Result.fail(new NotificationDomainError('At least one delivery is required', 'DELIVERY_REQUIRED'));
+    }
+
     const now = new Date();
     const notification = new Notification(id, now, now, template.trim(), { ...payload });
-    notification.deliveries.push(delivery);
-    notification.addDomainEvent(new NotificationRequestedEvent(id, now, {
-      channel: delivery.getChannel(),
-      recipient: delivery.getRecipient(),
-      template: template.trim(),
-    }));
+    notification.deliveries.push(...deliveries);
+
+    for (const delivery of deliveries) {
+      notification.addDomainEvent(new NotificationRequestedEvent(id, now, {
+        channel: delivery.getChannel(),
+        recipient: delivery.getRecipient(),
+        template: template.trim(),
+      }));
+    }
+
     return Result.ok(notification);
   }
 
@@ -61,4 +74,5 @@ export class Notification extends AggregateRoot<string> {
 
   getDeliveries(): readonly NotificationDelivery[] { return this.deliveries; }
   getTemplate(): string { return this.template; }
+  getPayload(): Readonly<Record<string, string>> { return this.payload; }
 }
