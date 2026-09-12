@@ -136,7 +136,7 @@ Last Updated
 | Order        | ✅     | ✅ lifecycle, create-from-checkout, query/history/cancel API, outbox, tests |
 | Inventory    | ✅     | ✅ stock, reservations, API, events, tests |
 | Payment      | ✅     | ✅ intent/confirm/fail/refund, provider abstraction, outbox, API, tests |
-| Shipping     | ✅     | 🚧 domain only |
+| Shipping     | ✅     | ✅ quotes, create, track, dispatch, provider abstraction, outbox, API, tests |
 | Promotion    | ✅     | 🚧 domain + checkout evaluation service |
 | Review       | ✅     | 🚧 domain only |
 | CMS          | ✅     | 🚧 domain only |
@@ -225,9 +225,9 @@ Core Commerce Flow: register → catalog → cart → checkout → order → `Or
 
 ## Milestone 3 — Commerce Extensions
 
-Status: 🚧 Payment complete; Shipping, Promotion, Notification, Review pending
+Status: 🚧 Payment and Shipping complete; Promotion, Notification, Review pending
 
-Modules: Payment (✅), Shipping, Promotion, Notification, Review
+Modules: Payment (✅), Shipping (✅), Promotion, Notification, Review
 
 ---
 

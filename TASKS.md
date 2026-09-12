@@ -294,16 +294,16 @@
 
 ## 4.2 Shipping
 
-- [ ] Define Shipping domain
-- [ ] Define Shipment
-- [ ] Define Shipping Address
-- [ ] Define Shipping Method
-- [ ] Define Shipping Provider interface
-- [ ] Implement shipping calculation
-- [ ] Implement shipment creation
-- [ ] Implement shipment tracking
-- [ ] Add Shipping events
-- [ ] Add Shipping tests
+- [x] Define Shipping domain
+- [x] Define Shipment
+- [x] Define Shipping Address
+- [x] Define Shipping Method
+- [x] Define Shipping Provider interface
+- [x] Implement shipping calculation
+- [x] Implement shipment creation
+- [x] Implement shipment tracking
+- [x] Add Shipping events
+- [x] Add Shipping tests
 
 ## 4.3 Promotion
 
