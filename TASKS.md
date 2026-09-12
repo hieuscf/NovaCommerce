@@ -307,15 +307,15 @@
 
 ## 4.3 Promotion
 
-- [ ] Define Promotion domain
-- [ ] Define Coupon
-- [ ] Define Discount Rule
-- [ ] Define Promotion Rule
-- [ ] Implement coupon validation
-- [ ] Implement discount calculation
-- [ ] Implement usage limits
-- [ ] Emit `CouponUsed`
-- [ ] Add Promotion tests
+- [x] Define Promotion domain
+- [x] Define Coupon
+- [x] Define Discount Rule
+- [x] Define Promotion Rule
+- [x] Implement coupon validation
+- [x] Implement discount calculation
+- [x] Implement usage limits
+- [x] Emit `CouponUsed`
+- [x] Add Promotion tests
 
 ## 4.4 Notification
 
