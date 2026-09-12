@@ -15,7 +15,28 @@ export class CartItem extends BaseEntity<string> {
     return new CartItem(id, new Date(), new Date(), productReference, quantity, unitPrice);
   }
 
-  updateQuantity(quantity: Quantity): void { this.quantity = quantity; this.updatedAt = new Date(); }
+  static reconstitute(props: {
+    id: string;
+    productReference: ProductReference;
+    quantity: Quantity;
+    unitPrice: Money;
+    createdAt: Date;
+    updatedAt: Date;
+  }): CartItem {
+    return new CartItem(
+      props.id,
+      props.createdAt,
+      props.updatedAt,
+      props.productReference,
+      props.quantity,
+      props.unitPrice,
+    );
+  }
+
+  updateQuantity(quantity: Quantity): void {
+    this.quantity = quantity;
+    this.updatedAt = new Date();
+  }
   getProductReference(): ProductReference { return this.productReference; }
   getQuantity(): Quantity { return this.quantity; }
   getUnitPrice(): Money { return this.unitPrice; }

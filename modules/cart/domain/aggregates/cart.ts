@@ -8,7 +8,7 @@ import { CartItemRemovedEvent } from '../events/cart-item-removed.event';
 import type { CartId } from '../value-objects/cart-id';
 import type { Money } from '../value-objects/money';
 import type { ProductReference } from '../value-objects/product-reference';
-import type { Quantity } from '../value-objects/quantity';
+import { Quantity } from '../value-objects/quantity';
 
 export class Cart extends AggregateRoot<string> {
   private items: CartItem[] = [];
@@ -33,7 +33,8 @@ export class Cart extends AggregateRoot<string> {
   addItem(item: CartItem): Result<void, CartDomainError> {
     const existing = this.items.find((i) => i.getProductReference().equals(item.getProductReference()));
     if (existing) {
-      existing.updateQuantity(item.getQuantity());
+      const mergedQuantity = Quantity.create(existing.getQuantity().value + item.getQuantity().value);
+      existing.updateQuantity(mergedQuantity);
     } else {
       this.items.push(item);
     }
@@ -42,6 +43,16 @@ export class Cart extends AggregateRoot<string> {
       productId: item.getProductReference().productId,
       quantity: item.getQuantity().value,
     }));
+    return Result.ok(undefined);
+  }
+
+  updateItemQuantity(itemId: string, quantity: Quantity): Result<void, CartDomainError> {
+    const item = this.items.find((i) => i.id === itemId);
+    if (!item) {
+      return Result.fail(new CartDomainError('Cart item not found', 'CART_ITEM_NOT_FOUND'));
+    }
+    item.updateQuantity(quantity);
+    this.updatedAt = new Date();
     return Result.ok(undefined);
   }
 
