@@ -131,7 +131,7 @@ Last Updated
 | Identity     | ✅     | ✅ auth, RBAC, audit, tests |
 | User         | ✅     | ✅ profile, addresses, preferences, API, tests |
 | Catalog      | ✅     | ✅ products, categories, API, events, tests |
-| Cart         | ✅     | 🚧 domain only |
+| Cart         | ✅     | ✅ cart lifecycle, persistence, Redis cache, API, tests |
 | Checkout     | ✅     | 🚧 domain only |
 | Order        | ✅     | 🚧 domain only |
 | Inventory    | ✅     | ✅ stock, reservations, API, events, tests |

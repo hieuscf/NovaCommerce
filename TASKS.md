@@ -223,16 +223,16 @@
 
 ## 3.5 Cart
 
-- [ ] Define Cart aggregate
-- [ ] Define Cart Item
-- [ ] Implement add item
-- [ ] Implement update quantity
-- [ ] Implement remove item
-- [ ] Implement clear cart
-- [ ] Implement cart persistence
-- [ ] Add Redis caching where appropriate
-- [ ] Add Cart API
-- [ ] Add Cart tests
+- [x] Define Cart aggregate
+- [x] Define Cart Item
+- [x] Implement add item
+- [x] Implement update quantity
+- [x] Implement remove item
+- [x] Implement clear cart
+- [x] Implement cart persistence
+- [x] Add Redis caching where appropriate
+- [x] Add Cart API
+- [x] Add Cart tests
 
 ## 3.6 Checkout
 
@@ -751,7 +751,7 @@ Sau khi Sprint 0 hoàn tất:
 2. [ ] User
 3. [ ] Catalog
 4. [ ] Inventory
-5. [ ] Cart
+5. [x] Cart
 6. [ ] Checkout
 7. [ ] Order
 8. [ ] End-to-End Checkout Flow
