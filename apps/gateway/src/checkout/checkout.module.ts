@@ -8,9 +8,6 @@ import { PrismaOutboxStore as CheckoutPrismaOutboxStore } from '../../../../modu
 import { PrismaCheckoutSessionRepository } from '../../../../modules/checkout/infrastructure/repositories/prisma-checkout-session-repository';
 import { INVENTORY_TOKENS } from '../../../../modules/inventory/contracts/tokens';
 import { ORDER_TOKENS } from '../../../../modules/order/contracts/tokens';
-import { CreateOrderFromCheckoutHandler } from '../../../../modules/order/application/handlers/create-order-from-checkout.handler';
-import { PrismaOutboxStore as OrderPrismaOutboxStore } from '../../../../modules/order/infrastructure/prisma/prisma-outbox-store';
-import { PrismaOrderRepository } from '../../../../modules/order/infrastructure/repositories/prisma-order-repository';
 import { PAYMENT_TOKENS } from '../../../../modules/payment/contracts/tokens';
 import { StubPaymentInitiationService } from '../../../../modules/payment/infrastructure/services/stub-payment-initiation.service';
 import { PROMOTION_TOKENS } from '../../../../modules/promotion/contracts/tokens';
@@ -21,12 +18,13 @@ import { USER_TOKENS } from '../../../../modules/user/contracts/tokens';
 import { CartModule } from '../cart/cart.module';
 import { CatalogModule } from '../catalog/catalog.module';
 import { InventoryModule } from '../inventory/inventory.module';
+import { OrderModule } from '../order/order.module';
 import { UserModule } from '../user/user.module';
 import { PrismaService } from '../infrastructure/database/prisma.service';
 import { CheckoutController } from './controllers/checkout.controller';
 
 @Module({
-  imports: [UserModule, CartModule, CatalogModule, InventoryModule],
+  imports: [UserModule, CartModule, CatalogModule, InventoryModule, OrderModule],
   controllers: [CheckoutController],
   providers: [
     {
@@ -43,30 +41,6 @@ import { CheckoutController } from './controllers/checkout.controller';
     {
       provide: CHECKOUT_TOKENS.CHECKOUT_SESSION_REPOSITORY,
       useExisting: PrismaCheckoutSessionRepository,
-    },
-    {
-      provide: ORDER_TOKENS.OUTBOX_STORE,
-      useFactory: (prisma: PrismaService) => new OrderPrismaOutboxStore(prisma),
-      inject: [PrismaService],
-    },
-    {
-      provide: PrismaOrderRepository,
-      useFactory: (prisma: PrismaService, outboxStore: OrderPrismaOutboxStore) =>
-        new PrismaOrderRepository(prisma, outboxStore),
-      inject: [PrismaService, ORDER_TOKENS.OUTBOX_STORE],
-    },
-    {
-      provide: ORDER_TOKENS.ORDER_REPOSITORY,
-      useExisting: PrismaOrderRepository,
-    },
-    {
-      provide: CreateOrderFromCheckoutHandler,
-      useFactory: (orderRepository: PrismaOrderRepository) => new CreateOrderFromCheckoutHandler(orderRepository),
-      inject: [ORDER_TOKENS.ORDER_REPOSITORY],
-    },
-    {
-      provide: ORDER_TOKENS.CREATE_ORDER_FROM_CHECKOUT,
-      useExisting: CreateOrderFromCheckoutHandler,
     },
     {
       provide: PROMOTION_TOKENS.COUPON_REPOSITORY,
