@@ -63,6 +63,7 @@ import { InventoryController } from './controllers/inventory.controller';
       inject: [ReserveStockHandler],
     },
   ],
+  exports: [INVENTORY_TOKENS.INVENTORY_ITEM_REPOSITORY],
 })
 export class InventoryModule implements OnModuleInit {
   constructor(

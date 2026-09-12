@@ -63,5 +63,6 @@ import { CartController } from './controllers/cart.controller';
       inject: [USER_TOKENS.USER_REPOSITORY, CART_TOKENS.CART_REPOSITORY],
     },
   ],
+  exports: [CART_TOKENS.CART_REPOSITORY],
 })
 export class CartModule {}

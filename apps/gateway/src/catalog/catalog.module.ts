@@ -99,5 +99,6 @@ import { ProductsController } from './controllers/products.controller';
       inject: [CATALOG_TOKENS.CATEGORY_REPOSITORY],
     },
   ],
+  exports: [CATALOG_TOKENS.PRODUCT_REPOSITORY],
 })
 export class CatalogModule {}
