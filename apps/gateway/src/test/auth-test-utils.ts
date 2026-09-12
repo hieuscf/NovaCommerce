@@ -9,5 +9,5 @@ export const TEST_USER: SecurityContext = {
 export const TEST_ADMIN: SecurityContext = {
   userId: '550e8400-e29b-41d4-a716-446655440002',
   roles: ['admin'],
-  permissions: ['admin:read', 'orders:read'],
+  permissions: ['admin:read', 'orders:read', 'catalog:write'],
 };
