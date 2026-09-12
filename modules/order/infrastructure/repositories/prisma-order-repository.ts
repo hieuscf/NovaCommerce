@@ -34,6 +34,34 @@ export class PrismaOrderRepository implements IOrderRepository {
     return row ? this.toDomain(row) : null;
   }
 
+  async listByCustomerId(
+    customerId: string,
+    params: { status?: OrderStatus; page?: number; pageSize?: number } = {},
+  ): Promise<{ items: Order[]; total: number }> {
+    const page = params.page && params.page > 0 ? params.page : 1;
+    const pageSize = params.pageSize && params.pageSize > 0 ? Math.min(params.pageSize, 100) : 20;
+    const where = {
+      customerId,
+      ...(params.status ? { status: params.status } : {}),
+    };
+
+    const [rows, total] = await Promise.all([
+      this.prisma.order.findMany({
+        where,
+        include: this.defaultInclude(),
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      }),
+      this.prisma.order.count({ where }),
+    ]);
+
+    return {
+      items: rows.map((row) => this.toDomain(row)),
+      total,
+    };
+  }
+
   async save(order: Order): Promise<void> {
     const events = order.pullDomainEvents();
 
