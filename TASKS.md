@@ -279,18 +279,18 @@
 
 ## 4.1 Payment
 
-- [ ] Define Payment domain
-- [ ] Define Payment aggregate
-- [ ] Define Payment status
-- [ ] Define Payment provider interface
-- [ ] Implement payment intent
-- [ ] Implement payment confirmation
-- [ ] Implement payment failure
-- [ ] Implement refund foundation
-- [ ] Emit `PaymentSucceeded`
-- [ ] Emit payment failure event
-- [ ] Add provider integration abstraction
-- [ ] Add Payment tests
+- [x] Define Payment domain
+- [x] Define Payment aggregate
+- [x] Define Payment status
+- [x] Define Payment provider interface
+- [x] Implement payment intent
+- [x] Implement payment confirmation
+- [x] Implement payment failure
+- [x] Implement refund foundation
+- [x] Emit `PaymentSucceeded`
+- [x] Emit payment failure event
+- [x] Add provider integration abstraction
+- [x] Add Payment tests
 
 ## 4.2 Shipping
 

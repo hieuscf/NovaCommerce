@@ -132,10 +132,10 @@ Last Updated
 | User         | ✅     | ✅ profile, addresses, preferences, API, tests |
 | Catalog      | ✅     | ✅ products, categories, API, events, tests |
 | Cart         | ✅     | ✅ cart lifecycle, persistence, Redis cache, API, tests |
-| Checkout     | ✅     | ✅ orchestration, API, tests (payment handoff via stub) |
+| Checkout     | ✅     | ✅ orchestration, API, tests (payment handoff via PaymentInitiationService) |
 | Order        | ✅     | ✅ lifecycle, create-from-checkout, query/history/cancel API, outbox, tests |
 | Inventory    | ✅     | ✅ stock, reservations, API, events, tests |
-| Payment      | ✅     | 🚧 domain + stub initiation contract (VNPAY/MOMO/PayPal) |
+| Payment      | ✅     | ✅ intent/confirm/fail/refund, provider abstraction, outbox, API, tests |
 | Shipping     | ✅     | 🚧 domain only |
 | Promotion    | ✅     | 🚧 domain + checkout evaluation service |
 | Review       | ✅     | 🚧 domain only |
@@ -225,9 +225,9 @@ Core Commerce Flow: register → catalog → cart → checkout → order → `Or
 
 ## Milestone 3 — Commerce Extensions
 
-Status: ⏳
+Status: 🚧 Payment complete; Shipping, Promotion, Notification, Review pending
 
-Modules: Payment, Shipping, Promotion, Notification, Review
+Modules: Payment (✅), Shipping, Promotion, Notification, Review
 
 ---
 
