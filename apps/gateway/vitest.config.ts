@@ -31,6 +31,7 @@ export default defineConfig({
       '../../modules/payment/**/*.test.ts',
       '../../modules/shipping/**/*.test.ts',
       '../../modules/promotion/**/*.test.ts',
+      '../../modules/notification/**/*.test.ts',
     ],
     setupFiles: ['./vitest.setup.ts'],
     testTimeout: 30_000,

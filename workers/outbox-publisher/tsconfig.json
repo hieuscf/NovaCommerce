@@ -15,11 +15,16 @@
     "../../modules/inventory/domain/**/*.ts",
     "../../modules/inventory/application/**/*.ts",
     "../../modules/inventory/infrastructure/**/*.ts",
-    "../../modules/inventory/contracts/**/*.ts"
+    "../../modules/inventory/contracts/**/*.ts",
+    "../../modules/notification/domain/**/*.ts",
+    "../../modules/notification/application/**/*.ts",
+    "../../modules/notification/infrastructure/**/*.ts",
+    "../../modules/notification/contracts/**/*.ts"
   ],
   "exclude": [
     "src/**/*.test.ts",
     "src/**/*.integration.test.ts",
-    "../../modules/inventory/**/*.test.ts"
+    "../../modules/inventory/**/*.test.ts",
+    "../../modules/notification/**/*.test.ts"
   ]
 }

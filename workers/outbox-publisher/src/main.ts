@@ -4,6 +4,7 @@ import {
 } from '@novacommerce/building-blocks';
 import { PrismaClient, PrismaOutboxRepository } from '@novacommerce/database';
 import { registerCommerceEventHandlers } from './register-commerce-handlers';
+import { registerNotificationWorker } from './register-notification-handlers';
 
 const POLL_INTERVAL_MS = Number(process.env.WORKER_POLL_INTERVAL_MS ?? 5000);
 const BATCH_SIZE = Number(process.env.WORKER_BATCH_SIZE ?? 10);
@@ -16,6 +17,7 @@ const outboxPublisher = new OutboxPublisher(outboxRepository, eventBus, {
 });
 
 registerCommerceEventHandlers(eventBus, prisma);
+const { notificationProcessor } = registerNotificationWorker(eventBus, prisma);
 
 let running = true;
 
@@ -48,6 +50,11 @@ async function run(): Promise<void> {
       const processedCount = await outboxPublisher.processBatch();
       if (processedCount > 0) {
         console.info(`Outbox worker processed ${processedCount} message(s)`);
+      }
+
+      const notificationCount = await notificationProcessor.processBatch();
+      if (notificationCount > 0) {
+        console.info(`Notification worker processed ${notificationCount} delivery(ies)`);
       }
     } catch (error) {
       console.error('Outbox worker batch failed', error);

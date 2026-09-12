@@ -26,6 +26,7 @@ import { OrderModule } from './order/order.module';
 import { PaymentModule } from './payment/payment.module';
 import { ShippingModule } from './shipping/shipping.module';
 import { PromotionModule } from './promotion/promotion.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { PromotionModule } from './promotion/promotion.module';
     PaymentModule,
     ShippingModule,
     PromotionModule,
+    NotificationModule,
     CheckoutModule,
     V1Module,
   ],
