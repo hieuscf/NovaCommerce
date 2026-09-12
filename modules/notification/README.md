@@ -2,6 +2,8 @@
 
 **Bounded Context:** Notification
 
-**Responsibility:** Notification delivery — email, SMS, push, and in-app notifications driven by platform events.
+**Responsibility:** Event-driven notification delivery via email and push channels. Consumes Order and Payment integration events, resolves templates, persists delivery state, and processes pending deliveries through the notification worker.
 
-**Dependencies / Communication:** Consumes domain/integration events from Order, User, Payment, and others. Channel implementations (email, SMS) reside in Infrastructure. Event-driven only — no business logic from other modules.
+**Dependencies / Communication:** Consumes `order.created`, `payment.completed`, and `payment.failed` integration events. Publishes `NotificationRequested`, `NotificationSent`, and `NotificationFailed` through the Outbox. Channel implementations (email, push) reside in Infrastructure as stub providers until external integrations are configured.
+
+**Worker:** Pending deliveries are processed by `NotificationProcessor`, wired into the outbox worker loop alongside outbox publication.

@@ -140,7 +140,7 @@ Last Updated
 | Promotion    | ✅     | ✅ validation, discount calculation, usage limits, outbox, API, tests |
 | Review       | ✅     | 🚧 domain only |
 | CMS          | ✅     | 🚧 domain only |
-| Notification | ✅     | 🚧 domain only |
+| Notification | ✅     | ✅ event handlers, templates, email/push channels, worker, retry, tests |
 | Search       | ✅     | ⏳ read-side deferred |
 | Analytics    | ✅     | ⏳ read-side deferred |
 | Seller       | ✅     | ⏳ requirements pending |
@@ -225,9 +225,9 @@ Core Commerce Flow: register → catalog → cart → checkout → order → `Or
 
 ## Milestone 3 — Commerce Extensions
 
-Status: 🚧 Promotion complete; Notification, Review pending
+Status: 🚧 Notification complete; Review pending
 
-Modules: Payment (✅), Shipping (✅), Promotion (✅), Notification, Review
+Modules: Payment (✅), Shipping (✅), Promotion (✅), Notification (✅), Review
 
 ---
 
@@ -268,7 +268,7 @@ Sprint 0 — Architecture & Project Foundation
 - [x] API Gateway infrastructure (`/api/v1`, OpenAPI, auth/authz wiring)
 - [ ] Application layer (commands/queries/handlers)
 - [ ] Infrastructure repositories (Prisma)
-- [x] Wire module event handlers to `InMemoryEventBus` (Inventory `OrderCreated` → `order.created`)
+- [x] Wire module event handlers to `InMemoryEventBus` (Inventory `OrderCreated` → `order.created`; Notification `order.created`, `payment.completed`, `payment.failed`)
 
 ---
 

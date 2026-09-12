@@ -319,16 +319,16 @@
 
 ## 4.4 Notification
 
-- [ ] Define Notification domain
-- [ ] Define notification templates
-- [ ] Define email channel
-- [ ] Define push channel
-- [ ] Define notification events
-- [ ] Consume order events
-- [ ] Consume payment events
-- [ ] Implement notification worker
-- [ ] Add retry strategy
-- [ ] Add Notification tests
+- [x] Define Notification domain
+- [x] Define notification templates
+- [x] Define email channel
+- [x] Define push channel
+- [x] Define notification events
+- [x] Consume order events
+- [x] Consume payment events
+- [x] Implement notification worker
+- [x] Add retry strategy
+- [x] Add Notification tests
 
 ## 4.5 Review
 
