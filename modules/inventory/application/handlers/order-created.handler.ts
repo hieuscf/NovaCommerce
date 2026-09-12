@@ -1,4 +1,4 @@
-import type { DomainEvent } from '@novacommerce/building-blocks';
+import type { BusEvent } from '@novacommerce/building-blocks';
 import { parseOrderCreatedInventoryContract } from '../contracts/order-created.contract';
 import { InventoryApplicationError } from '../errors/inventory-application.error';
 import type { ReserveStockHandler } from './reserve-stock.handler';
@@ -6,7 +6,7 @@ import type { ReserveStockHandler } from './reserve-stock.handler';
 export class OrderCreatedHandler {
   constructor(private readonly reserveStockHandler: ReserveStockHandler) {}
 
-  async handle(event: DomainEvent): Promise<void> {
+  async handle(event: BusEvent): Promise<void> {
     const contract = parseOrderCreatedInventoryContract(event);
     if (!contract) {
       throw new InventoryApplicationError('Invalid OrderCreated payload for inventory reservation', 'INVALID_ORDER_CREATED');

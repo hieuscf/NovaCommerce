@@ -1,6 +1,7 @@
 import { Inject, Module, OnModuleInit } from '@nestjs/common';
-import type { DomainEvent, IEventBus } from '@novacommerce/building-blocks';
+import type { IEventBus } from '@novacommerce/building-blocks';
 import { INVENTORY_TOKENS } from '../../../../modules/inventory/contracts/tokens';
+import { registerInventoryEventHandlers } from '../../../../modules/inventory/application/register-inventory-event-handlers';
 import { EVENT_BUS } from '../infrastructure/events/event-bus.module';
 import { AdjustStockHandler } from '../../../../modules/inventory/application/handlers/adjust-stock.handler';
 import { CreateInventoryItemHandler } from '../../../../modules/inventory/application/handlers/create-inventory-item.handler';
@@ -72,8 +73,6 @@ export class InventoryModule implements OnModuleInit {
   ) {}
 
   onModuleInit(): void {
-    this.eventBus.subscribe('OrderCreated', async (event) => {
-      await this.orderCreatedHandler.handle(event as DomainEvent);
-    });
+    registerInventoryEventHandlers(this.eventBus, this.orderCreatedHandler);
   }
 }

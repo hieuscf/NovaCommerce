@@ -3,16 +3,19 @@ import {
   OutboxPublisher,
 } from '@novacommerce/building-blocks';
 import { PrismaClient, PrismaOutboxRepository } from '@novacommerce/database';
+import { registerCommerceEventHandlers } from './register-commerce-handlers';
 
 const POLL_INTERVAL_MS = Number(process.env.WORKER_POLL_INTERVAL_MS ?? 5000);
 const BATCH_SIZE = Number(process.env.WORKER_BATCH_SIZE ?? 10);
 
-const prisma = new PrismaClient();
+const prisma: PrismaClient = new PrismaClient();
 const eventBus = new InMemoryEventBus();
 const outboxRepository = new PrismaOutboxRepository(prisma);
 const outboxPublisher = new OutboxPublisher(outboxRepository, eventBus, {
   batchSize: BATCH_SIZE,
 });
+
+registerCommerceEventHandlers(eventBus, prisma);
 
 let running = true;
 

@@ -1,4 +1,4 @@
-import type { DomainEvent } from '@novacommerce/building-blocks';
+import { isIntegrationEvent, type BusEvent } from '@novacommerce/building-blocks';
 
 export interface OrderCreatedLineContract {
   readonly sku: string;
@@ -28,17 +28,42 @@ function isOrderCreatedLine(value: unknown): value is OrderCreatedLineContract {
   );
 }
 
+function isOrderCreatedEvent(event: BusEvent): boolean {
+  if (isIntegrationEvent(event)) {
+    return event.eventType === 'order.created';
+  }
+
+  return event.eventName === 'OrderCreated';
+}
+
+function readEventPayload(event: BusEvent): Record<string, unknown> {
+  if (isIntegrationEvent(event)) {
+    return event.payload ?? {};
+  }
+
+  if ('payload' in event && typeof event.payload === 'object' && event.payload !== null) {
+    return event.payload as Record<string, unknown>;
+  }
+
+  return {};
+}
+
+function readAggregateId(event: BusEvent): string {
+  if (isIntegrationEvent(event)) {
+    return event.aggregateId;
+  }
+
+  return event.aggregateId;
+}
+
 export function parseOrderCreatedInventoryContract(
-  event: DomainEvent,
+  event: BusEvent,
 ): OrderCreatedInventoryContract | null {
-  if (event.eventName !== 'OrderCreated') {
+  if (!isOrderCreatedEvent(event)) {
     return null;
   }
 
-  const payload =
-    'payload' in event && typeof (event as { payload: unknown }).payload === 'object'
-      ? ((event as { payload: Record<string, unknown> }).payload ?? {})
-      : {};
+  const payload = readEventPayload(event);
 
   if (typeof payload.orderNumber !== 'string' || typeof payload.customerId !== 'string') {
     return null;
@@ -51,7 +76,7 @@ export function parseOrderCreatedInventoryContract(
   }
 
   return {
-    orderId: event.aggregateId,
+    orderId: readAggregateId(event),
     orderNumber: payload.orderNumber,
     customerId: payload.customerId,
     lines,

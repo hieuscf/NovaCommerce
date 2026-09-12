@@ -2,8 +2,24 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": "../..",
+    "baseUrl": "./",
+    "paths": {
+      "@novacommerce/building-blocks": ["../../packages/building-blocks/dist/index.d.ts"],
+      "@novacommerce/database": ["../../packages/database/dist/index.d.ts"],
+      "@prisma/client": ["../../node_modules/.pnpm/@prisma+client@6.5.0_prisma@6.5.0_typescript@5.8.2__typescript@5.8.2/node_modules/@prisma/client"]
+    }
   },
-  "include": ["src/**/*"],
-  "exclude": ["src/**/*.test.ts", "src/**/*.integration.test.ts"]
+  "include": [
+    "src/**/*",
+    "../../modules/inventory/domain/**/*.ts",
+    "../../modules/inventory/application/**/*.ts",
+    "../../modules/inventory/infrastructure/**/*.ts",
+    "../../modules/inventory/contracts/**/*.ts"
+  ],
+  "exclude": [
+    "src/**/*.test.ts",
+    "src/**/*.integration.test.ts",
+    "../../modules/inventory/**/*.test.ts"
+  ]
 }
