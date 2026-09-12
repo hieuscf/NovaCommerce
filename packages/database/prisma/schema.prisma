@@ -79,6 +79,13 @@ enum ContentStatus {
   archived
 }
 
+enum ReturnRequestStatus {
+  requested
+  approved
+  refunded
+  rejected
+}
+
 // =============================================================================
 // Identity
 // =============================================================================
@@ -847,6 +854,28 @@ model CouponRedemption {
   @@index([orderId])
   @@index([customerId])
   @@map("coupon_redemptions")
+}
+
+// =============================================================================
+// Return & Refund
+// =============================================================================
+
+model ReturnRequest {
+  id           String              @id @db.Uuid
+  orderId      String              @map("order_id") @db.Uuid
+  customerId   String              @map("customer_id") @db.Uuid
+  paymentId    String              @map("payment_id") @db.Uuid
+  status       ReturnRequestStatus @default(requested)
+  refundAmount Decimal             @map("refund_amount") @db.Decimal(19, 4)
+  currency     String
+  createdAt    DateTime            @default(now()) @map("created_at")
+  updatedAt    DateTime            @updatedAt @map("updated_at")
+
+  @@index([orderId])
+  @@index([customerId])
+  @@index([paymentId])
+  @@index([status])
+  @@map("return_requests")
 }
 
 // =============================================================================

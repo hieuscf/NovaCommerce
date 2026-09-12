@@ -39,6 +39,7 @@ PostgreSQL (single database)
 │                     coupons, coupon_redemptions
 ├── Notification      notifications, notification_deliveries
 ├── Review            reviews, review_media
+├── ReturnRefund      return_requests
 ├── CMS               contents, content_revisions
 └── Outbox            outbox_messages
 ```
@@ -73,6 +74,7 @@ Cross-context references use **UUID columns only** — no Prisma `@relation` acr
 | Promotion | `promotions`, `promotion_rules`, `promotion_benefits`, `coupons`, `coupon_redemptions` |
 | Notification | `notifications`, `notification_deliveries` |
 | Review | `reviews`, `review_media` |
+| ReturnRefund | `return_requests` |
 | CMS | `contents`, `content_revisions` |
 | Outbox | `outbox_messages` |
 
@@ -728,7 +730,25 @@ Unique: `(sku, warehouse_id)`
 
 ---
 
-### 8.13 CMS
+### 8.13 Return & Refund
+
+#### `return_requests`
+
+| Column | Type | Constraints |
+|--------|------|-------------|
+| `id` | UUID | PK |
+| `order_id` | UUID | NOT NULL (logical ref → Order) |
+| `customer_id` | UUID | NOT NULL (logical ref → User) |
+| `payment_id` | UUID | NOT NULL (logical ref → Payment) |
+| `status` | ReturnRequestStatus | NOT NULL, DEFAULT requested |
+| `refund_amount` | DECIMAL(19,4) | NOT NULL |
+| `currency` | TEXT | NOT NULL |
+| `created_at` | TIMESTAMP(3) | NOT NULL |
+| `updated_at` | TIMESTAMP(3) | NOT NULL |
+
+---
+
+### 8.14 CMS
 
 #### `contents`
 

@@ -40,6 +40,15 @@ export class PrismaPaymentRepository implements IPaymentRepository {
     return row ? this.toDomain(row) : null;
   }
 
+  async findByOrderId(orderId: string): Promise<Payment | null> {
+    const row = await this.prisma.payment.findFirst({
+      where: { orderId },
+      orderBy: { createdAt: 'desc' },
+      include: this.defaultInclude(),
+    });
+    return row ? this.toDomain(row) : null;
+  }
+
   async save(payment: Payment): Promise<void> {
     const events = payment.pullDomainEvents();
 
