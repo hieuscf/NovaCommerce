@@ -114,12 +114,20 @@ describe('LoginForm', () => {
 
   it('disables submit and announces loading while signing in', async () => {
     let resolveRequest: (value: Response) => void = () => undefined;
-    global.fetch = vi.fn().mockImplementation(
-      () =>
-        new Promise<Response>((resolve) => {
-          resolveRequest = resolve;
-        }),
-    );
+    let loginStarted = false;
+    global.fetch = vi.fn().mockImplementation((input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.includes('/api/auth/session')) {
+        return Promise.resolve({ ok: true, status: 204 } as Response);
+      }
+      if (loginStarted) {
+        return Promise.resolve({ ok: true, status: 204 } as Response);
+      }
+      loginStarted = true;
+      return new Promise<Response>((resolve) => {
+        resolveRequest = resolve;
+      });
+    });
 
     render(<LoginForm />);
 

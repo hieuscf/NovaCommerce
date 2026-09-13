@@ -57,6 +57,12 @@ describe('createMockAuthClient', () => {
     expect(tokens.accessToken).toContain('mock-access');
   });
 
+  it('rotates a mock refresh token', async () => {
+    const client = createMockAuthClient();
+    const tokens = await client.refresh({ refreshToken: 'mock-refresh-user@novacommerce.dev' });
+    expect(tokens.accessToken).toContain('mock-access-user@novacommerce.dev');
+  });
+
   it('rejects unknown credentials without logging secrets', async () => {
     const client = createMockAuthClient();
     await expect(

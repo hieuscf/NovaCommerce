@@ -15,7 +15,9 @@ function subscribe(listener: () => void): () => void {
 
 async function revokeAndSignOut(): Promise<void> {
   const { authClient } = await import('@/lib/auth/client');
-  await signOutSession((refreshToken) => authClient.logout({ refreshToken }));
+  const { clearPersistedSession } = await import('@/lib/auth/session-persistence');
+  await signOutSession(() => authClient.logout());
+  await clearPersistedSession();
 }
 
 export function useSession(): SessionSnapshot & { signOut: () => Promise<void> } {

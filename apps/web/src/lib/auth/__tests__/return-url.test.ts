@@ -9,6 +9,12 @@ describe('getSafeAuthReturnUrl', () => {
     expect(getSafeAuthReturnUrl(new URLSearchParams('redirect=/account'))).toBe('/account');
     expect(getSafeAuthReturnUrl(new URLSearchParams('returnUrl=https://evil.example'))).toBe('/');
     expect(getSafeAuthReturnUrl(new URLSearchParams('returnUrl=//evil.example'))).toBe('/');
+    expect(getSafeAuthReturnUrl(new URLSearchParams('returnUrl=javascript:alert(1)'))).toBe('/');
+    expect(getSafeAuthReturnUrl(new URLSearchParams('returnUrl=data:text/html,phishing'))).toBe('/');
+    expect(getSafeAuthReturnUrl(new URLSearchParams('returnUrl=/orders?status=pending'))).toBe(
+      '/orders?status=pending',
+    );
+    expect(getSafeAuthReturnUrl(new URLSearchParams('returnUrl=/checkout'))).toBe('/checkout');
   });
 });
 

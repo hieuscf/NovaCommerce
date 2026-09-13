@@ -1,18 +1,22 @@
-import type { AuthenticationResponse, SessionReason, SessionSnapshot } from './types';
+import { resetAuthGuards } from './auth-guards';
+import type { AccessSession, AuthenticationResponse, SessionReason, SessionSnapshot } from './types';
 
 type SessionListener = () => void;
+type SessionRestoreLoader = () => Promise<AccessSession | null>;
 
 export interface AuthSession {
-  getTokens(): AuthenticationResponse | null;
-  setTokens(tokens: AuthenticationResponse): void;
+  getTokens(): AccessSession | null;
+  setTokens(tokens: AccessSession | AuthenticationResponse): void;
   clearTokens(): void;
   isAuthenticated(): boolean;
   getAccessToken(): string | null;
   getSnapshot(): SessionSnapshot;
   subscribe(listener: SessionListener): () => void;
   bootstrap(): void;
+  restore(loader: SessionRestoreLoader): Promise<SessionSnapshot>;
   markExpired(): void;
   signOut(revoke?: (refreshToken: string) => Promise<void>): Promise<void>;
+  resetToLoading(): void;
 }
 
 const LOADING_SNAPSHOT: SessionSnapshot = {
@@ -22,23 +26,31 @@ const LOADING_SNAPSHOT: SessionSnapshot = {
   reason: null,
 };
 
+function toAccessSession(tokens: AccessSession | AuthenticationResponse): AccessSession {
+  return {
+    accessToken: tokens.accessToken,
+    tokenType: tokens.tokenType,
+    expiresIn: tokens.expiresIn,
+  };
+}
+
 /**
- * In-memory session storage.
+ * In-memory access-token store.
  *
- * Tokens stay in application memory only. They are not written to
- * localStorage or sessionStorage. UI consumers must use getSnapshot()
- * or useSession() — never read refresh tokens in components.
+ * Access tokens stay in application memory only. Refresh tokens are persisted
+ * by the Next.js `/api/auth/session` BFF as an httpOnly cookie — never
+ * localStorage / sessionStorage, and never exposed on the session snapshot.
  *
- * Production target: Gateway-issued httpOnly, Secure, SameSite cookies.
- * Until that exists, the first client snapshot is `loading` so protected
- * routes do not flash an unauthenticated state before memory is read.
+ * Production target remains Gateway-issued httpOnly cookies. This BFF is the
+ * current adapter around `POST /auth/refresh`.
  */
 function createMemoryAuthSession(): AuthSession {
-  let tokens: AuthenticationResponse | null = null;
+  let tokens: AccessSession | null = null;
   let resolved = false;
   let signingOut = false;
   let reason: SessionReason | null = null;
   let cachedSnapshot: SessionSnapshot = LOADING_SNAPSHOT;
+  let restoreInFlight: Promise<SessionSnapshot> | null = null;
   const listeners = new Set<SessionListener>();
 
   const notify = () => {
@@ -91,13 +103,14 @@ function createMemoryAuthSession(): AuthSession {
     notify();
   };
 
-  return {
+  const session: AuthSession = {
     getTokens: () => tokens,
     setTokens: (value) => {
-      tokens = value;
+      tokens = toAccessSession(value);
       resolved = true;
       signingOut = false;
       reason = null;
+      resetAuthGuards();
       notify();
     },
     clearTokens: () => {
@@ -108,11 +121,12 @@ function createMemoryAuthSession(): AuthSession {
     getSnapshot: snapshot,
     subscribe: (listener) => {
       listeners.add(listener);
-      if (!resolved) {
+      if (!resolved && !restoreInFlight) {
         queueMicrotask(() => {
           if (!resolved) {
-            resolved = true;
-            notify();
+            void import('./session-persistence').then(({ readPersistedSession }) => {
+              void session.restore(readPersistedSession);
+            });
           }
         });
       }
@@ -126,16 +140,44 @@ function createMemoryAuthSession(): AuthSession {
         notify();
       }
     },
+    restore: (loader) => {
+      if (resolved && tokens) {
+        return Promise.resolve(snapshot());
+      }
+      if (restoreInFlight) {
+        return restoreInFlight;
+      }
+      restoreInFlight = (async () => {
+        try {
+          const restored = await loader();
+          if (restored) {
+            tokens = toAccessSession(restored);
+            resolved = true;
+            signingOut = false;
+            reason = null;
+            resetAuthGuards();
+            notify();
+          } else {
+            settleUnauthenticated(null);
+          }
+        } catch {
+          settleUnauthenticated(null);
+        } finally {
+          restoreInFlight = null;
+        }
+        return snapshot();
+      })();
+      return restoreInFlight;
+    },
     markExpired: () => {
       settleUnauthenticated('session_expired');
     },
     signOut: async (revoke) => {
-      const refreshToken = tokens?.refreshToken;
       signingOut = true;
       notify();
       try {
-        if (refreshToken && revoke) {
-          await revoke(refreshToken);
+        if (revoke) {
+          await revoke('');
         }
       } catch {
         // Local UI state must recover even if Gateway logout is unavailable.
@@ -143,12 +185,23 @@ function createMemoryAuthSession(): AuthSession {
         settleUnauthenticated(null);
       }
     },
+    resetToLoading: () => {
+      tokens = null;
+      resolved = false;
+      signingOut = false;
+      reason = null;
+      restoreInFlight = null;
+      cachedSnapshot = LOADING_SNAPSHOT;
+      notify();
+    },
   };
+
+  return session;
 }
 
 export const authSession = createMemoryAuthSession();
 
-export function signIn(tokens: AuthenticationResponse): void {
+export function signIn(tokens: AccessSession | AuthenticationResponse): void {
   authSession.setTokens(tokens);
 }
 
@@ -168,6 +221,11 @@ export function bootstrapSession(): void {
   authSession.bootstrap();
 }
 
+export async function restoreSession(): Promise<SessionSnapshot> {
+  const { readPersistedSession } = await import('./session-persistence');
+  return authSession.restore(readPersistedSession);
+}
+
 export function markSessionExpired(): void {
   authSession.markExpired();
 }
@@ -175,4 +233,9 @@ export function markSessionExpired(): void {
 /** Test helper — settles the in-memory session to a known unauthenticated state. */
 export function resetAuthSession(): void {
   authSession.clearTokens();
+}
+
+/** Test helper — returns the singleton to an unresolved loading snapshot. */
+export function resetAuthSessionToLoading(): void {
+  authSession.resetToLoading();
 }

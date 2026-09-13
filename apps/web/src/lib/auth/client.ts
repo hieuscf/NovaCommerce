@@ -4,6 +4,7 @@ import type {
   IAuthClient,
   LoginRequest,
   LogoutRequest,
+  RefreshTokenRequest,
   RegisterRequest,
   RegisterResponse,
   ResetPasswordRequest,
@@ -23,6 +24,10 @@ function createGatewayAuthClient(): IAuthClient {
 
     logout(data?: LogoutRequest): Promise<void> {
       return getApiClient().post<void>('/auth/logout', data ?? {});
+    },
+
+    refresh(data: RefreshTokenRequest): Promise<AuthenticationResponse> {
+      return getApiClient().post<AuthenticationResponse>('/auth/refresh', data);
     },
 
     forgotPassword(data: ForgotPasswordRequest): Promise<void> {

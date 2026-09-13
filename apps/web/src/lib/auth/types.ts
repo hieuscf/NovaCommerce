@@ -38,6 +38,21 @@ export interface LogoutRequest {
   refreshToken?: string;
 }
 
+export interface RefreshTokenRequest {
+  refreshToken: string;
+}
+
+export interface AccessSession {
+  readonly accessToken: string;
+  readonly tokenType: 'Bearer';
+  readonly expiresIn: number;
+}
+
+export interface PersistSessionRequest {
+  refreshToken: string;
+  rememberMe?: boolean;
+}
+
 export interface SessionSnapshot {
   readonly status: AuthStatus;
   readonly isAuthenticated: boolean;
@@ -53,6 +68,7 @@ export interface IAuthClient {
   login(credentials: LoginRequest): Promise<AuthenticationResponse>;
   register(data: RegisterRequest): Promise<RegisterResponse>;
   logout(data?: LogoutRequest): Promise<void>;
+  refresh(data: RefreshTokenRequest): Promise<AuthenticationResponse>;
   forgotPassword(data: ForgotPasswordRequest): Promise<void>;
   resetPassword(data: ResetPasswordRequest): Promise<void>;
 }

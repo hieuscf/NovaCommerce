@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isCustomerProtectedPath } from '../route-policy';
+import { isAuthSurfacePath, isCustomerProtectedPath, isProtectedRoute } from '../route-policy';
 
 describe('isCustomerProtectedPath', () => {
   it('protects customer account routes', () => {
@@ -15,5 +15,23 @@ describe('isCustomerProtectedPath', () => {
     expect(isCustomerProtectedPath('/login')).toBe(false);
     expect(isCustomerProtectedPath('/unauthorized')).toBe(false);
     expect(isCustomerProtectedPath('/account-recovery')).toBe(false);
+  });
+});
+
+describe('isProtectedRoute', () => {
+  it('aliases the centralized customer policy', () => {
+    expect(isProtectedRoute('/account')).toBe(true);
+    expect(isProtectedRoute('/orders')).toBe(true);
+    expect(isProtectedRoute('/checkout')).toBe(true);
+    expect(isProtectedRoute('/login')).toBe(false);
+  });
+});
+
+describe('isAuthSurfacePath', () => {
+  it('keeps auth and unauthorized pages out of protected-route redirects', () => {
+    expect(isAuthSurfacePath('/login')).toBe(true);
+    expect(isAuthSurfacePath('/register')).toBe(true);
+    expect(isAuthSurfacePath('/unauthorized')).toBe(true);
+    expect(isAuthSurfacePath('/account')).toBe(false);
   });
 });

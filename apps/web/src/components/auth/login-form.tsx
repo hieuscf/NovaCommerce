@@ -13,6 +13,7 @@ import { Label } from '@novacommerce/ui/components/label';
 import { toAuthFormError } from '@/lib/auth/errors';
 import { buildRegisterHref, getSafeAuthReturnUrl } from '@/lib/auth/return-url';
 import { authClient } from '@/lib/auth/client';
+import { persistSession } from '@/lib/auth/session-persistence';
 import { signIn } from '@/lib/auth/session';
 import type { AuthErrorKind } from '@/lib/auth/types';
 import { loginSchema, type LoginFormData } from '@/lib/validation/auth-schemas';
@@ -56,9 +57,7 @@ export function LoginForm() {
         password: data.password,
       });
 
-      // rememberMe is collected for a future cookie session duration.
-      // Tokens stay in memory only — they are never written to storage.
-      void data.rememberMe;
+      await persistSession(result, { rememberMe: data.rememberMe === true });
       signIn(result);
       setSignedIn(true);
       router.push(returnUrl);

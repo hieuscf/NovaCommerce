@@ -97,6 +97,20 @@ export function createMockAuthClient(): IAuthClient {
       await delay(80);
     },
 
+    async refresh(data: { refreshToken: string }): Promise<AuthenticationResponse> {
+      await delay(80);
+      if (data.refreshToken.startsWith('mock-refresh-')) {
+        const email = data.refreshToken.slice('mock-refresh-'.length) || MOCK_AUTH_FIXTURES.email;
+        return tokensFor(email);
+      }
+      throw new ApiClientError({
+        category: 'authentication',
+        code: 'UNAUTHENTICATED',
+        message: 'Invalid refresh token',
+        status: 401,
+      });
+    },
+
     async forgotPassword(): Promise<void> {
       await delay();
     },

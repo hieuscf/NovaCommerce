@@ -2,7 +2,12 @@ import * as React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { RequireAuth } from '../require-auth';
-import { resetAuthSession, signIn } from '@/lib/auth/session';
+import {
+  markSessionExpired,
+  resetAuthSession,
+  resetAuthSessionToLoading,
+  signIn,
+} from '@/lib/auth/session';
 
 const replaceMock = vi.fn();
 
@@ -15,6 +20,20 @@ describe('RequireAuth', () => {
   beforeEach(() => {
     replaceMock.mockClear();
     resetAuthSession();
+  });
+
+  it('stays on the loading snapshot while the session is still restoring', () => {
+    resetAuthSessionToLoading();
+
+    render(
+      <RequireAuth>
+        <p>Private content</p>
+      </RequireAuth>,
+    );
+
+    expect(screen.getByText(/checking your session/i)).toBeInTheDocument();
+    expect(replaceMock).not.toHaveBeenCalled();
+    expect(screen.queryByText('Private content')).not.toBeInTheDocument();
   });
 
   it('shows a session loading state before redirecting unauthenticated users', async () => {
@@ -50,5 +69,28 @@ describe('RequireAuth', () => {
 
     expect(await screen.findByText('Private content')).toBeInTheDocument();
     expect(replaceMock).not.toHaveBeenCalled();
+  });
+
+  it('redirects expired sessions to login with a session-expired reason', async () => {
+    signIn({
+      accessToken: 'access-token',
+      refreshToken: 'refresh-token',
+      tokenType: 'Bearer',
+      expiresIn: 900,
+    });
+    markSessionExpired();
+
+    render(
+      <RequireAuth>
+        <p>Private content</p>
+      </RequireAuth>,
+    );
+
+    await waitFor(() => {
+      expect(replaceMock).toHaveBeenCalledWith(
+        '/login?returnUrl=%2Faccount&reason=session-expired',
+      );
+    });
+    expect(screen.queryByText('Private content')).not.toBeInTheDocument();
   });
 });
