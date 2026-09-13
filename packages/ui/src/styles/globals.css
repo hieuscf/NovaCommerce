@@ -1,0 +1,529 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ==========================================================================
+   NovaCommerce token layer
+   --------------------------------------------------------------------------
+   Raw token values live here as `--nc-*` custom properties and are mapped
+   into Tailwind namespaces by the `@theme inline` block below. Because the
+   theme maps to `var(--nc-*)`, overriding a value on a scope (e.g. `.dark`)
+   re-themes every utility without touching a single component.
+
+   Keep in sync with `assets/design-tokens.json` (canonical brand tokens).
+   ========================================================================== */
+:root {
+  /* Neutral surfaces & text */
+  --nc-background: #f7f9fc;
+  --nc-background-secondary: #eef3fa;
+  --nc-surface: #ffffff;
+  --nc-surface-subtle: #f8fafd;
+  --nc-foreground: #0b1f3a;
+  --nc-muted: #eef3fa;
+  --nc-muted-foreground: #64748b;
+  --nc-border: #e2e8f0;
+  --nc-input: #e2e8f0;
+  --nc-ring: #4f46e5;
+
+  /* Brand — Figma storefront 1920w light (`brand`, `brand/soft`, `brand/tint`) */
+  --nc-primary: #4f46e5;
+  --nc-primary-strong: #4338ca;
+  --nc-primary-foreground: #ffffff;
+  --nc-primary-soft: #6366f1;
+  --nc-primary-tint: #eef0ff;
+  --nc-secondary: #7c3aed;
+  --nc-secondary-foreground: #ffffff;
+  --nc-accent: #3b82f6;
+  --nc-accent-cyan: #38bdf8;
+  --nc-accent-soft: #e0e7ff;
+  --nc-accent-foreground: #ffffff;
+
+  /* Editorial ink from the homepage frame (Ebony / Fiord) */
+  --nc-ink: #0f172b;
+  --nc-copy: #45556c;
+
+  /* Semantic state.
+   * `*-foreground` → text on a solid fill of that colour.
+   * `*-strong`     → text/icons on a low-opacity tint of that colour, where
+   *                  the base hue would not reach 4.5:1 against a light
+   *                  surface. Used by Badge and Alert.
+   */
+  --nc-success: #10b981;
+  --nc-success-foreground: #ffffff;
+  --nc-success-strong: #047857;
+  --nc-warning: #f59e0b;
+  --nc-warning-foreground: #0b1f3a;
+  --nc-warning-strong: #b45309;
+  --nc-destructive: #ef4444;
+  --nc-destructive-foreground: #ffffff;
+  --nc-destructive-strong: #b91c1c;
+  --nc-info: #3b82f6;
+  --nc-info-foreground: #ffffff;
+  --nc-info-strong: #1d4ed8;
+
+  /* Inverted / dark promotional surfaces */
+  --nc-dark-surface: #0b162a;
+  --nc-dark-surface-secondary: #111d33;
+  --nc-dark-foreground: #f8fafc;
+
+  /* Component surfaces */
+  --nc-card: var(--nc-surface);
+  --nc-card-foreground: var(--nc-foreground);
+  --nc-popover: var(--nc-surface);
+  --nc-popover-foreground: var(--nc-foreground);
+
+  /* Motion — see docs/frontend-design-system.md § Motion */
+  --nc-duration-fast: 150ms;
+  --nc-duration-normal: 250ms;
+  --nc-duration-slow: 400ms;
+}
+
+@theme inline {
+  /* --- Colors -------------------------------------------------------- */
+  --color-background: var(--nc-background);
+  --color-background-secondary: var(--nc-background-secondary);
+  --color-surface: var(--nc-surface);
+  --color-surface-subtle: var(--nc-surface-subtle);
+  --color-foreground: var(--nc-foreground);
+  --color-muted: var(--nc-muted);
+  --color-muted-foreground: var(--nc-muted-foreground);
+  --color-border: var(--nc-border);
+  --color-input: var(--nc-input);
+  --color-ring: var(--nc-ring);
+
+  --color-primary: var(--nc-primary);
+  --color-primary-strong: var(--nc-primary-strong);
+  --color-primary-foreground: var(--nc-primary-foreground);
+  --color-primary-soft: var(--nc-primary-soft);
+  --color-primary-tint: var(--nc-primary-tint);
+  --color-ink: var(--nc-ink);
+  --color-copy: var(--nc-copy);
+  --color-secondary: var(--nc-secondary);
+  --color-secondary-foreground: var(--nc-secondary-foreground);
+  --color-accent: var(--nc-accent);
+  --color-accent-cyan: var(--nc-accent-cyan);
+  --color-accent-soft: var(--nc-accent-soft);
+  --color-accent-foreground: var(--nc-accent-foreground);
+
+  --color-success: var(--nc-success);
+  --color-success-foreground: var(--nc-success-foreground);
+  --color-success-strong: var(--nc-success-strong);
+  --color-warning: var(--nc-warning);
+  --color-warning-foreground: var(--nc-warning-foreground);
+  --color-warning-strong: var(--nc-warning-strong);
+  --color-destructive: var(--nc-destructive);
+  --color-destructive-foreground: var(--nc-destructive-foreground);
+  --color-destructive-strong: var(--nc-destructive-strong);
+  --color-info: var(--nc-info);
+  --color-info-foreground: var(--nc-info-foreground);
+  --color-info-strong: var(--nc-info-strong);
+
+  --color-dark-surface: var(--nc-dark-surface);
+  --color-dark-surface-secondary: var(--nc-dark-surface-secondary);
+  --color-dark-foreground: var(--nc-dark-foreground);
+
+  --color-card: var(--nc-card);
+  --color-card-foreground: var(--nc-card-foreground);
+  --color-popover: var(--nc-popover);
+  --color-popover-foreground: var(--nc-popover-foreground);
+
+  /* --- Radius -------------------------------------------------------- *
+   * xs   → dense controls (checkbox, radio dot)
+   * sm   → nested elements inside a rounded parent
+   * md   → compact buttons, menu items
+   * lg   → dropdown/select surfaces
+   * xl   → buttons, inputs, textareas
+   * 2xl  → cards, dialogs, sheets, tables
+   * pill → badges, tabs, avatars
+   */
+  --radius-xs: 0.375rem;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.5rem;
+  --radius-pill: 9999px;
+
+  /* --- Shadows ------------------------------------------------------- *
+   * sm  → resting surfaces (inputs, flat cards)
+   * md  → raised / hovered cards
+   * lg  → overlays (dialog, sheet, dropdown, toast)
+   * premium → hero & promotional showcase panels
+   */
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.06);
+  --shadow-lg: 0 20px 50px rgba(15, 23, 42, 0.08);
+  --shadow-premium: 0 24px 80px rgba(15, 23, 42, 0.12);
+  --shadow-cta: 0 12px 24px -12px rgba(79, 70, 229, 0.7);
+  --shadow-card-soft: 0 16px 34px -28px rgba(15, 23, 42, 0.45);
+  --shadow-rail: 0 18px 40px -26px rgba(15, 23, 42, 0.35);
+
+  /* --- Layout -------------------------------------------------------- */
+  /* Wide dashboard shell; narrower widths use Tailwind's container scale. */
+  --container-wide: 96rem;
+
+  /* --- Typography ---------------------------------------------------- */
+  --font-sans: var(--font-geist-sans, 'Inter', system-ui, -apple-system, sans-serif);
+  --font-mono: var(--font-geist-mono, 'JetBrains Mono', monospace);
+
+  --text-hero: clamp(2.75rem, 6vw, 4.5rem);
+  --text-hero--line-height: 1.03;
+  --text-hero--letter-spacing: -0.03em;
+  --text-hero--font-weight: 700;
+
+  --text-display: clamp(2.5rem, 5vw, 4rem);
+  --text-display--line-height: 1.06;
+  --text-display--letter-spacing: -0.025em;
+  --text-display--font-weight: 700;
+
+  --text-h1: clamp(2rem, 4vw, 3rem);
+  --text-h1--line-height: 1.1;
+  --text-h1--letter-spacing: -0.02em;
+  --text-h1--font-weight: 700;
+
+  --text-h2: clamp(1.75rem, 3vw, 2.5rem);
+  --text-h2--line-height: 1.15;
+  --text-h2--letter-spacing: -0.02em;
+  --text-h2--font-weight: 700;
+
+  --text-h3: clamp(1.375rem, 2vw, 1.875rem);
+  --text-h3--line-height: 1.25;
+  --text-h3--letter-spacing: -0.015em;
+  --text-h3--font-weight: 600;
+
+  --text-h4: clamp(1.125rem, 1.5vw, 1.5rem);
+  --text-h4--line-height: 1.3;
+  --text-h4--letter-spacing: -0.01em;
+  --text-h4--font-weight: 600;
+
+  --text-body: 1rem;
+  --text-body--line-height: 1.625;
+
+  --text-body-sm: 0.875rem;
+  --text-body-sm--line-height: 1.5715;
+
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1.5;
+
+  --text-label: 0.875rem;
+  --text-label--line-height: 1.25;
+  --text-label--font-weight: 500;
+
+  /* --- Motion -------------------------------------------------------- */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-enter: cubic-bezier(0, 0, 0.2, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+
+  --default-transition-duration: var(--nc-duration-fast);
+  --default-transition-timing-function: var(--ease-standard);
+
+  --animate-fade-in: nc-fade-in var(--nc-duration-normal) var(--ease-enter);
+  --animate-fade-out: nc-fade-out var(--nc-duration-fast) var(--ease-exit);
+  --animate-overlay-in: nc-fade-in var(--nc-duration-normal) var(--ease-enter);
+  --animate-overlay-out: nc-fade-out var(--nc-duration-fast) var(--ease-exit);
+  --animate-dialog-in: nc-dialog-in var(--nc-duration-normal) var(--ease-enter);
+  --animate-dialog-out: nc-dialog-out var(--nc-duration-fast) var(--ease-exit);
+  --animate-popover-in: nc-popover-in var(--nc-duration-fast) var(--ease-enter);
+  --animate-popover-out: nc-popover-out var(--nc-duration-fast) var(--ease-exit);
+  --animate-panel-in: nc-panel-in var(--nc-duration-normal) var(--ease-enter);
+  --animate-panel-out: nc-panel-out var(--nc-duration-fast) var(--ease-exit);
+  --animate-shimmer: nc-shimmer 1.6s var(--ease-standard) infinite;
+}
+
+/* ==========================================================================
+   Keyframes — the only place motion is authored. Components reference the
+   `animate-*` utilities generated from the theme keys above.
+   ========================================================================== */
+@keyframes nc-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes nc-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes nc-dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes nc-dialog-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(0.25rem) scale(0.98);
+  }
+}
+
+@keyframes nc-popover-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes nc-popover-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+}
+
+/*
+ * Directional panel motion (Sheet / drawer). The travel distance is supplied
+ * by the `panel-from-*` utilities so one keyframe pair covers all four sides.
+ */
+@keyframes nc-panel-in {
+  from {
+    opacity: 0;
+    transform: translate3d(var(--nc-panel-x, 0), var(--nc-panel-y, 0), 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes nc-panel-out {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    opacity: 0;
+    transform: translate3d(var(--nc-panel-x, 0), var(--nc-panel-y, 0), 0);
+  }
+}
+
+@keyframes nc-shimmer {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    @apply border-border;
+  }
+
+  html {
+    @apply scroll-smooth antialiased;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply text-foreground tracking-tight;
+  }
+
+  /*
+   * Never ship an invisible focus indicator. Components opt into the branded
+   * ring via `focus-ring`; this guarantees a fallback for anything that does
+   * not, including third-party and native controls.
+   */
+  :focus-visible {
+    outline: 2px solid var(--nc-ring);
+    outline-offset: 2px;
+  }
+}
+
+/* ==========================================================================
+   NovaCommerce utilities
+   ========================================================================== */
+
+/* Brand gradient — reserved for primary CTAs, hero highlights and premium
+   promotional surfaces. See docs/frontend-design-system.md § Gradient system. */
+@utility bg-gradient-hero {
+  background-image: linear-gradient(135deg, var(--nc-primary), var(--nc-secondary));
+}
+
+@utility bg-gradient-cta {
+  background-image: linear-gradient(95deg, var(--nc-primary), var(--nc-primary-soft));
+}
+
+@utility bg-hero-panel {
+  background-image:
+    radial-gradient(700px 340px at 78% 18%, rgb(167 139 250 / 0.28), transparent 68%),
+    radial-gradient(620px 320px at 55% 85%, rgb(129 140 248 / 0.2), transparent 70%),
+    linear-gradient(#dfe7f5 0%, #eef1f8 45%, #f6f8fc 100%);
+}
+
+@utility bg-offer-rail {
+  background-image: linear-gradient(170deg, #f4f7ff 0%, #eaeeff 55%, #e7e5ff 100%);
+}
+
+@utility bg-page-canvas {
+  background-image:
+    radial-gradient(900px 420px at 12% -8%, #e6ecff 0%, transparent 70%),
+    radial-gradient(1100px 520px at 88% -12%, #e9e4ff 0%, transparent 70%),
+    linear-gradient(#f7f9fc 0%, #f3f5fa 100%);
+}
+
+@utility bg-topbar {
+  background-image: linear-gradient(#7f95c4 0%, #8fa3ca 100%);
+  backdrop-filter: blur(6px);
+}
+
+@utility bg-panel-dark {
+  background-image:
+    radial-gradient(520px 360px at 115% 68%, rgb(99 102 241 / 0.55), transparent 62%),
+    radial-gradient(360px 280px at -10% 92%, rgb(139 92 246 / 0.35), transparent 70%),
+    linear-gradient(165deg, #16203c 0%, #0d1530 55%, #131b38 100%);
+}
+
+@utility nova-shot {
+  position: relative;
+  overflow: hidden;
+  background-image: linear-gradient(160deg, #eef2fb 0%, #e4e9f5 100%);
+}
+
+@utility nova-shot-glow {
+  pointer-events: none;
+  background-image: radial-gradient(60% 100% at 50% 0, rgb(99 102 241 / 0.18), transparent 70%);
+}
+
+@utility text-gradient-hero {
+  background-image: linear-gradient(95deg, var(--nc-primary-soft), #8b5cf6);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility bg-login-aside {
+  background-image:
+    radial-gradient(620px 420px at 72% 62%, #c4b5fd73 0%, transparent 70%),
+    radial-gradient(520px 360px at 18% 78%, #93c5fd66 0%, transparent 72%),
+    linear-gradient(#cfe0f6 0%, #dfe9f8 38%, #eef3fb 72%, #f6f9fd 100%);
+}
+
+@utility bg-login-form {
+  background-image: linear-gradient(#fbfcfe 0%, #f5f7fb 100%);
+}
+
+@utility bg-login-cta {
+  background-image: linear-gradient(95deg, #4f46e5 0%, #8b5cf6 100%);
+  box-shadow: 0 16px 30px -16px rgb(79 70 229 / 0.8);
+}
+
+@utility bg-gradient-ambient {
+  background-image: linear-gradient(
+    135deg,
+    color-mix(in oklab, var(--nc-primary) 12%, transparent),
+    color-mix(in oklab, var(--nc-accent-cyan) 8%, transparent),
+    color-mix(in oklab, var(--nc-secondary) 8%, transparent)
+  );
+}
+
+/* Translucent surfaces — navigation, floating panels, hero overlays only.
+   Core data surfaces stay opaque for readability. */
+@utility glass {
+  background-color: color-mix(in srgb, var(--nc-surface) 72%, transparent);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid color-mix(in srgb, var(--nc-surface) 50%, transparent);
+}
+
+@utility glass-dark {
+  background-color: color-mix(in srgb, var(--nc-dark-surface) 75%, transparent);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid color-mix(in srgb, var(--nc-dark-foreground) 8%, transparent);
+}
+
+@utility focus-ring {
+  @apply outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+}
+
+/* Overline / eyebrow label — uppercase tracking makes this a utility rather
+   than a plain font-size token. */
+@utility text-overline {
+  font-size: 0.6875rem;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* Named motion durations so components never hardcode milliseconds. */
+@utility duration-fast {
+  transition-duration: var(--nc-duration-fast);
+}
+
+@utility duration-normal {
+  transition-duration: var(--nc-duration-normal);
+}
+
+@utility duration-slow {
+  transition-duration: var(--nc-duration-slow);
+}
+
+/* Travel distance for `animate-panel-in` / `animate-panel-out`. */
+@utility panel-from-right {
+  --nc-panel-x: 100%;
+  --nc-panel-y: 0;
+}
+
+@utility panel-from-left {
+  --nc-panel-x: -100%;
+  --nc-panel-y: 0;
+}
+
+@utility panel-from-top {
+  --nc-panel-x: 0;
+  --nc-panel-y: -100%;
+}
+
+@utility panel-from-bottom {
+  --nc-panel-x: 0;
+  --nc-panel-y: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

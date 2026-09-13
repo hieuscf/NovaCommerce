@@ -21,11 +21,16 @@
     "db:validate": "pnpm --filter @novacommerce/database run validate",
     "db:test": "pnpm --filter @novacommerce/database run test",
     "build:modules": "pnpm --filter @novacommerce/building-blocks run build && tsc -p modules/tsconfig.json",
-    "typecheck": "pnpm --filter @novacommerce/building-blocks run typecheck && pnpm --filter @novacommerce/infrastructure run typecheck && pnpm --filter @novacommerce/database run typecheck && pnpm --filter @novacommerce/outbox-worker run typecheck && pnpm --filter @novacommerce/gateway run typecheck",
-    "test": "pnpm --filter @novacommerce/building-blocks run test && pnpm --filter @novacommerce/infrastructure run test && pnpm --filter @novacommerce/gateway run test && pnpm --filter @novacommerce/database run test"
+    "typecheck": "pnpm --filter @novacommerce/building-blocks run typecheck && pnpm --filter @novacommerce/infrastructure run typecheck && pnpm --filter @novacommerce/database run typecheck && pnpm --filter @novacommerce/outbox-worker run typecheck && pnpm --filter @novacommerce/gateway run typecheck && pnpm --filter @novacommerce/frontend run typecheck && pnpm --filter @novacommerce/ui run typecheck && pnpm --filter @novacommerce/web run typecheck && pnpm --filter @novacommerce/admin run typecheck",
+    "lint": "pnpm --filter @novacommerce/web run lint && pnpm --filter @novacommerce/admin run lint && pnpm --filter @novacommerce/frontend run lint",
+    "format:check": "prettier --check \"apps/web/src/**/*.{ts,tsx}\" \"apps/admin/src/**/*.{ts,tsx}\" \"packages/frontend/src/**/*.{ts,tsx}\" \"packages/ui/src/**/*.{ts,tsx}\" \"docs/frontend-architecture.md\" \"docs/frontend-design-system.md\"",
+    "test": "pnpm --filter @novacommerce/building-blocks run test && pnpm --filter @novacommerce/infrastructure run test && pnpm --filter @novacommerce/gateway run test && pnpm --filter @novacommerce/database run test && pnpm --filter @novacommerce/frontend run test && pnpm --filter @novacommerce/ui run test && pnpm --filter @novacommerce/web run test && pnpm --filter @novacommerce/admin run test",
+    "test:frontend": "pnpm --filter @novacommerce/frontend run test && pnpm --filter @novacommerce/ui run test && pnpm --filter @novacommerce/web run test && pnpm --filter @novacommerce/admin run test",
+    "test:e2e": "pnpm --filter @novacommerce/e2e run test"
   },
   "packageManager": "pnpm@9.15.4",
   "devDependencies": {
+    "prettier": "^3.5.3",
     "vitest": "3.0.9"
   }
 }

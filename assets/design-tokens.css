@@ -76,6 +76,7 @@
   --primitive-font-weight-medium: 500;
   --primitive-font-weight-semibold: 600;
   --primitive-font-weight-bold: 700;
+  --primitive-font-weight-extrabold: 800;
   --primitive-radius-sm: 0.25rem;
   --primitive-radius-default: 0.5rem;
   --primitive-radius-md: 0.5rem;
@@ -86,19 +87,37 @@
   --primitive-shadow-default: 0 1px 3px rgb(0 0 0 / 0.1);
   --primitive-shadow-md: 0 4px 6px rgb(0 0 0 / 0.1);
   --primitive-shadow-lg: 0 10px 15px rgb(0 0 0 / 0.1);
+  --primitive-shadow-cta: 0 12px 24px -12px rgb(79 70 229 / 0.7);
+  --primitive-shadow-card-soft: 0 16px 34px -28px rgb(15 23 42 / 0.45);
+  --primitive-shadow-rail: 0 18px 40px -26px rgb(15 23 42 / 0.35);
+  --primitive-duration-instant: 100ms;
+  --primitive-duration-fast: 150ms;
+  --primitive-duration-normal: 250ms;
+  --primitive-duration-slow: 400ms;
+  --primitive-easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --primitive-easing-entrance: cubic-bezier(0, 0, 0.2, 1);
+  --primitive-easing-exit: cubic-bezier(0.4, 0, 1, 1);
 }
 
 /* === SEMANTIC === */
 :root {
-  --color-background: #F9FAFB;
-  --color-foreground: #111827;
+  --color-background: #F7F9FC;
+  --color-background-secondary: #EEF3FA;
+  --color-foreground: #0B1F3A;
+  --color-surface: #FFFFFF;
+  --color-surface-subtle: #F8FAFD;
   --color-card: #FFFFFF;
   --color-card-foreground: #111827;
   --color-popover: #FFFFFF;
   --color-popover-foreground: #111827;
-  --color-primary: #2563EB;
-  --color-primary-hover: #1D4ED8;
-  --color-primary-active: #1E40AF;
+  --color-primary: #4F46E5;
+  --color-primary-soft: #6366F1;
+  --color-primary-tint: #EEF0FF;
+  --color-ink: #0F172B;
+  --color-copy: #45556C;
+  --color-primary-strong: #4338CA;
+  --color-primary-hover: #4338CA;
+  --color-primary-active: #3730A3;
   --color-primary-foreground: #FFFFFF;
   --color-primary-light: #60A5FA;
   --color-primary-lighter: #DBEAFE;
@@ -111,19 +130,27 @@
   --color-accent-light: #FDBA74;
   --color-accent-foreground: #FFFFFF;
   --color-muted: #F3F4F6;
-  --color-muted-foreground: #6B7280;
-  --color-border: #E5E7EB;
-  --color-input: #E5E7EB;
-  --color-ring: #2563EB;
+  --color-muted-foreground: #64748B;
+  --color-border: #E2E8F0;
+  --color-dark-surface: #0B162A;
+  --color-dark-surface-secondary: #111D33;
+  --color-dark-foreground: #F8FAFC;
+  --color-accent-cyan: #38BDF8;
+  --color-accent-soft: #E0E7FF;
+  --color-input: #E2E8F0;
+  --color-ring: #4F46E5;
   --color-destructive: #DC2626;
   --color-destructive-foreground: #FFFFFF;
-  --color-success: #22C55E;
+  --color-success: #10B981;
   --color-success-light: #22C55E;
+  --color-success-foreground: #FFFFFF;
   --color-warning: #F59E0B;
+  --color-warning-foreground: #0B1F3A;
   --color-error: #EF4444;
   --color-error-light: #EF4444;
   --color-info: #3B82F6;
   --color-info-light: #C4B5FD;
+  --color-info-foreground: #FFFFFF;
   --spacing-component: 1rem;
   --spacing-section: 1.5rem;
   --spacing-page: 2rem;
@@ -134,32 +161,39 @@
   --radius-card: 0.75rem;
   --radius-input: 0.5rem;
   --radius-modal: 1rem;
+  --motion-duration-hover: 150ms;
+  --motion-duration-control: 150ms;
+  --motion-duration-overlay: 250ms;
+  --motion-duration-premium: 400ms;
+  --motion-easing-default: cubic-bezier(0.4, 0, 0.2, 1);
+  --motion-easing-enter: cubic-bezier(0, 0, 0.2, 1);
+  --motion-easing-exit: cubic-bezier(0.4, 0, 1, 1);
 }
 
 /* === COMPONENTS === */
 :root {
-  --button-primary-bg: #2563EB;
-  --button-primary-bg-hover: #1D4ED8;
+  --button-primary-bg: #4F46E5;
+  --button-primary-bg-hover: #4338CA;
   --button-primary-text: #FFFFFF;
   --button-primary-radius: 0.5rem;
   --button-secondary-bg: transparent;
   --button-secondary-bg-hover: #2563EB1A;
-  --button-secondary-text: #2563EB;
-  --button-secondary-border: #2563EB;
+  --button-secondary-text: #4F46E5;
+  --button-secondary-border: #4F46E5;
   --button-secondary-radius: 0.5rem;
   --button-promo-bg: #F97316;
   --button-promo-bg-hover: #EA580C;
   --button-promo-text: #FFFFFF;
   --button-promo-radius: 0.5rem;
   --card-bg: #FFFFFF;
-  --card-border: #E5E7EB;
+  --card-border: #E2E8F0;
   --card-radius: 0.75rem;
   --card-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
   --card-padding: 1rem;
   --input-bg: #FFFFFF;
-  --input-border: #E5E7EB;
+  --input-border: #E2E8F0;
   --input-radius: 0.5rem;
-  --input-focus-ring: #2563EB;
+  --input-focus-ring: #4F46E5;
 }
 
 /* === DARK MODE === */
