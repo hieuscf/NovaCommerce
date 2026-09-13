@@ -1,0 +1,4 @@
+@import "@novacommerce/ui/globals.css";
+
+@source "../../../packages/ui/src/**/*.{ts,tsx}";
+@source "../**/*.{ts,tsx}";
