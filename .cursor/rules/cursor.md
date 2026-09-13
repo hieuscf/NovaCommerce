@@ -45,7 +45,7 @@ Start from `docs/README.md` — it is the index for all docs and the task-based 
 | Database / Prisma / migration | + `docs/domain-model.md`, `docs/database-design.md` |
 | REST API / controller / DTO | + `docs/api-guidelines.md`, `docs/domain-model.md` |
 | Domain event / outbox / worker | + `docs/event-catalog.md`, `docs/database-design.md` |
-| Frontend UI | + `docs/api-guidelines.md`, `docs/brand-guidelines.md` |
+| Frontend UI | + `docs/frontend-architecture.md`, `docs/api-guidelines.md`, `docs/brand-guidelines.md` |
 | AI service (Python) | + `docs/NovaCommerce Architecture.md` (AI section), `docs/api-guidelines.md` |
 | Docker / infra | + `docs/docker.md`, `docs/techContext.md` |
 

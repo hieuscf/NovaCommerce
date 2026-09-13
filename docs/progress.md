@@ -12,7 +12,7 @@ Status
 
 Last Updated
 
-2026-09-12
+2026-09-13
 
 ---
 
@@ -35,9 +35,9 @@ Last Updated
 | Database Design      | ✅ Complete   |     100% | `docs/database-design.md` v1.0.0 — synced with Prisma + PostgreSQL (46 tables) |
 | API Design           | ✅ Complete   |     100% | `docs/api-guidelines.md` synchronized with Gateway infrastructure |
 | Backend              | 🚧 In Progress |      65% | Gateway `/api/v1` + Core Commerce Flow (Identity → Order → Inventory events) |
-| Frontend             | 🚧 In Progress |       5% | Next.js web/admin placeholder pages |
+| Frontend             | 🚧 In Progress |      62% | Architecture foundation + `@novacommerce/frontend` client; homepage + `/login` aligned to Alloy storefront; shop/auth; admin shell |
 | AI Platform          | 🚧 In Progress |       5% | FastAPI health endpoint stub |
-| Testing              | 🚧 In Progress |      35% | Database + Event System + Infrastructure + Gateway + module handler tests; no CI yet |
+| Testing              | 🚧 In Progress |      40% | Backend Vitest + web/admin frontend tests + Playwright smoke foundation; no CI yet |
 | Deployment           | 🚧 Partial    |      50% | Docker Compose + app-level health/readiness + typed env validation |
 
 ---
@@ -69,6 +69,10 @@ Last Updated
 - [x] Agent instructions (`.cursor/cursorcustominstructions.md`)
 - [x] PR template (`.github/PULL_REQUEST_TEMPLATE.md`)
 - [x] Design tokens (`assets/design-tokens.json`, `assets/design-tokens.css`)
+- [x] `design-system.md` (Web UI v1 — tokens, components, Three.js strategy)
+- [x] `frontend-auth.md` (Web auth UI — routes, API boundary, session strategy)
+- [x] `frontend-architecture.md` (Web/Admin foundation)
+- [x] ADR-005 Frontend Architecture Foundation
 
 ## Planned
 
@@ -92,8 +96,10 @@ Last Updated
 | ---- | ------ | -------- |
 | pnpm monorepo | ✅ | `package.json`, `pnpm-workspace.yaml` |
 | API Gateway (NestJS) | ✅ | `apps/gateway` — `/health`, `/ready`, `/api/v1`, OpenAPI |
-| Web Store (Next.js) | 🚧 | `apps/web` — placeholder page |
-| Admin (Next.js) | 🚧 | `apps/admin` — placeholder page |
+| Web Store (Next.js) | 🚧 | `apps/web` — homepage, Alloy `/login` + `/register` shell, shop, customer auth UI (login/register/logout/401/403), API client, error boundaries, Vitest |
+| Admin (Next.js) | 🚧 | `apps/admin` — admin shell, isolated session/API client, error boundaries, Vitest |
+| UI Design System | 🚧 | `packages/ui` — tokens, shadcn primitives, EmptyState, ErrorState |
+| Frontend kit | ✅ | `packages/frontend` — HTTP, errors, env, request IDs |
 | Building blocks | ✅ | `packages/building-blocks` — DDD abstractions + Event System contracts |
 | Database package (Prisma) | ✅ | `packages/database` — 46 business models + OutboxMessage; migration `20250907000000_init` |
 | Domain modules | 🚧 | `modules/` — domain layer in 13/16 contexts (154 TS files) |

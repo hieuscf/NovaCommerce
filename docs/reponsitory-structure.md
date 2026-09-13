@@ -53,8 +53,10 @@ novacommerce/
 │
 ├── packages/
 │   ├── building-blocks/
-│   ├── shared/
-│   └── database/
+│   ├── database/
+│   ├── infrastructure/
+│   ├── frontend/
+│   └── ui/
 │
 ├── workers/
 │   └── outbox-publisher/
@@ -211,22 +213,23 @@ Outbox
 
 Không chứa business logic cụ thể của Commerce.
 
-### `packages/shared`
+### `packages/ui`
 
-Các thành phần cross-cutting:
+Shared design system for Web and Admin: tokens, Tailwind theme, shadcn primitives.
 
-```text
-Validation
-Pagination
-Logger
-Guards
-Security
-Caching
-Common Types
-Utilities
-```
+Không chứa business logic, API clients, hoặc backend types.
 
-Không biến `shared` thành nơi chứa business logic dùng chung.
+### `packages/frontend`
+
+Shared frontend infrastructure: HTTP transport, API error model, public env validation, request IDs, safe redirect.
+
+Không chứa catalog/order/identity/admin workflows.
+
+### `packages/infrastructure`
+
+Backend infrastructure adapters (Redis, OpenSearch, MinIO, env validation).
+
+Không biến các package dùng chung thành nơi chứa business logic.
 
 ### `packages/database`
 
@@ -315,6 +318,7 @@ docs/
 ├── api-guidelines.md
 ├── repository-structure.md
 ├── coding-standards.md
+├── frontend-architecture.md
 ├── testing-strategy.md
 ├── security.md
 ├── deployment.md

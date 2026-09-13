@@ -5,7 +5,7 @@
 > **Architecture:** Modular Monolith → Event-Driven → Microservices
 > **Primary Language:** TypeScript
 > **AI Platform:** Python
-> **Last Updated:** 2026-09-09
+> **Last Updated:** 2026-09-13
 > **Phase:** Foundation — design docs ~80%, code ~10%
 
 ---
@@ -21,9 +21,9 @@
 | Database (Prisma) | ✅ | 🚧 | 46 business tables + Outbox; schema synced with PostgreSQL |
 | Event system | ✅ | 🚧 | Outbox + `InMemoryEventBus` + P0 schemas; module handlers not wired yet |
 | API (Gateway) | ✅ | 🚧 | `/api/v1` + OpenAPI + auth wiring; business endpoints pending |
-| Frontend | — | 🚧 | Next.js placeholder pages (web, admin) |
+| Frontend | ✅ | 🚧 | Architecture foundation; `@novacommerce/frontend`; web homepage + shop + auth; admin shell |
 | AI services | 🚧 | 🚧 | FastAPI `/health` stub |
-| Tests | — | ⏳ | No app tests |
+| Tests | ✅ | 🚧 | Backend + frontend Vitest; Playwright smoke foundation |
 | CI/CD | — | ⏳ | No GitHub Actions workflows |
 
 **Key gaps:** Module Infrastructure repositories (Prisma), In-Memory EventBus implementation, test/CI infrastructure, foundation design doc sign-off.
@@ -155,6 +155,22 @@
 - [x] Integrate MinIO in application code (`MinioStorageService` → `IObjectStorage`, bucket init on startup)
 - [x] Configure application-level health checks (`/health`, `/health/live`, `/ready`, `/health/ready` with DB/Redis/OpenSearch/MinIO probes)
 - [x] Configure environment validation (`validateAppConfig` fail-fast typed config)
+
+## 2.9 Frontend Foundation
+
+- [x] Define frontend architecture (`docs/frontend-architecture.md`, ADR-005)
+- [x] Define Web/Admin application boundaries
+- [x] Define frontend folder structure
+- [x] Define routing strategy (App Router + `(store)` / `(auth)` / `(console)`)
+- [x] Define API client architecture (`@novacommerce/frontend`)
+- [x] Define authentication/session strategy (in-memory until httpOnly cookies)
+- [x] Define frontend error handling (`ApiClientError` + route `error.tsx`)
+- [x] Define loading and empty states
+- [x] Define frontend validation strategy (Zod + React Hook Form)
+- [x] Configure environment variables (`validatePublicEnv`)
+- [x] Configure TypeScript strict mode
+- [x] Configure ESLint/Prettier
+- [x] Configure frontend testing (Vitest + Playwright smoke)
 
 ---
 

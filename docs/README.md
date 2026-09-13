@@ -67,6 +67,9 @@ Tài liệu chính thức của NovaCommerce. AI agents và developers **phải 
 |----------|-------------|
 | [docker.md](./docker.md) | Docker Compose, build, run, troubleshoot |
 | [brand-guidelines.md](./brand-guidelines.md) | Colors, typography, voice, design components |
+| [design-system.md](./design-system.md) | Web UI tokens, components, Three.js strategy, accessibility |
+| [frontend-architecture.md](./frontend-architecture.md) | Web/Admin boundaries, API client, session, errors, testing |
+| [frontend-auth.md](./frontend-auth.md) | Customer auth UI — routes, API boundary, session/token strategy |
 
 ### Architecture Decision Records (ADRs)
 
@@ -76,6 +79,7 @@ Tài liệu chính thức của NovaCommerce. AI agents và developers **phải 
 | [ADR-002](./architecture/adrs/Use%20In-Memory%20Event%20Bus%20with%20Outbox%20Pattern.md) | In-Memory Event Bus + Outbox Pattern |
 | [ADR-003](./architecture/adrs/Use%20Prisma%20ORM%20with%20PostgreSQL.md) | Prisma ORM + PostgreSQL |
 | [ADR-004](./architecture/adrs/Separate%20AI%20Services%20into%20Python%20Microservices.md) | Python AI Microservices |
+| [ADR-005](./architecture/adrs/Establish%20Frontend%20Architecture%20Foundation.md) | Frontend architecture foundation |
 
 ---
 
@@ -91,7 +95,7 @@ Tài liệu chính thức của NovaCommerce. AI agents và developers **phải 
 | **Database / Prisma / migration** | + `domain-model.md`, `database-design.md` | ADR-003 |
 | **REST API / controller / DTO** | + `api-guidelines.md`, `domain-model.md` | `event-catalog.md` |
 | **Domain event / outbox / worker** | + `event-catalog.md`, `database-design.md` | ADR-002 |
-| **Frontend UI (web/admin)** | + `api-guidelines.md`, `brand-guidelines.md` | `assets/design-tokens.css` |
+| **Frontend UI (web/admin)** | + `frontend-architecture.md`, `api-guidelines.md`, `brand-guidelines.md`, `design-system.md` | `frontend-auth.md`, `assets/design-tokens.css`, `packages/ui` |
 | **AI service (Python)** | + `NovaCommerce Architecture.md` § AI, `api-guidelines.md` | ADR-004 |
 | **Docker / infra / deploy** | + `docker.md`, `techContext.md` | `reponsitory-structure.md` |
 | **Cross-module integration** | + `domain-model.md`, `event-catalog.md`, `NovaCommerce Architecture.md` | ADR-002 |
@@ -117,7 +121,6 @@ Tài liệu chính thức của NovaCommerce. AI agents và developers **phải 
 Chưa có — sẽ bổ sung trong các sprint tiếp theo:
 
 - `testing-strategy.md`
-- `security.md`
 - `deployment.md`
 - `monitoring.md`
 - `local-development.md`

@@ -134,18 +134,30 @@ docker compose up -d                               # full stack
 
 See [docker.md](./docker.md) for full Docker workflow.
 
+### Lint, format, and tests
+
+```bash
+pnpm lint
+pnpm format:check
+pnpm test
+pnpm test:frontend
+pnpm --filter @novacommerce/web run typecheck
+pnpm --filter @novacommerce/admin run typecheck
+```
+
+E2E smoke tests (Playwright; requires local browsers):
+
+```bash
+pnpm test:e2e
+```
+
 ### Not available yet
 
-The following are **planned** but not configured at repository root:
-
 ```text
-pnpm lint          ← no root lint script
-pnpm test          ← no test runner configured
-pnpm typecheck     ← use pnpm build instead
 GitHub Actions CI  ← no .github/workflows/
 ```
 
-Document manual verification in your PR until CI and test infrastructure exist.
+Document manual verification in your PR until CI exists.
 
 ---
 
@@ -161,6 +173,7 @@ Update documentation when your change affects:
 | Events | `event-catalog.md` |
 | API | `api-guidelines.md`, Swagger/OpenAPI |
 | Repository layout | `reponsitory-structure.md` |
+| Frontend architecture | `frontend-architecture.md` |
 | Progress / status | `progress.md` |
 
 Significant design decisions require an ADR in `docs/architecture/adrs/`.

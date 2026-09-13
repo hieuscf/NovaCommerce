@@ -390,7 +390,7 @@ Never commit `.env`, credentials, API keys, or tokens. Use `.env.example` for do
 
 **Coverage target:** ≥ 80% overall; critical domain logic near 100%.
 
-> **Current status:** No root test runner or CI test pipeline exists yet. These are requirements for new features — see [contributing.md](./contributing.md) for verification steps available today.
+> **Current status:** Vitest covers backend packages and frontend unit/component tests. Playwright smoke tests live in `tests/e2e`. GitHub Actions CI is not configured yet.
 
 Every new public API and domain feature must include unit and integration tests once test infrastructure is in place.
 
@@ -422,6 +422,16 @@ Allowed: Result, DomainError, BaseEntity, AggregateRoot, ValueObject, DomainEven
 ### `@novacommerce/database`
 
 Prisma schema and client. Modules must not use this package to query another module's tables.
+
+### `@novacommerce/ui`
+
+Visual primitives and tokens for `apps/web` and `apps/admin`. No business logic.
+
+### `@novacommerce/frontend`
+
+HTTP client, API error normalization, public env validation, and safe-redirect helpers. No commerce or admin workflows.
+
+See [frontend-architecture.md](./frontend-architecture.md).
 
 ---
 
