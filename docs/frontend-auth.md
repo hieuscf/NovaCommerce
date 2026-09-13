@@ -1,7 +1,7 @@
 # NovaCommerce Frontend Authentication
 
-> Version: 1.1  
-> Last updated: 2026-09-13  
+> Version: 1.2  
+> Last updated: 2026-09-14  
 > Status: Active — Web customer auth UI
 
 ## Scope
@@ -16,16 +16,19 @@ Admin authentication is a separate concern in `apps/admin` and must not reuse th
 |------|--------|
 | Login / register / forgot / reset / verify UI | Implemented |
 | Auth state model (`loading` → authenticated / unauthenticated) | Implemented |
-| Logout UI + Gateway logout integration point | Implemented |
-| Protected-route UX (`RequireAuth`) | Implemented |
-| 401 session-expired vs 403 unauthorized | Implemented |
+| Logout UI + Gateway logout | Implemented |
+| Protected-route UX (`RequireAuth` + centralized policy) | Implemented |
+| Global 401 session-expired handling | Implemented |
+| Global 403 → `/unauthorized` | Implemented |
+| Session restore after reload (Next.js httpOnly refresh cookie + `POST /auth/refresh`) | Implemented |
 | Categorized auth error UI | Implemented |
 | Development mock adapter | Implemented (opt-in, never production) |
-| Gateway `httpOnly` cookie sessions | Pending |
-| Token refresh / silent renew | Pending |
+| Gateway-issued `httpOnly` cookie sessions | Pending — Web BFF is the current adapter |
+| Silent refresh retry of the original request (once) | Implemented via `POST /auth/refresh` |
 | OAuth / social sign-in | Pending (button disabled) |
+| Remember Me backend field | Not in Identity login DTO — cookie lifetime only |
 | Register profile fields (name, terms, marketing) | Collected in UI only — not sent yet |
-| Full account dashboard (profile, addresses, orders) | Pending |
+| Full account dashboard (profile, addresses, orders) | Pending — `/account` currently shows `AccountSessionCard` |
 
 Frontend route guards are **UX only**. Gateway / Identity authorization remains authoritative.
 
@@ -34,11 +37,11 @@ Frontend route guards are **UX only**. Gateway / Identity authorization remains 
 ```text
 UI (AuthCard, forms, AccountMenu)
   ↓
-useSession() / RequireAuth
+SessionBootstrap / useSession() / RequireAuth
   ↓
-AuthSession (in-memory snapshot, no refresh token in UI)
+AuthSession (in-memory access token only)
   ↓
-IAuthClient
+IAuthClient + /api/auth/session BFF
   ├── GatewayAuthClient   (default)
   └── MockAuthClient      (development only)
   ↓
@@ -49,7 +52,119 @@ API Gateway /api/v1
 Identity module
 ```
 
-Do not call `fetch` from form components. Do not read refresh tokens in UI.
+Do not call `fetch` from form components except through `IAuthClient` or the session BFF helper. Do not read refresh tokens in UI.
+
+## Authentication state lifecycle
+
+```text
+App
+ ↓
+SessionBootstrap
+ ↓
+status: loading
+ ↓
+GET /api/auth/session
+ ├── valid refresh cookie → POST Gateway /auth/refresh → authenticated
+ └── missing / invalid cookie → unauthenticated
+```
+
+Expected after a signed-in reload:
+
+```text
+Authenticated
+    ↓
+F5
+    ↓
+loading
+    ↓
+restore session
+    ↓
+authenticated
+```
+
+SSR / first paint always uses a `loading` snapshot so the header and `RequireAuth` do not flash “signed out”.
+
+## Session restoration
+
+`restoreSession()` is the single bootstrap entry. React components must not call Gateway auth endpoints to decide session state.
+
+| Question | Answer |
+|----------|--------|
+| Where is the access token stored? | In-memory `authSession` only |
+| Where is the refresh token stored? | httpOnly `nc_refresh` cookie set by `apps/web` `/api/auth/session` |
+| How is the session restored? | BFF reads the cookie and calls existing `POST /api/v1/auth/refresh` |
+| What happens after F5? | Loading → restore → authenticated if the refresh session is valid |
+| What happens after browser restart? | Restored only when Remember Me set a persistent cookie. Session cookies die with the browser. |
+| What happens when the access token expires? | Next Gateway 401 triggers one refresh, then retries the original request once |
+| What happens when API returns 401 after refresh fails? | `markSessionExpired()` → `/login?reason=session-expired` |
+| What happens when API returns 403? | Redirect `/unauthorized`. Session stays authenticated |
+
+Refresh tokens are never written to `localStorage` or `sessionStorage`.
+
+## 401 behavior
+
+```text
+API 401
+ ↓
+ignore login/register/refresh/logout/forgot/reset
+ ↓
+if never authenticated → throw (no session-expired UX)
+ ↓
+if authenticated → single-flight POST /auth/refresh via BFF
+ ├── success → retry original request once
+ └── failure → clear session → /login?reason=session-expired
+```
+
+Concurrent 401s share one refresh / one expiry navigation. Mutations are not retried unless that single refresh succeeds.
+
+## 403 behavior
+
+```text
+API 403
+ ↓
+/unauthorized
+```
+
+Do not logout, do not clear a valid session, do not convert 403 into 401, do not redirect to `/login`.
+
+## Protected route policy
+
+Centralized in `apps/web/src/lib/auth/route-policy.ts`:
+
+```ts
+isProtectedRoute(pathname) // alias of isCustomerProtectedPath
+```
+
+Customer protected prefixes (UX): `/account`, `/orders`, `/checkout`.
+
+`ProtectedRoutes` in the store layout wraps any matching path with `RequireAuth`. `/account` also keeps its existing `RequireAuth` boundary. `/orders` and `/checkout` are guarded as soon as those pages exist.
+
+Unauthenticated visit:
+
+```text
+status: loading
+  → resolved unauthenticated
+  → /login?returnUrl=<sanitized-path>&reason=session-required
+```
+
+Session expired visit:
+
+```text
+→ /login?returnUrl=<sanitized-path>&reason=session-expired
+```
+
+`/login`, `/register`, and `/unauthorized` are not protected and must not auth-redirect-loop.
+
+## Return URL security
+
+`returnUrl` / `redirect` are sanitized by `sanitizeRedirect` (`@novacommerce/frontend`). Only same-origin relative paths are accepted. Rejected:
+
+- `https://evil.com`
+- `//evil.com`
+- `javascript:`
+- `data:`
+
+Invalid values fall back to `/` (existing UX).
 
 ## Routes
 
@@ -61,21 +176,9 @@ Do not call `fetch` from form components. Do not read refresh tokens in UI.
 | `/reset-password?token=...` | Set a new password |
 | `/verify-email?status=...` | Verification status (architecture-ready) |
 | `/unauthorized` | 403 access-restricted |
-| `/account` | Session surface + sign out (protected). Not the full account dashboard. |
+| `/account` | Protected account card + sign out. Not `/account/*` routes. |
 
 Auth and account routes are `noindex,nofollow`.
-
-Customer protected prefixes (UX): `/account`, `/orders`, `/checkout`.
-
-Unauthenticated visit to a protected route:
-
-```text
-status: loading
-  → resolved unauthenticated
-  → /login?returnUrl=<sanitized-path>&reason=session-required
-```
-
-`returnUrl` / `redirect` are sanitized to same-origin relative paths. Open redirects are rejected.
 
 ## Auth state model
 
@@ -84,14 +187,10 @@ status: loading
 | Field | Values |
 |-------|--------|
 | `status` | `unknown` \| `loading` \| `authenticated` \| `unauthenticated` \| `error` |
-| `isAuthenticated` | derived from settled tokens |
+| `isAuthenticated` | derived from a settled access session |
 | `isSigningOut` | logout in progress |
 | `reason` | `session_expired` \| `null` |
-| `signOut()` | revoke via Gateway when possible, always clear local UI state |
-
-SSR / first paint uses a `loading` snapshot so the header and `RequireAuth` do not flash “signed out” before memory is read.
-
-In-memory tokens do **not** survive a full page reload. After reload the session settles to `unauthenticated` until Gateway cookie sessions exist.
+| `signOut()` | revoke via Gateway when possible, always clear local UI state and the refresh cookie |
 
 ## API boundary
 
@@ -102,25 +201,43 @@ Default client: `apps/web/src/lib/auth/client.ts` → `POST /api/v1/auth/*`.
 | POST | `/auth/login` | Login form |
 | POST | `/auth/register` | Register form |
 | POST | `/auth/logout` | Header / account sign out |
+| POST | `/auth/refresh` | Session BFF restore + 401 recovery |
 | POST | `/auth/forgot-password` | Forgot password form |
 | POST | `/auth/reset-password` | Reset password form |
-| POST | `/auth/refresh` | Not wired — extension point only |
+
+Same-origin BFF (not a new Identity contract):
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| POST | `/api/auth/session` | Persist refresh cookie after login |
+| GET | `/api/auth/session` | Restore access session |
+| DELETE | `/api/auth/session` | Clear refresh cookie |
 
 Current Identity login/register contracts accept **email + password only**.
 
 Register does not return tokens. The UI redirects to `/login?registered=true` and does not auto-login.
 
-Logout: UI sends the in-memory refresh token when present. If Gateway logout fails, local session is still cleared so the user is never stuck signed-in in the UI.
+Logout: UI calls Gateway logout with the access token. If Gateway logout fails, local session and the refresh cookie are still cleared.
 
-## Session / token storage
+## Token storage
 
-`apps/web/src/lib/auth/session.ts` is the only token store.
+`apps/web/src/lib/auth/session.ts` is the only access-token store.
 
-- Not `localStorage` / `sessionStorage`
+- Access token: in-memory
+- Refresh token: httpOnly, `Secure` in production, `SameSite=Lax`, path `/`
 - UI must not log access tokens, refresh tokens, or passwords
-- Production target: Gateway `httpOnly`, `Secure`, `SameSite` cookies
+- Production target remains Gateway-issued cookies; the Web BFF is the adapter until then
 
-`Remember me` is collected for a future cookie lifetime. It does not persist tokens in the browser today.
+## Remember Me
+
+Identity `LoginRequestDto` has no `rememberMe` field. The checkbox is **not** sent to Gateway.
+
+| Remember Me | Cookie lifetime |
+|-------------|-----------------|
+| Off | Browser session cookie (survives F5, not browser restart) |
+| On | `Max-Age` = 7 days, matching `JWT_REFRESH_TOKEN_TTL` default |
+
+Backend refresh-session TTL is still authoritative. Remember Me never uses `localStorage`.
 
 ## Development mock
 
@@ -134,6 +251,8 @@ Documented fixtures (not production credentials):
 | `locked@novacommerce.dev` | any | Account unavailable |
 | `limited@novacommerce.dev` | any | Rate limited |
 | `existing@novacommerce.dev` | register | Conflict |
+
+Non-production BFF restore also accepts refresh tokens prefixed `mock-refresh-` so Playwright can follow the real cookie flow without a live Gateway.
 
 ## Forms & validation
 
@@ -161,18 +280,9 @@ Documented fixtures (not production credentials):
 | `AuthSuccessMessage` | Success Alert |
 | `SessionExpiredState` | 401 / expired session |
 | `UnauthorizedState` | 403 |
-| `AccountSessionCard` | Authenticated session surface |
+| `AccountSessionCard` | Protected account surface + sign out |
 
 Navigation: `AccountMenu` in `SiteHeader` (desktop) and sheet actions (mobile).
-
-## 401 vs 403
-
-| HTTP / situation | UX |
-|------------------|----|
-| 401 / session required / expired | Sign in again. `/login?reason=session-expired` or `SessionExpiredState` |
-| 403 / no permission | `/unauthorized` — Back / Home / Account. No role IDs or permission keys |
-
-Do not show “You are not authorized” for every failure.
 
 ## Accessibility
 
@@ -188,9 +298,10 @@ Do not show “You are not authorized” for every failure.
 
 ```bash
 pnpm --filter @novacommerce/web test
+pnpm --filter @novacommerce/frontend test
 ```
 
-Covered: login/register validation and loading, password toggle, session status, sanitized return URLs, RequireAuth redirect, unauthorized actions, mock adapter isolation.
+Covered: login/register validation and loading, password toggle, session restore, sanitized return URLs, RequireAuth / protected-route policy, 401 single-flight expiry, 403 unauthorized redirect, mock adapter isolation.
 
 ## Related documents
 
@@ -198,3 +309,4 @@ Covered: login/register validation and loading, password toggle, session status,
 - [design-system.md](./design-system.md)
 - [brand-guidelines.md](./brand-guidelines.md)
 - [api-guidelines.md](./api-guidelines.md)
+- [security.md](./security.md)

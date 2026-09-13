@@ -220,9 +220,11 @@ Browser
   → Identity module
 ```
 
-**Current storage:** in-memory only. Tokens are not written to `localStorage` or `sessionStorage`. The UI snapshot starts as `loading`, then settles to `authenticated` or `unauthenticated` to avoid signed-out flicker.
+**Current storage:** access token in memory; refresh token in a same-origin httpOnly cookie set by the Web BFF (`/api/auth/session`). Tokens are not written to `localStorage` or `sessionStorage`. The UI snapshot starts as `loading`, then `restoreSession()` settles to `authenticated` or `unauthenticated` so reload does not flash “signed out”.
 
-**Production target:** Gateway-issued `httpOnly`, `Secure`, `SameSite` cookies. Until that exists, in-memory storage avoids accidental XSS token theft at the cost of losing session on reload.
+**Production target:** Gateway-issued `httpOnly`, `Secure`, `SameSite` cookies. Until Gateway sets cookies, the Web BFF persists the existing `POST /auth/refresh` token as an httpOnly cookie.
+
+`createApiClient` optional hooks: `onUnauthorized` (401 refresh / expire) and `onForbidden` (403 → `/unauthorized`). Apps own navigation; the transport does not.
 
 UI rules:
 
@@ -366,7 +368,7 @@ pnpm test:e2e
 
 Tests must not call production services. Mock `fetch` or run against local Gateway. Coverage reporting is enabled; project-wide ≥80% remains the platform target and is enforced first on `@novacommerce/frontend` (the new logic-heavy package). Do not exclude files merely to inflate coverage.
 
-E2E currently covers home, login reachability, and admin dashboard smoke. Broader journeys wait for those features.
+E2E currently covers home, login/register/unauthorized reachability, unauthenticated `/account` redirect, session restore after reload, logout, and admin dashboard smoke.
 
 ---
 
@@ -463,7 +465,7 @@ Target WCAG 2.2 AA: semantic HTML, keyboard access, visible focus, labeled forms
 
 ## SEO boundary
 
-Web: title template, descriptions, Open Graph on the root layout. Auth routes `noindex`. Future account routes must stay unindexed.
+Web: title template, descriptions, Open Graph on the root layout. Auth and account routes `noindex`. Nested `/account/*` routes stay reserved and unindexed.
 
 Admin: entire app `noindex, nofollow`.
 

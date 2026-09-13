@@ -21,7 +21,7 @@
 | Database (Prisma) | ✅ | 🚧 | 46 business tables + Outbox; schema synced with PostgreSQL |
 | Event system | ✅ | 🚧 | Outbox + `InMemoryEventBus` + P0 schemas; module handlers not wired yet |
 | API (Gateway) | ✅ | 🚧 | `/api/v1` + OpenAPI + auth wiring; business endpoints pending |
-| Frontend | ✅ | 🚧 | Architecture foundation; `@novacommerce/frontend`; web homepage + shop + auth; admin shell |
+| Frontend | ✅ | 🚧 | Architecture foundation; `@novacommerce/frontend`; web homepage + shop + auth + Alloy account; admin shell |
 | AI services | 🚧 | 🚧 | FastAPI `/health` stub |
 | Tests | ✅ | 🚧 | Backend + frontend Vitest; Playwright smoke foundation |
 | CI/CD | — | ⏳ | No GitHub Actions workflows |
@@ -163,7 +163,7 @@
 - [x] Define frontend folder structure
 - [x] Define routing strategy (App Router + `(store)` / `(auth)` / `(console)`)
 - [x] Define API client architecture (`@novacommerce/frontend`)
-- [x] Define authentication/session strategy (in-memory until httpOnly cookies)
+- [x] Define authentication/session strategy (in-memory access token + Web BFF httpOnly refresh cookie until Gateway cookies)
 - [x] Define frontend error handling (`ApiClientError` + route `error.tsx`)
 - [x] Define loading and empty states
 - [x] Define frontend validation strategy (Zod + React Hook Form)
