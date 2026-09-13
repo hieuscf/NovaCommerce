@@ -99,7 +99,22 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
       } catch {
         parsed = undefined;
       }
-      throw normalizeApiError(parsed, response.status);
+      const error = normalizeApiError(parsed, response.status);
+      const retried = options.authRetried === true;
+      const handlerContext = { method, path, retried };
+
+      if (error.status === 401 && config.onUnauthorized) {
+        const recovery = await config.onUnauthorized(error, handlerContext);
+        if (recovery === 'retry' && !retried) {
+          return request<T>(method, path, body, { ...options, authRetried: true });
+        }
+      }
+
+      if (error.status === 403) {
+        config.onForbidden?.(error, handlerContext);
+      }
+
+      throw error;
     }
 
     if (response.status === 204) {

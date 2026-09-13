@@ -116,4 +116,69 @@ describe('createApiClient', () => {
       code: 'NETWORK_ERROR',
     });
   });
+
+  it('retries a request once when onUnauthorized returns retry', async () => {
+    const fetchImpl = vi
+      .fn()
+      .mockResolvedValueOnce(
+        jsonResponse(
+          { error: { code: 'UNAUTHENTICATED', message: 'Expired', requestId: 'req-3' } },
+          { ok: false, status: 401 },
+        ),
+      )
+      .mockResolvedValueOnce(jsonResponse({ data: { ok: true }, meta: { requestId: 'req-4' } }));
+    const onUnauthorized = vi.fn().mockResolvedValue('retry');
+
+    const client = createApiClient({
+      baseUrl: 'http://localhost:3000',
+      fetchImpl: fetchImpl as unknown as typeof fetch,
+      onUnauthorized,
+    });
+
+    await expect(client.get('/orders')).resolves.toEqual({ ok: true });
+    expect(fetchImpl).toHaveBeenCalledTimes(2);
+    expect(onUnauthorized).toHaveBeenCalledOnce();
+  });
+
+  it('does not retry mutations twice after a failed recovery', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue(
+      jsonResponse(
+        { error: { code: 'UNAUTHENTICATED', message: 'Expired', requestId: 'req-5' } },
+        { ok: false, status: 401 },
+      ),
+    );
+    const onUnauthorized = vi.fn().mockResolvedValue('throw');
+
+    const client = createApiClient({
+      baseUrl: 'http://localhost:3000',
+      fetchImpl: fetchImpl as unknown as typeof fetch,
+      onUnauthorized,
+    });
+
+    await expect(client.post('/orders', { id: '1' })).rejects.toMatchObject({ status: 401 });
+    expect(fetchImpl).toHaveBeenCalledOnce();
+  });
+
+  it('notifies onForbidden for 403 without retrying', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue(
+      jsonResponse(
+        { error: { code: 'FORBIDDEN', message: 'No access', requestId: 'req-6' } },
+        { ok: false, status: 403 },
+      ),
+    );
+    const onForbidden = vi.fn();
+
+    const client = createApiClient({
+      baseUrl: 'http://localhost:3000',
+      fetchImpl: fetchImpl as unknown as typeof fetch,
+      onForbidden,
+    });
+
+    await expect(client.get('/admin')).rejects.toMatchObject({
+      category: 'authorization',
+      status: 403,
+    });
+    expect(fetchImpl).toHaveBeenCalledOnce();
+    expect(onForbidden).toHaveBeenCalledOnce();
+  });
 });

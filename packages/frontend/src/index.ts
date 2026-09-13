@@ -6,9 +6,11 @@ export {
   type ApiClientConfig,
   type ApiErrorBody,
   type ApiErrorEnvelope,
+  type ApiErrorHandlerContext,
   type ApiRequestOptions,
   type ApiSuccessEnvelope,
   type HttpMethod,
+  type UnauthorizedRecovery,
 } from './http/types';
 
 export {
