@@ -28,7 +28,7 @@ Admin authentication is a separate concern in `apps/admin` and must not reuse th
 | OAuth / social sign-in | Pending (button disabled) |
 | Remember Me backend field | Not in Identity login DTO — cookie lifetime only |
 | Register profile fields (name, terms, marketing) | Collected in UI only — not sent yet |
-| Full account dashboard (profile, addresses, orders) | Pending — `/account` currently shows `AccountSessionCard` |
+| Full account dashboard (profile, addresses, orders) | Implemented as presentation UI with mock fixtures. User / Order Gateway adapters pending. Sign out lives on `/account?section=security`. |
 
 Frontend route guards are **UX only**. Gateway / Identity authorization remains authoritative.
 
@@ -176,7 +176,7 @@ Invalid values fall back to `/` (existing UX).
 | `/reset-password?token=...` | Set a new password |
 | `/verify-email?status=...` | Verification status (architecture-ready) |
 | `/unauthorized` | 403 access-restricted |
-| `/account` | Protected account card + sign out. Not `/account/*` routes. |
+| `/account` | Protected dashboard. Query: `section` (`overview` default, plus `orders`, `addresses`, `payment`, `wishlist`, `profile`, `notifications`, `security`, `help`). Not nested `/account/*` routes. |
 
 Auth and account routes are `noindex,nofollow`.
 
@@ -280,7 +280,8 @@ Non-production BFF restore also accepts refresh tokens prefixed `mock-refresh-` 
 | `AuthSuccessMessage` | Success Alert |
 | `SessionExpiredState` | 401 / expired session |
 | `UnauthorizedState` | 403 |
-| `AccountSessionCard` | Protected account surface + sign out |
+
+Account dashboard (not under `components/auth/`): `AccountDashboard` on `/account`, with sign out on the Security section (`AccountSecurityPanel`).
 
 Navigation: `AccountMenu` in `SiteHeader` (desktop) and sheet actions (mobile).
 
@@ -301,7 +302,7 @@ pnpm --filter @novacommerce/web test
 pnpm --filter @novacommerce/frontend test
 ```
 
-Covered: login/register validation and loading, password toggle, session restore, sanitized return URLs, RequireAuth / protected-route policy, 401 single-flight expiry, 403 unauthorized redirect, mock adapter isolation.
+Covered: login/register validation and loading, password toggle, session restore, sanitized return URLs, RequireAuth / protected-route policy, 401 single-flight expiry, 403 unauthorized redirect, mock adapter isolation, Alloy account dashboard sections.
 
 ## Related documents
 

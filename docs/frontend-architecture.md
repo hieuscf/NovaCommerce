@@ -1,7 +1,7 @@
 # NovaCommerce Frontend Architecture
 
 > **Version:** 1.0  
-> **Last updated:** 2026-09-13  
+> **Last updated:** 2026-09-14  
 > **Status:** Active — foundation implemented  
 > **Apps:** `apps/web` (customer storefront), `apps/admin` (operations console)
 
@@ -98,11 +98,12 @@ Only directories justified by current code exist. Empty feature folders are not 
 apps/web/src/
 ├── app/
 │   ├── (auth)/          login, register, password, verify
-│   ├── (store)/         home, shop + storefront layout
+│   ├── (store)/         home, shop, account + storefront layout
 │   ├── error.tsx
 │   ├── global-error.tsx
 │   └── not-found.tsx
 ├── components/
+│   ├── account/         Alloy account dashboard (presentation fixtures until User/Order APIs)
 │   ├── auth/            auth-specific UI (not primitives)
 │   ├── commerce/
 │   ├── feedback/        API / page loading wrappers
@@ -119,6 +120,8 @@ apps/web/src/
 │   ├── auth/            session, route policy, auth API
 │   ├── validation/      Zod schemas
 │   ├── url/             shareable query parsers
+│   ├── view-models/     UI contracts (no backend entities)
+│   ├── mock-data/       presentation fixtures until Gateway adapters exist
 │   ├── env.ts
 │   └── errors.ts
 └── test/
@@ -164,9 +167,9 @@ Both apps use the **Next.js 15 App Router**.
 | `/shop` | `(store)` | Catalog browsing |
 | `/login` `/register` `/forgot-password` `/reset-password` `/verify-email` | `(auth)` | Authentication |
 | `/unauthorized` | `(store)` | 403 access-restricted |
-| `/account` | `(store)` | Session surface + logout (protected). Not the full account dashboard. |
+| `/account` | `(store)` | Protected Alloy dashboard (profile, orders, addresses, security). Sections via `?section=`. Not nested `/account/*`. |
 
-Reserved (do not create empty pages): `/categories`, `/products/[slug]`, `/search`, `/cart`, `/checkout`, `/account/*` beyond the session surface.
+Reserved (do not create empty pages): `/categories`, `/products/[slug]`, `/search`, `/cart`, `/checkout`, `/account/*`. Account sections stay on `/account?section=`.
 
 ### Admin (current)
 
@@ -180,7 +183,7 @@ Reserved: `/catalog`, `/inventory`, `/orders`, `/customers`, `/promotions`, `/se
 
 Shareable, reloadable state belongs in the URL.
 
-Example: `/shop?q=laptop&sort=price-asc&sale=true&page=2`
+Examples: `/shop?q=laptop&sort=price-asc&sale=true&page=2`, `/account?section=orders`
 
 Parsers live in `lib/url/`. Do not put search/sort/pagination into global React state.
 
@@ -243,7 +246,7 @@ Frontend route guards (`RequireAuth`, route policies) are **UX protection**. Hid
 API / thrown value
   → ApiClientError (category, code, requestId)
   → getUserFacingMessage()
-  → form / ErrorState / toast
+  → form / ErrorState / toast (`@novacommerce/ui` React-Toastify)
 ```
 
 Categories: `validation`, `authentication`, `authorization`, `not_found`, `conflict`, `rate_limit`, `network`, `server`, `unknown`.
@@ -306,7 +309,9 @@ Admin will adopt the same libraries when it grows forms. Do not install unused c
 
 | Variable | Surface | Purpose |
 |----------|---------|---------|
-| `NEXT_PUBLIC_API_URL` | Browser + server | Public Gateway origin |
+| `NEXT_PUBLIC_API_URL` | Browser + server | Public Gateway origin (`http://localhost:3000` locally) |
+| `NEXT_PUBLIC_AUTH_ADAPTER` | Browser (dev only) | Set `mock` to skip Gateway. Leave unset to use Identity. |
+| `CORS_ORIGIN` | Gateway | Browser origins allowed to call `/api/v1` with credentials |
 
 Validated by `validatePublicEnv()`:
 
@@ -316,7 +321,27 @@ Validated by `validatePublicEnv()`:
 
 Never expose `JWT_SECRET`, `DATABASE_URL`, Redis, MinIO, or provider keys through `NEXT_PUBLIC_*`.
 
-App-level files: `apps/web/.env.example`, `apps/admin/.env.example`. Root `.env.example` remains the compose/backend catalog.
+App-level files: `apps/web/.env.example`, `apps/admin/.env.example`. Copy `apps/web/.env.example` to `apps/web/.env.local` for local Next.js. Root `.env.example` remains the compose/backend catalog.
+
+Local wiring:
+
+```text
+Browser (http://localhost:3001)
+  → NEXT_PUBLIC_API_URL (http://localhost:3000)
+  → Gateway /api/v1
+  → Identity
+```
+
+Gateway enables CORS for `http://localhost:3001` and `http://localhost:3002` in development when `CORS_ORIGIN` is unset. Production must set `CORS_ORIGIN` explicitly.
+
+Local run (real Identity, not the mock adapter):
+
+```text
+docker compose -f docker-compose.dev.yml up -d
+pnpm db:migrate:deploy
+pnpm --filter @novacommerce/gateway run start:dev   # :3000, loads repo .env
+pnpm --filter @novacommerce/web run dev             # :3001, NEXT_PUBLIC_API_URL=http://localhost:3000
+```
 
 ---
 

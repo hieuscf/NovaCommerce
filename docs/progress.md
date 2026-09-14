@@ -35,7 +35,7 @@ Last Updated
 | Database Design      | ✅ Complete   |     100% | `docs/database-design.md` v1.0.0 — synced with Prisma + PostgreSQL (46 tables) |
 | API Design           | ✅ Complete   |     100% | `docs/api-guidelines.md` synchronized with Gateway infrastructure |
 | Backend              | 🚧 In Progress |      65% | Gateway `/api/v1` + Core Commerce Flow (Identity → Order → Inventory events) |
-| Frontend             | 🚧 In Progress |      66% | Architecture foundation + `@novacommerce/frontend` client; homepage + Alloy `/login` `/register` `/account`; session restore + global 401/403; shop/auth; admin shell |
+| Frontend             | 🚧 In Progress |      66% | Architecture foundation + `@novacommerce/frontend` client; homepage + Alloy `/login` `/register` `/account` dashboard; session restore + global 401/403; shop/auth; admin shell |
 | AI Platform          | 🚧 In Progress |       5% | FastAPI health endpoint stub |
 | Testing              | 🚧 In Progress |      40% | Backend Vitest + web/admin frontend tests + Playwright smoke foundation; no CI yet |
 | Deployment           | 🚧 Partial    |      50% | Docker Compose + app-level health/readiness + typed env validation |
@@ -96,7 +96,7 @@ Last Updated
 | ---- | ------ | -------- |
 | pnpm monorepo | ✅ | `package.json`, `pnpm-workspace.yaml` |
 | API Gateway (NestJS) | ✅ | `apps/gateway` — `/health`, `/ready`, `/api/v1`, OpenAPI |
-| Web Store (Next.js) | 🚧 | `apps/web` — homepage, Alloy `/login` `/register` `/account`, shop, customer auth UI (login/register/logout/session restore/401/403), API client, error boundaries, Vitest |
+| Web Store (Next.js) | 🚧 | `apps/web` — homepage, Alloy `/login` `/register` `/account` dashboard (mock fixtures until User/Order APIs), shop, customer auth UI (login/register/logout/session restore/401/403), default client → Gateway Identity, error boundaries, Vitest |
 | Admin (Next.js) | 🚧 | `apps/admin` — admin shell, isolated session/API client, error boundaries, Vitest |
 | UI Design System | 🚧 | `packages/ui` — tokens, shadcn primitives, EmptyState, ErrorState |
 | Frontend kit | ✅ | `packages/frontend` — HTTP, errors, env, request IDs |
