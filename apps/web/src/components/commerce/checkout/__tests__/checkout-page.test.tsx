@@ -4,8 +4,10 @@ import { describe, expect, it, vi } from 'vitest';
 import { CheckoutPage } from '../checkout-page';
 import { getCheckoutPage } from '@/lib/checkout/get-checkout-page';
 
+const { push } = vi.hoisted(() => ({ push: vi.fn() }));
+
 vi.mock('next/navigation', () => ({
-  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
+  useRouter: () => ({ push, replace: vi.fn() }),
 }));
 
 async function fillCardPayment(user: ReturnType<typeof userEvent.setup>) {
@@ -18,6 +20,10 @@ async function fillCardPayment(user: ReturnType<typeof userEvent.setup>) {
 }
 
 describe('CheckoutPage', () => {
+  beforeEach(() => {
+    push.mockClear();
+  });
+
   it('renders the Alloy checkout details from the fixture cart', () => {
     render(<CheckoutPage checkout={getCheckoutPage()} />);
 
@@ -94,10 +100,12 @@ describe('CheckoutPage', () => {
     const review = screen.getByRole('heading', { name: 'Review Order' }).closest('section');
     expect(review).toBeTruthy();
     await user.click(within(review!).getByRole('button', { name: 'Place order' }));
-    expect(await screen.findByRole('heading', { name: 'Order confirmed' })).toBeInTheDocument();
-    expect(screen.getByText('Order NC-PREVIEW-001')).toBeInTheDocument();
+    await vi.waitFor(() => {
+      expect(push).toHaveBeenCalledWith('/orders/confirmed');
+    });
+    expect(screen.queryByRole('heading', { name: 'Order Confirmed!' })).not.toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'Payment Gateway' })).not.toBeInTheDocument();
-  });
+  }, 10_000);
 
   it('lets a wallet method skip card details', async () => {
     const user = userEvent.setup();

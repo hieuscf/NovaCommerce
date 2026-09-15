@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 import { AccountDashboard } from '@/components/account/account-dashboard';
 import { RequireAuth } from '@/features/auth/require-auth';
 import { parseAccountQuery } from '@/lib/url/account-query';
@@ -14,6 +15,10 @@ interface AccountPageProps {
 
 export default async function AccountPage({ searchParams }: AccountPageProps) {
   const query = parseAccountQuery(await searchParams);
+
+  if (query.section === 'orders') {
+    redirect('/orders');
+  }
 
   return (
     <RequireAuth>

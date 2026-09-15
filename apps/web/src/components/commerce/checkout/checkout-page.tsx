@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Container } from '@novacommerce/ui/components/container';
@@ -11,7 +12,6 @@ import { CheckoutErrorSummary } from '@/components/commerce/checkout/checkout-er
 import { CheckoutPaymentForm } from '@/components/commerce/checkout/checkout-payment-form';
 import { CheckoutReviewCard } from '@/components/commerce/checkout/checkout-review-card';
 import { CheckoutStepper } from '@/components/commerce/checkout/checkout-stepper';
-import { CheckoutSuccess } from '@/components/commerce/checkout/checkout-success';
 import { CheckoutSummary } from '@/components/commerce/checkout/checkout-summary';
 import { CheckoutTrustBar } from '@/components/commerce/checkout/checkout-trust-bar';
 import {
@@ -29,9 +29,8 @@ import {
   type CheckoutStepId,
 } from '@/lib/view-models/checkout';
 
-const PREVIEW_ORDER_NUMBER = 'NC-PREVIEW-001';
-
 export function CheckoutPage({ checkout }: { checkout: CheckoutPageViewModel }) {
+  const router = useRouter();
   const [stage, setStage] = useState<CheckoutStage>('details');
   const [lines, setLines] = useState<CartLineViewModel[]>(() => [...checkout.lines]);
   const [submitting, setSubmitting] = useState(false);
@@ -104,7 +103,7 @@ export function CheckoutPage({ checkout }: { checkout: CheckoutPageViewModel }) 
     setSubmitting(true);
     window.setTimeout(() => {
       setSubmitting(false);
-      setStage('success');
+      router.push('/orders/confirmed');
     }, 400);
   }
 
@@ -137,7 +136,7 @@ export function CheckoutPage({ checkout }: { checkout: CheckoutPageViewModel }) 
     setLines((current) => current.filter((line) => line.id !== id));
   }
 
-  if (lines.length === 0 && stage !== 'success') {
+  if (lines.length === 0) {
     return (
       <div className="bg-page-canvas min-h-svh">
         <Container size="wide" className="py-8 lg:py-10">
@@ -155,15 +154,7 @@ export function CheckoutPage({ checkout }: { checkout: CheckoutPageViewModel }) 
     <div className="bg-page-canvas min-h-svh">
       <Container size="wide" className="py-8 lg:py-10">
         <h1 className="sr-only">Checkout</h1>
-        {stage === 'success' ? (
-          <>
-            <ShopBreadcrumb crumbs={crumbs} />
-            <div className="mt-8">
-              <CheckoutSuccess orderNumber={PREVIEW_ORDER_NUMBER} summary={summary} />
-            </div>
-          </>
-        ) : (
-          <form
+        <form
             noValidate
             className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_320px] xl:grid-cols-[minmax(0,1fr)_380px]"
             onSubmit={(event) => {
@@ -226,7 +217,6 @@ export function CheckoutPage({ checkout }: { checkout: CheckoutPageViewModel }) 
                 onPrimaryAction={() => void handlePrimaryAction()}
               />
             </form>
-        )}
       </Container>
     </div>
   );

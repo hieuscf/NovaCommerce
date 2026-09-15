@@ -26,16 +26,21 @@ describe('AccountDashboard', () => {
     expect(screen.getByRole('link', { name: 'Overview' })).toHaveAttribute('href', '/account');
     expect(screen.getByRole('link', { name: 'Orders' })).toHaveAttribute(
       'href',
-      '/account?section=orders',
+      '/orders',
+    );
+    expect(screen.getAllByRole('link', { name: 'View Details' })[0]).toHaveAttribute(
+      'href',
+      '/orders/NC2026001',
     );
   });
 
   it('shows a focused orders section from the URL', () => {
     render(<AccountDashboard section="orders" />);
 
-    expect(screen.getByRole('heading', { name: 'Recent Orders' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'My Orders' })).toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'Quick Actions' })).not.toBeInTheDocument();
-    expect(screen.getByText('Orders', { selector: 'span' })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Recent Orders' })).not.toBeInTheDocument();
+    expect(screen.getByText('#NC2026001')).toBeInTheDocument();
   });
 
   it('shows a pending empty state for wishlist', () => {

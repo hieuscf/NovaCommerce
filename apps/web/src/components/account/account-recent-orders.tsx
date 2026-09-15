@@ -1,9 +1,11 @@
 import { CheckCircle2, Clock, Truck } from 'lucide-react';
+import Link from 'next/link';
 import { Badge } from '@novacommerce/ui/components/badge';
 import { Button } from '@novacommerce/ui/components/button';
 import { ProductShape } from '@/components/commerce/product-shape';
 import { accountOrders } from '@/lib/mock-data/account';
-import { accountSectionHref, type AccountOrderStatus } from '@/lib/view-models/account';
+import { orderHref } from '@/lib/view-models/order';
+import { type AccountOrderStatus } from '@/lib/view-models/account';
 import { AccountCard } from './account-card';
 import { AccountSectionHeading } from './account-section-heading';
 
@@ -24,7 +26,7 @@ export function AccountRecentOrders() {
   return (
     <AccountCard padded={false}>
       <div className="px-5 pt-5">
-        <AccountSectionHeading title="Recent Orders" action="View All" href={accountSectionHref('orders')} />
+        <AccountSectionHeading title="Recent Orders" action="View All" href="/orders" />
       </div>
       <ul className="mt-2 flex flex-col">
         {accountOrders.map((order) => {
@@ -54,15 +56,8 @@ export function AccountRecentOrders() {
                   <StatusIcon aria-hidden="true" />
                   {order.status}
                 </Badge>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  size="sm"
-                  className="h-9 rounded-xl"
-                  disabled
-                  title="Order detail will appear when Order APIs are connected"
-                >
-                  View Details
+                <Button asChild variant="secondary" size="sm" className="h-9 rounded-xl">
+                  <Link href={orderHref(order.id)}>View Details</Link>
                 </Button>
               </div>
             </li>

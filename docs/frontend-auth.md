@@ -28,7 +28,7 @@ Admin authentication is a separate concern in `apps/admin` and must not reuse th
 | OAuth / social sign-in | Pending (button disabled) |
 | Remember Me backend field | Not in Identity login DTO — cookie lifetime only |
 | Register profile fields (name, terms, marketing) | Collected in UI only — not sent yet |
-| Full account dashboard (profile, addresses, orders) | Implemented as presentation UI with mock fixtures. User / Order Gateway adapters pending. Sign out lives on `/account?section=security`. |
+| Full account dashboard (profile, addresses, orders) | Implemented as presentation UI with mock fixtures. User / Order Gateway adapters pending. Sign out lives on `/account?section=security`. Orders list/detail/confirmation live on `/orders`. |
 
 Frontend route guards are **UX only**. Gateway / Identity authorization remains authoritative.
 
@@ -176,8 +176,11 @@ Invalid values fall back to `/` (existing UX).
 | `/reset-password?token=...` | Set a new password |
 | `/verify-email?status=...` | Verification status (architecture-ready) |
 | `/unauthorized` | 403 access-restricted |
-| `/account` | Protected dashboard. Query: `section` (`overview` default, plus `orders`, `addresses`, `payment`, `wishlist`, `profile`, `notifications`, `security`, `help`). Not nested `/account/*` routes. |
-| `/checkout` | Protected Alloy checkout. Customer information, shipping address, order summary, then Payment Gateway (card/OTP or wallet tiles) + review. Presentation fixtures until Checkout Gateway adapters are wired. Card details are never posted. |
+| `/account` | Protected dashboard. Query: `section` (`overview` default, plus `addresses`, `payment`, `wishlist`, `profile`, `notifications`, `security`, `help`). `section=orders` redirects to `/orders`. Not nested `/account/*` routes. |
+| `/checkout` | Protected Alloy checkout. Customer information, shipping address, order summary, then Payment Gateway (card/OTP or wallet tiles) + review. Presentation fixtures until Checkout Gateway adapters are wired. Card details are never posted. Place order navigates to `/orders/confirmed`. |
+| `/orders` | Protected order list. Query: `status`, `page`. Presentation fixtures until Order Gateway adapters are wired. |
+| `/orders/confirmed` | Protected order confirmation preview. Does not invent Order or Payment APIs. |
+| `/orders/[orderNumber]` | Protected order detail. Unknown numbers use `not-found`. |
 
 Auth and account routes are `noindex,nofollow`.
 

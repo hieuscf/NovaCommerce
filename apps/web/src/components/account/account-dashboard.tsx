@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
 import { Container } from '@novacommerce/ui/components/container';
+import { OrderListPage } from '@/components/commerce/orders/order-list-page';
+import { getOrderListPage } from '@/lib/orders/get-order-list';
 import { ACCOUNT_SECTION_LABELS, type AccountSection } from '@/lib/view-models/account';
 import {
   AccountAddresses,
@@ -47,7 +49,7 @@ function AccountPageHeader({ section }: { section: AccountSection }) {
 function AccountSectionPanel({ section }: { section: AccountSection }) {
   switch (section) {
     case 'orders':
-      return <AccountRecentOrders />;
+      return null;
     case 'addresses':
       return <AccountAddresses />;
     case 'payment':
@@ -67,6 +69,11 @@ function AccountSectionPanel({ section }: { section: AccountSection }) {
 }
 
 export function AccountDashboard({ section }: { section: AccountSection }) {
+  if (section === 'orders') {
+    const query = { status: 'all' as const, page: 1 };
+    return <OrderListPage list={getOrderListPage(query)} query={query} />;
+  }
+
   const overview = section === 'overview';
 
   return (

@@ -73,6 +73,9 @@ export const ACCOUNT_SECTION_LABELS: Record<AccountSection, string> = {
 };
 
 export function accountSectionHref(section: AccountSection): string {
+  if (section === 'orders') {
+    return '/orders';
+  }
   return section === 'overview' ? '/account' : `/account?section=${section}`;
 }
 
