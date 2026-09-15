@@ -155,6 +155,8 @@ function relatedProducts(product: ProductViewModel): ProductViewModel[] {
 /**
  * Presentation lookup for the PDP. Replace with a Catalog Gateway adapter later.
  * Does not encode inventory, pricing, or checkout rules.
+ * Unknown slugs return `undefined` (route `not-found`). Unexpected load failures must throw
+ * so `products/[slug]/error.tsx` can render `ErrorState`.
  */
 export function getProductDetailBySlug(slug: string): ProductDetailViewModel | undefined {
   const product = catalogProducts.find((item) => item.slug === slug);

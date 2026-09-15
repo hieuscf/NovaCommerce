@@ -17,6 +17,7 @@ import {
   SheetTrigger,
 } from '@novacommerce/ui/components/sheet';
 import { useSession } from '@/features/auth/use-session';
+import { getCartLineCount } from '@/lib/cart/get-cart-page';
 import { cn } from '@/lib/utils';
 import { AccountMenu } from './account-menu';
 
@@ -38,6 +39,7 @@ export function SiteHeader() {
   const pathname = usePathname();
   const { status, isAuthenticated, isSigningOut, signOut } = useSession();
   const sessionResolving = status === 'unknown' || status === 'loading';
+  const cartCount = getCartLineCount();
 
   async function handleMobileSignOut() {
     if (isSigningOut) {
@@ -136,15 +138,23 @@ export function SiteHeader() {
               <Heart className="size-[19px]" />
             </Button>
             <Button
+              asChild
               variant="ghost"
               size="icon-sm"
               className={cn('relative', iconButtonClass)}
-              aria-label="Cart"
             >
-              <ShoppingCart className="size-[19px]" />
-              <span className="absolute -top-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
-                2
-              </span>
+              <Link
+                href="/cart"
+                aria-label={cartCount > 0 ? `Cart, ${cartCount} items` : 'Cart'}
+                aria-current={pathname === '/cart' ? 'page' : undefined}
+              >
+                <ShoppingCart className="size-[19px]" />
+                {cartCount > 0 ? (
+                  <span className="absolute -top-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+                    {cartCount}
+                  </span>
+                ) : null}
+              </Link>
             </Button>
 
             <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>

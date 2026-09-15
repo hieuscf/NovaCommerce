@@ -5,6 +5,8 @@ import type { ShopQuery } from '@/lib/url/shop-query';
 /**
  * Client-side fixture selection for the listing UI.
  * Not a Catalog bounded-context rule — swap for a Gateway query later.
+ * Zero matches are an empty result (`EmptyState`). Unexpected load failures must throw
+ * so `shop/error.tsx` can render `ErrorState`.
  */
 export function applyShopQuery(
   products: readonly ProductViewModel[],

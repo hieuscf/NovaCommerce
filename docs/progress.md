@@ -12,7 +12,7 @@ Status
 
 Last Updated
 
-2026-09-14
+2026-09-15
 
 ---
 
@@ -35,7 +35,7 @@ Last Updated
 | Database Design      | ✅ Complete   |     100% | `docs/database-design.md` v1.0.0 — synced with Prisma + PostgreSQL (46 tables) |
 | API Design           | ✅ Complete   |     100% | `docs/api-guidelines.md` synchronized with Gateway infrastructure |
 | Backend              | 🚧 In Progress |      65% | Gateway `/api/v1` + Core Commerce Flow (Identity → Order → Inventory events) |
-| Frontend             | 🚧 In Progress |      75% | Architecture foundation + `@novacommerce/frontend` client; homepage + Alloy `/login` `/register` `/account` dashboard + `/shop` listing + `/products/[slug]` PDP; session restore + global 401/403; admin shell |
+| Frontend             | 🚧 In Progress |      78% | Architecture foundation + `@novacommerce/frontend` client; homepage + Alloy `/login` `/register` `/account` dashboard + `/shop` listing + `/products/[slug]` PDP + `/cart`; session restore + global 401/403; admin shell |
 | AI Platform          | 🚧 In Progress |       5% | FastAPI health endpoint stub |
 | Testing              | 🚧 In Progress |      40% | Backend Vitest + web/admin frontend tests + Playwright smoke foundation; no CI yet |
 | Deployment           | 🚧 Partial    |      50% | Docker Compose + app-level health/readiness + typed env validation |
@@ -96,7 +96,7 @@ Last Updated
 | ---- | ------ | -------- |
 | pnpm monorepo | ✅ | `package.json`, `pnpm-workspace.yaml` |
 | API Gateway (NestJS) | ✅ | `apps/gateway` — `/health`, `/ready`, `/api/v1`, OpenAPI |
-| Web Store (Next.js) | 🚧 | `apps/web` — homepage, Alloy `/login` `/register` `/account` dashboard, `/shop` listing (filters/sort/pagination on mock catalog), `/products/[slug]` PDP (gallery/variants/reviews on mock catalog), customer auth UI, default client → Gateway Identity, error boundaries, Vitest |
+| Web Store (Next.js) | 🚧 | `apps/web` — homepage, Alloy `/login` `/register` `/account` dashboard, `/shop` listing (filters/sort/pagination on mock catalog; empty/skeleton/error), `/products/[slug]` PDP (gallery/variants/reviews on mock catalog; loading/not-found/error), `/cart` (lines/qty/summary on mock cart; empty/skeleton/error), customer auth UI, default client → Gateway Identity, error boundaries, Vitest |
 | Admin (Next.js) | 🚧 | `apps/admin` — admin shell, isolated session/API client, error boundaries, Vitest |
 | UI Design System | 🚧 | `packages/ui` — tokens, shadcn primitives, EmptyState, ErrorState |
 | Frontend kit | ✅ | `packages/frontend` — HTTP, errors, env, request IDs |
