@@ -4,8 +4,10 @@ import { describe, expect, it, vi } from 'vitest';
 import { CartPage } from '../cart-page';
 import { getCartPage } from '@/lib/cart/get-cart-page';
 
+const { pushMock } = vi.hoisted(() => ({ pushMock: vi.fn() }));
+
 vi.mock('next/navigation', () => ({
-  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
+  useRouter: () => ({ push: pushMock, replace: vi.fn() }),
 }));
 
 const toastSuccess = vi.fn();
@@ -18,6 +20,10 @@ vi.mock('@novacommerce/ui/components/toast', () => ({
 }));
 
 describe('CartPage', () => {
+  beforeEach(() => {
+    pushMock.mockClear();
+  });
+
   it('renders lines, summary totals, and recommendations from the fixture cart', () => {
     render(<CartPage cart={getCartPage()} />);
 
@@ -78,5 +84,13 @@ describe('CartPage', () => {
 
     expect(screen.getByRole('heading', { name: '4 items in your cart' })).toBeInTheDocument();
     expect(screen.getAllByRole('link', { name: 'Nike Air Force 1' }).length).toBeGreaterThan(1);
+  });
+
+  it('sends the shopper to checkout without inventing a payment API', async () => {
+    render(<CartPage cart={getCartPage()} />);
+
+    await userEvent.click(screen.getByRole('button', { name: 'Proceed to Checkout' }));
+
+    expect(pushMock).toHaveBeenCalledWith('/checkout');
   });
 });

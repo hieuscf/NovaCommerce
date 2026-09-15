@@ -1,7 +1,7 @@
 # NovaCommerce Design System
 
 > Version: 1.0  
-> Last updated: 2026-09-15  
+> Last updated: 2026-09-16  
 > Status: Active — Web v1 foundation
 
 ## Visual Philosophy
@@ -128,7 +128,7 @@ shadcn/ui foundation, customized for NovaCommerce:
 ### App: `apps/web`
 
 - **Layout:** `StorefrontLayout`, `SiteHeader` (64px glass topbar, pill search), `SiteFooter` (newsletter bar + link columns)
-- **Commerce:** `ProductCard` (`default` | `compact` | `listing`), `CategoryCard` (`default` | `compact`), `ProductGrid` (homepage rails), Alloy product listing (`ProductListing` — filter sidebar, toolbar, 2/3/4-column grid, pagination, empty/skeleton/error), product detail (`ProductDetailPage` — gallery, variant/quantity selectors, details tabs, reviews, related products, loading/not-found/error; mock catalog until Gateway), cart (`CartPage` — line items, quantity/remove, order summary, recommendations, empty/skeleton/error; mock cart until Gateway)
+- **Commerce:** `ProductCard` (`default` | `compact` | `listing`), `CategoryCard` (`default` | `compact`), `ProductGrid` (homepage rails), Alloy product listing (`ProductListing` — filter sidebar, toolbar, 2/3/4-column grid, pagination, empty/skeleton/error), product detail (`ProductDetailPage` — gallery, variant/quantity selectors, details tabs, reviews, related products, loading/not-found/error; mock catalog until Gateway), cart (`CartPage` — line items, quantity/remove, order summary, recommendations, empty/skeleton/error; mock cart until Gateway), checkout (`CheckoutPage` — customer/shipping, Alloy Payment Gateway with card/OTP + wallet tiles, order summary, review/success; mock cart/customer until Gateway; does not invent Payment APIs; visual methods map to Gateway `paymentProvider`)
 - **Marketing:** Hero, SpecialOfferRail, ServiceBenefits, CategorySection, FeaturedProducts, DarkPromo, Trending, AI Discovery
 - **Homepage canvas (`1920w light`):** wide container, hero + 264px offer rail, then guarantees/categories/featured + dark promo rail
 - **Hero art:** CSS `HeroArt` cluster on the homepage (matches the Alloy storefront prototype). `HeroProductScene` remains available as Three.js progressive enhancement elsewhere.

@@ -1,7 +1,7 @@
 # NovaCommerce Frontend Authentication
 
 > Version: 1.2  
-> Last updated: 2026-09-14  
+> Last updated: 2026-09-16  
 > Status: Active — Web customer auth UI
 
 ## Scope
@@ -137,7 +137,7 @@ isProtectedRoute(pathname) // alias of isCustomerProtectedPath
 
 Customer protected prefixes (UX): `/account`, `/orders`, `/checkout`.
 
-`ProtectedRoutes` in the store layout wraps any matching path with `RequireAuth`. `/account` also keeps its existing `RequireAuth` boundary. `/orders` and `/checkout` are guarded as soon as those pages exist.
+`ProtectedRoutes` in the store layout wraps any matching path with `RequireAuth`. `/account` also keeps its existing `RequireAuth` boundary. `/checkout` is guarded by that shared policy.
 
 Unauthenticated visit:
 
@@ -177,6 +177,7 @@ Invalid values fall back to `/` (existing UX).
 | `/verify-email?status=...` | Verification status (architecture-ready) |
 | `/unauthorized` | 403 access-restricted |
 | `/account` | Protected dashboard. Query: `section` (`overview` default, plus `orders`, `addresses`, `payment`, `wishlist`, `profile`, `notifications`, `security`, `help`). Not nested `/account/*` routes. |
+| `/checkout` | Protected Alloy checkout. Customer information, shipping address, order summary, then Payment Gateway (card/OTP or wallet tiles) + review. Presentation fixtures until Checkout Gateway adapters are wired. Card details are never posted. |
 
 Auth and account routes are `noindex,nofollow`.
 

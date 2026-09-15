@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { toast } from '@novacommerce/ui/components/toast';
 import { Container } from '@novacommerce/ui/components/container';
 import { ShopBreadcrumb } from '@/components/commerce/listing/shop-breadcrumb';
@@ -12,6 +13,7 @@ import { summarizeCart, type CartLineViewModel, type CartPageViewModel } from '@
 import type { ProductViewModel } from '@/lib/view-models/product';
 
 export function CartPage({ cart }: { cart: CartPageViewModel }) {
+  const router = useRouter();
   const [lines, setLines] = useState<CartLineViewModel[]>(() => [...cart.lines]);
   const summary = useMemo(() => summarizeCart(lines), [lines]);
 
@@ -64,10 +66,8 @@ export function CartPage({ cart }: { cart: CartPageViewModel }) {
     toast.success('Added to cart', { description: product.name });
   }
 
-  function handleCheckoutSoon() {
-    toast.success('Checkout is coming next', {
-      description: 'Your cart is ready when checkout is available.',
-    });
+  function handleCheckout() {
+    router.push('/checkout');
   }
 
   return (
@@ -91,8 +91,8 @@ export function CartPage({ cart }: { cart: CartPageViewModel }) {
             />
             <CartSummary
               summary={summary}
-              onCheckout={handleCheckoutSoon}
-              onPayPal={handleCheckoutSoon}
+              onCheckout={handleCheckout}
+              onPayPal={handleCheckout}
             />
           </div>
         )}

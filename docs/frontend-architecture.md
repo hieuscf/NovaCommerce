@@ -1,7 +1,7 @@
 # NovaCommerce Frontend Architecture
 
 > **Version:** 1.0  
-> **Last updated:** 2026-09-15  
+> **Last updated:** 2026-09-16  
 > **Status:** Active — foundation implemented  
 > **Apps:** `apps/web` (customer storefront), `apps/admin` (operations console)
 
@@ -98,14 +98,14 @@ Only directories justified by current code exist. Empty feature folders are not 
 apps/web/src/
 ├── app/
 │   ├── (auth)/          login, register, password, verify
-│   ├── (store)/         home, shop, product detail, account + storefront layout
+│   ├── (store)/         home, shop, product detail, cart, checkout, account + storefront layout
 │   ├── error.tsx
 │   ├── global-error.tsx
 │   └── not-found.tsx
 ├── components/
 │   ├── account/         Alloy account dashboard (presentation fixtures until User/Order APIs)
 │   ├── auth/            auth-specific UI (not primitives)
-│   ├── commerce/        product cards, listing (PLP), product detail (PDP), merchandising
+│   ├── commerce/        product cards, listing (PLP), product detail (PDP), cart, checkout, merchandising
 │   ├── feedback/        API / page loading wrappers
 │   ├── layout/
 │   ├── marketing/
@@ -122,6 +122,7 @@ apps/web/src/
 │   ├── url/             shareable query parsers
 │   ├── catalog/         listing + PDP fixture selection until Catalog Gateway exists
 │   ├── cart/            cart page fixture selection until Cart Gateway exists
+│   ├── checkout/        checkout page fixture selection until Checkout Gateway exists
 │   ├── view-models/     UI contracts (no backend entities)
 │   ├── mock-data/       presentation fixtures until Gateway adapters exist
 │   ├── env.ts
@@ -168,12 +169,13 @@ Both apps use the **Next.js 15 App Router**.
 | `/` | `(store)` | Homepage |
 | `/shop` | `(store)` | Product listing. Filters/sort/page live in the URL (`category`, `brand`, `sort`, `page`, …). Catalog photos until the Catalog API is wired. |
 | `/products/[slug]` | `(store)` | Product detail. Gallery, variants, reviews, and related products use presentation fixtures until the Catalog Gateway is wired. |
-| `/cart` | `(store)` | Shopping cart. Line items, quantity, remove, summary, and recommendations use presentation fixtures until `GET /api/v1/users/me/cart` is wired. Checkout and PayPal buttons do not invent Payment APIs. |
+| `/cart` | `(store)` | Shopping cart. Line items, quantity, remove, summary, and recommendations use presentation fixtures until `GET /api/v1/users/me/cart` is wired. Checkout and PayPal buttons navigate to `/checkout` and do not invent Payment APIs. |
+| `/checkout` | `(store)` | Protected Alloy checkout (customer + shipping, then Payment Gateway, then review). Presentation fixtures until Cart / User / Checkout Gateway adapters are wired. Payment tiles are presentation methods (`card`, `paypal`, `qr_pay`, `google_pay`) and map to Gateway `paymentProvider` (`vnpay`, `paypal`, `momo`) when checkout is wired. Card/OTP fields stay in the browser and are never posted. Place order is a preview success state — it does not call `POST /users/me/checkout`. |
 | `/login` `/register` `/forgot-password` `/reset-password` `/verify-email` | `(auth)` | Authentication |
 | `/unauthorized` | `(store)` | 403 access-restricted |
 | `/account` | `(store)` | Protected Alloy dashboard (profile, orders, addresses, security). Sections via `?section=`. Not nested `/account/*`. |
 
-Reserved (do not create empty pages): `/categories`, `/search`, `/checkout`, `/account/*`. Account sections stay on `/account?section=`.
+Reserved (do not create empty pages): `/categories`, `/search`, `/account/*`. Account sections stay on `/account?section=`.
 
 ### Admin (current)
 
@@ -266,6 +268,7 @@ Next.js boundaries:
 - `(store)/shop/error.tsx` — catalog listing load failure (`ErrorState`, retry). Empty filter matches stay `EmptyState`.
 - `(store)/products/[slug]/error.tsx` — product detail load failure. Unknown slugs stay `not-found.tsx`.
 - `(store)/cart/error.tsx` — cart load failure. An empty cart stays `EmptyState`.
+- `(store)/checkout/error.tsx` — checkout load failure. An empty selected cart stays `EmptyState`.
 - `not-found.tsx` — unknown routes
 - `global-error.tsx` — root crash (own `html`/`body`)
 
@@ -288,7 +291,7 @@ Structured reporting uses `reportFrontendEvent` (no-op until a reporter is attac
 
 Use `@novacommerce/ui` `EmptyState`: icon, title, explanation, action.
 
-Empty is not an error. Shop with no matches renders `EmptyState`, not `ErrorState`. An empty cart renders `EmptyState`. Catalog listing, PDP, and cart load failures render `ErrorState` with retry.
+Empty is not an error. Shop with no matches renders `EmptyState`, not `ErrorState`. An empty cart or empty checkout renders `EmptyState`. Catalog listing, PDP, cart, and checkout load failures render `ErrorState` with retry.
 
 ---
 
