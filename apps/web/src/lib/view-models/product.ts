@@ -12,6 +12,12 @@ export interface ProductViewModel {
   badge?: 'bestseller' | 'sale' | 'new';
   discountPercent?: number;
   slug: string;
+  /** Leaf category on the listing page (smartphones, laptops, …). */
+  categorySlug?: string;
+  /** Parent department used by homepage category tiles (electronics, fashion, …). */
+  departmentSlug?: string;
+  inStock?: boolean;
+  createdAt?: string;
 }
 
 export interface CategoryViewModel {
@@ -20,6 +26,14 @@ export interface CategoryViewModel {
   productCount: number;
   imageUrl: string;
   slug: string;
+}
+
+export function productHref(slug: string): string {
+  return `/products/${slug}`;
+}
+
+export function brandHref(brand: string): string {
+  return `/shop?brand=${encodeURIComponent(brand)}`;
 }
 
 export function formatPrice(amount: number, currency = 'USD'): string {

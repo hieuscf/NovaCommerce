@@ -1,7 +1,7 @@
 # NovaCommerce Design System
 
 > Version: 1.0  
-> Last updated: 2026-09-13  
+> Last updated: 2026-09-14  
 > Status: Active — Web v1 foundation
 
 ## Visual Philosophy
@@ -128,7 +128,7 @@ shadcn/ui foundation, customized for NovaCommerce:
 ### App: `apps/web`
 
 - **Layout:** `StorefrontLayout`, `SiteHeader` (64px glass topbar, pill search), `SiteFooter` (newsletter bar + link columns)
-- **Commerce:** `ProductCard` (`default` | `compact`), `CategoryCard` (`default` | `compact`), `ProductGrid` (up to 5 columns)
+- **Commerce:** `ProductCard` (`default` | `compact` | `listing`), `CategoryCard` (`default` | `compact`), `ProductGrid` (homepage rails), Alloy product listing (`ProductListing` — filter sidebar, toolbar, 2/3/4-column grid, pagination, empty/skeleton), product detail (`ProductDetailPage` — gallery, variant/quantity selectors, details tabs, reviews, related products; mock catalog until Gateway)
 - **Marketing:** Hero, SpecialOfferRail, ServiceBenefits, CategorySection, FeaturedProducts, DarkPromo, Trending, AI Discovery
 - **Homepage canvas (`1920w light`):** wide container, hero + 264px offer rail, then guarantees/categories/featured + dark promo rail
 - **Hero art:** CSS `HeroArt` cluster on the homepage (matches the Alloy storefront prototype). `HeroProductScene` remains available as Three.js progressive enhancement elsewhere.

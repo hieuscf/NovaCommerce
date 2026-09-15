@@ -21,7 +21,7 @@
 | Database (Prisma) | ✅ | 🚧 | 46 business tables + Outbox; schema synced with PostgreSQL |
 | Event system | ✅ | 🚧 | Outbox + `InMemoryEventBus` + P0 schemas; module handlers not wired yet |
 | API (Gateway) | ✅ | 🚧 | `/api/v1` + OpenAPI + auth wiring; business endpoints pending |
-| Frontend | ✅ | 🚧 | Architecture foundation; `@novacommerce/frontend`; web homepage + shop + auth + Alloy account; admin shell |
+| Frontend | ✅ | 🚧 | Architecture foundation; `@novacommerce/frontend`; web homepage + shop + product detail + auth + Alloy account; admin shell |
 | AI services | 🚧 | 🚧 | FastAPI `/health` stub |
 | Tests | ✅ | 🚧 | Backend + frontend Vitest; Playwright smoke foundation |
 | CI/CD | — | ⏳ | No GitHub Actions workflows |

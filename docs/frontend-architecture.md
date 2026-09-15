@@ -98,14 +98,14 @@ Only directories justified by current code exist. Empty feature folders are not 
 apps/web/src/
 ├── app/
 │   ├── (auth)/          login, register, password, verify
-│   ├── (store)/         home, shop, account + storefront layout
+│   ├── (store)/         home, shop, product detail, account + storefront layout
 │   ├── error.tsx
 │   ├── global-error.tsx
 │   └── not-found.tsx
 ├── components/
 │   ├── account/         Alloy account dashboard (presentation fixtures until User/Order APIs)
 │   ├── auth/            auth-specific UI (not primitives)
-│   ├── commerce/
+│   ├── commerce/        product cards, listing (PLP), product detail (PDP), merchandising
 │   ├── feedback/        API / page loading wrappers
 │   ├── layout/
 │   ├── marketing/
@@ -120,6 +120,7 @@ apps/web/src/
 │   ├── auth/            session, route policy, auth API
 │   ├── validation/      Zod schemas
 │   ├── url/             shareable query parsers
+│   ├── catalog/         listing + PDP fixture selection until Catalog Gateway exists
 │   ├── view-models/     UI contracts (no backend entities)
 │   ├── mock-data/       presentation fixtures until Gateway adapters exist
 │   ├── env.ts
@@ -164,12 +165,13 @@ Both apps use the **Next.js 15 App Router**.
 | Route | Group | Purpose |
 |-------|-------|---------|
 | `/` | `(store)` | Homepage |
-| `/shop` | `(store)` | Catalog browsing |
+| `/shop` | `(store)` | Product listing. Filters/sort/page live in the URL (`category`, `brand`, `sort`, `page`, …). Catalog photos until the Catalog API is wired. |
+| `/products/[slug]` | `(store)` | Product detail. Gallery, variants, reviews, and related products use presentation fixtures until the Catalog Gateway is wired. |
 | `/login` `/register` `/forgot-password` `/reset-password` `/verify-email` | `(auth)` | Authentication |
 | `/unauthorized` | `(store)` | 403 access-restricted |
 | `/account` | `(store)` | Protected Alloy dashboard (profile, orders, addresses, security). Sections via `?section=`. Not nested `/account/*`. |
 
-Reserved (do not create empty pages): `/categories`, `/products/[slug]`, `/search`, `/cart`, `/checkout`, `/account/*`. Account sections stay on `/account?section=`.
+Reserved (do not create empty pages): `/categories`, `/search`, `/cart`, `/checkout`, `/account/*`. Account sections stay on `/account?section=`.
 
 ### Admin (current)
 
@@ -183,7 +185,7 @@ Reserved: `/catalog`, `/inventory`, `/orders`, `/customers`, `/promotions`, `/se
 
 Shareable, reloadable state belongs in the URL.
 
-Examples: `/shop?q=laptop&sort=price-asc&sale=true&page=2`, `/account?section=orders`
+Examples: `/shop?q=laptop&sort=price-asc&sale=true&page=2`, `/shop?category=smartphones&brand=Apple`, `/account?section=orders`
 
 Parsers live in `lib/url/`. Do not put search/sort/pagination into global React state.
 
