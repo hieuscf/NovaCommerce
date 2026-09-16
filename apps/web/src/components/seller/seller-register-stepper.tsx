@@ -1,3 +1,4 @@
+import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   SELLER_REGISTER_STEPS,
@@ -45,7 +46,7 @@ export function SellerRegisterStepper({
                       : 'border border-border bg-surface text-muted-foreground',
                 )}
               >
-                {step.number}
+                {complete ? <Check className="size-3.5" strokeWidth={3} aria-hidden="true" /> : step.number}
               </span>
               <span
                 className={cn(
