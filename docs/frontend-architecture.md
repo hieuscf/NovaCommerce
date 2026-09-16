@@ -1,7 +1,7 @@
 # NovaCommerce Frontend Architecture
 
 > **Version:** 1.0  
-> **Last updated:** 2026-09-16  
+> **Last updated:** 2026-09-17  
 > **Status:** Active — foundation implemented  
 > **Apps:** `apps/web` (customer storefront), `apps/admin` (operations console)
 
@@ -170,8 +170,8 @@ Both apps use the **Next.js 15 App Router**.
 | Route | Group | Purpose |
 |-------|-------|---------|
 | `/` | `(store)` | Homepage. Category + featured product rails load from Gateway `GET /categories` + `GET /products?status=published` via `catalogClient`. Hero/promo/benefits stay static. |
-| `/shop` | `(store)` | Product listing for the full catalog. Remaining filters/sort/page live in the URL (`brand`, `sort`, `page`, `view`, …). Loads published products from Gateway (capped fetch) then applies presentation filters via `applyShopQuery`. |
-| `/shop/[category]` | `(store)` | Collection listing (for example `/shop/electronics`). Extra leaf filters stay in the query (`category`, `brand`, …). Unknown slugs use `not-found`. Same Gateway catalog source as `/shop`. |
+| `/shop` | `(store)` | Product listing for the full catalog. Filters/sort/page live in the URL (`q`, `brand`, `sort`, `page`, `view`, …). Product hits load from Gateway `GET /search/products` via `searchClient` (OpenSearch). Category slugs resolve through `catalogClient.listCategories()`. Presentation-only filters (brand name, rating, sale, availability) apply to the current page. |
+| `/shop/[category]` | `(store)` | Collection listing (for example `/shop/electronics`). Extra leaf filters stay in the query (`category`, `brand`, …). Unknown slugs use `not-found`. Same Search API as `/shop`, with the collection slug mapped to `categoryId` when Catalog has that category. |
 | `/products/[slug]` | `(store)` | Product detail. Gallery, variants, reviews, and related products use presentation fixtures until the Catalog Gateway is wired. |
 | `/cart` | `(store)` | Protected shopping cart. Loads Gateway `GET /users/me/cart` via `cartClient` (client-side after session restore; creates User profile on 404). Line merchandising joins Catalog by `productId`. Qty/remove/add persist through PATCH/DELETE/POST when line/product ids are Gateway UUIDs. Checkout and PayPal buttons navigate to `/checkout` and do not invent Payment APIs. |
 | `/checkout` | `(store)` | Protected Alloy checkout. Loads Gateway cart + User profile/addresses via `CheckoutContainer`, then Place order calls `POST /users/me/checkout` + `.../complete` (upserts shipping address first). Payment tiles (`card`, `paypal`, `qr_pay`, `google_pay`) map to Gateway `paymentProvider` (`vnpay`, `paypal`, `momo`). Saved cards can be selected; **CVV is required each charge and never posted to save APIs** (ADR-006). Card/OTP fields stay in the browser. Success navigates to `/orders/confirmed`; the created order is listed on `/orders`. Requires seeded inventory for the default warehouse. |

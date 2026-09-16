@@ -4,7 +4,8 @@ import type { ShopQuery } from '@/lib/url/shop-query';
 
 /**
  * Client-side fixture selection for the listing UI.
- * Not a Catalog bounded-context rule — swap for a Gateway query later.
+ * Keyword/category/price/sort/page for live shop listing now run on OpenSearch.
+ * This helper remains for presentation fixtures and extra shop filters.
  * Zero matches are an empty result (`EmptyState`). Unexpected load failures must throw
  * so `shop/error.tsx` can render `ErrorState`.
  */
@@ -44,10 +45,6 @@ export function applyShopQuery(
       }
     }
 
-    if (query.brands.length > 0 && !query.brands.includes(product.brand)) {
-      return false;
-    }
-
     if (query.minPrice != null && product.price < query.minPrice) {
       return false;
     }
@@ -56,19 +53,7 @@ export function applyShopQuery(
       return false;
     }
 
-    if (query.rating && product.rating < query.rating) {
-      return false;
-    }
-
-    if (query.inStock && product.inStock === false) {
-      return false;
-    }
-
-    if (query.sale && product.badge !== 'sale') {
-      return false;
-    }
-
-    return true;
+    return applyShopPresentationFilters([product], query).length > 0;
   });
 
   const sorted = [...matched].sort((left, right) => {
@@ -97,4 +82,33 @@ export function applyShopQuery(
     page,
     totalPages: total === 0 ? 0 : totalPages,
   };
+}
+
+/**
+ * Shop filters the Search API does not own (brand name, rating, stock, sale).
+ * Applied to the current Search page only — keyword/category/price/sort/page stay on OpenSearch.
+ */
+export function applyShopPresentationFilters(
+  products: readonly ProductViewModel[],
+  query: ShopQuery,
+): ProductViewModel[] {
+  return products.filter((product) => {
+    if (query.brands.length > 0 && !query.brands.includes(product.brand)) {
+      return false;
+    }
+
+    if (query.rating && product.rating < query.rating) {
+      return false;
+    }
+
+    if (query.inStock && product.inStock === false) {
+      return false;
+    }
+
+    if (query.sale && product.badge !== 'sale') {
+      return false;
+    }
+
+    return true;
+  });
 }

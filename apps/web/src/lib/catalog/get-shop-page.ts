@@ -1,7 +1,11 @@
 import type { ProductViewModel } from '@/lib/view-models/product';
-import { applyShopQuery } from '@/lib/catalog/apply-shop-query';
-import { loadPublishedCatalog } from '@/lib/catalog/load-published-catalog';
+import { applyShopPresentationFilters } from '@/lib/catalog/apply-shop-query';
+import { catalogClient } from '@/lib/catalog/client';
+import { buildCategoryIndex } from '@/lib/catalog/mappers';
 import { shopFacets } from '@/lib/mock-data/catalog';
+import { searchClient } from '@/lib/search/client';
+import { mapSearchItemToViewModel } from '@/lib/search/mappers';
+import { toSearchProductsQuery } from '@/lib/search/to-search-query';
 import { parseShopQuery, type ShopQuery } from '@/lib/url/shop-query';
 import {
   getShopChildCollections,
@@ -92,8 +96,10 @@ export function buildShopFacets(
 }
 
 /**
- * Loads `/shop` (and `/shop/[category]`) from Gateway published products.
- * Collection/filter/sort/page remain presentation-layer via `applyShopQuery`.
+ * Loads `/shop` and `/shop/[category]` from Gateway Search (`GET /search/products`).
+ * Categories come from Catalog so collection slugs can map to `categoryId`.
+ * Search does not query PostgreSQL; brand/rating/sale/availability stay presentation filters
+ * on the current result page.
  */
 export async function getShopPageModel(
   searchParams: Record<string, string | string[] | undefined>,
@@ -104,16 +110,19 @@ export async function getShopPageModel(
   }
 
   const query = parseShopQuery(searchParams, { collection });
-  const catalog = await loadPublishedCatalog();
-  const listing = applyShopQuery(catalog.viewModels, query);
+  const categories = await catalogClient.listCategories();
+  const categoryIndex = buildCategoryIndex(categories);
+  const result = await searchClient.searchProducts(toSearchProductsQuery(query, categories));
+  const mapped = result.items.map((item) => mapSearchItemToViewModel(item, categoryIndex));
+  const products = applyShopPresentationFilters(mapped, query);
 
   return {
     query,
     header: getShopHeader(query),
-    facets: buildShopFacets(catalog.viewModels, query),
-    products: listing.items,
-    total: listing.total,
-    page: listing.page,
-    totalPages: listing.totalPages,
+    facets: buildShopFacets(mapped, query),
+    products,
+    total: result.total,
+    page: result.page,
+    totalPages: result.totalPages === 0 && result.total === 0 ? 0 : result.totalPages,
   };
 }

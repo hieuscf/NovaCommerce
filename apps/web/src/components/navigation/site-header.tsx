@@ -1,11 +1,10 @@
 'use client';
 
 import Link from 'next/link';
+import { Suspense, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { ChevronDown, Globe, Heart, Menu, Search, ShoppingCart, User } from 'lucide-react';
+import { ChevronDown, Globe, Heart, Menu, ShoppingCart, User } from 'lucide-react';
 import { Button } from '@novacommerce/ui/components/button';
-import { Input } from '@novacommerce/ui/components/input';
 import { Container } from '@novacommerce/ui/components/container';
 import { NovaCommerceLogo } from '@novacommerce/ui/components/nova-commerce-logo';
 import { Skeleton } from '@novacommerce/ui/components/skeleton';
@@ -20,6 +19,7 @@ import { useSession } from '@/features/auth/use-session';
 import { getCartLineCount } from '@/lib/cart/get-cart-page';
 import { cn } from '@/lib/utils';
 import { AccountMenu } from './account-menu';
+import { HeaderSearchForm } from './header-search-form';
 
 const navLinks = [
   { href: '/', label: 'Home' },
@@ -96,14 +96,13 @@ export function SiteHeader() {
           </nav>
 
           <div className="ml-auto hidden min-w-0 flex-1 justify-end md:flex lg:max-w-[520px]">
-            <Input
-              type="search"
-              placeholder="Search for products, brands and more..."
-              startAdornment={<Search aria-hidden="true" />}
-              className="h-10 text-[13px]"
-              groupClassName="h-10 rounded-pill border-white/60 bg-white/95"
-              aria-label="Search products"
-            />
+            <Suspense fallback={<div className="h-10 w-full rounded-pill bg-white/40" aria-hidden="true" />}>
+              <HeaderSearchForm
+                placeholder="Search for products, brands and more..."
+                inputClassName="h-10 text-[13px]"
+                groupClassName="h-10 rounded-pill border-white/60 bg-white/95"
+              />
+            </Suspense>
           </div>
 
           <div className="flex items-center gap-1 text-white md:ml-0">
@@ -181,12 +180,12 @@ export function SiteHeader() {
                 </SheetHeader>
                 <div className="px-6 pb-6">
                   <div className="mb-6">
-                    <Input
-                      type="search"
-                      placeholder="Search products..."
-                      startAdornment={<Search aria-hidden="true" />}
-                      aria-label="Search products"
-                    />
+                    <Suspense fallback={<div className="h-11 rounded-xl bg-muted" aria-hidden="true" />}>
+                      <HeaderSearchForm
+                        placeholder="Search products..."
+                        onSearch={() => setMobileOpen(false)}
+                      />
+                    </Suspense>
                   </div>
                   <nav className="flex flex-col gap-1" aria-label="Mobile navigation">
                     {navLinks.map((link) => (
