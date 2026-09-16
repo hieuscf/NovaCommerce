@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "react-toastify/dist/ReactToastify.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -76,6 +77,17 @@
   --nc-duration-fast: 150ms;
   --nc-duration-normal: 250ms;
   --nc-duration-slow: 400ms;
+
+  /* react-toastify — map library variables onto NovaCommerce tokens */
+  --toastify-color-light: var(--nc-surface);
+  --toastify-color-info: var(--nc-info);
+  --toastify-color-success: var(--nc-success);
+  --toastify-color-warning: var(--nc-warning);
+  --toastify-color-error: var(--nc-destructive);
+  --toastify-text-color-light: var(--nc-foreground);
+  --toastify-font-family: inherit;
+  --toastify-toast-bd-radius: 0.75rem;
+  --toastify-toast-shadow: var(--shadow-lg, 0 20px 50px rgba(15, 23, 42, 0.08));
 }
 
 @theme inline {
@@ -515,6 +527,17 @@
 @utility panel-from-bottom {
   --nc-panel-x: 0;
   --nc-panel-y: 100%;
+}
+
+.Toastify__toast {
+  border: 1px solid var(--nc-border);
+  background: var(--nc-surface);
+  color: var(--nc-foreground);
+}
+
+.Toastify__toast-body {
+  align-items: flex-start;
+  color: inherit;
 }
 
 @media (prefers-reduced-motion: reduce) {

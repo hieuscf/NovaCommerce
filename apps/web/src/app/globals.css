@@ -2,3 +2,39 @@
 
 @source "../../../packages/ui/src/**/*.{ts,tsx}";
 @source "../**/*.{ts,tsx}";
+
+.shop-range-thumb {
+  pointer-events: none;
+}
+
+.shop-range-thumb::-webkit-slider-thumb {
+  pointer-events: auto;
+  appearance: none;
+  height: 18px;
+  width: 18px;
+  border-radius: 9999px;
+  border: 2px solid var(--color-primary);
+  background: white;
+  box-shadow: 0 1px 4px rgb(15 23 42 / 0.16);
+  cursor: pointer;
+}
+
+.shop-range-thumb::-moz-range-thumb {
+  pointer-events: auto;
+  appearance: none;
+  height: 18px;
+  width: 18px;
+  border-radius: 9999px;
+  border: 2px solid var(--color-primary);
+  background: white;
+  box-shadow: 0 1px 4px rgb(15 23 42 / 0.16);
+  cursor: pointer;
+}
+
+.shop-range-thumb::-webkit-slider-runnable-track {
+  background: transparent;
+}
+
+.shop-range-thumb::-moz-range-track {
+  background: transparent;
+}

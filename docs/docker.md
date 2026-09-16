@@ -108,6 +108,13 @@ docker compose -f docker-compose.dev.yml up -d
 
 Then run apps locally with pnpm (see section 7–9).
 
+**These two stacks cannot run at the same time.** Both publish Postgres on host `5433` (and Redis `6379`, OpenSearch `9200`, MinIO `9000`/`9001`). Pick one:
+
+```bash
+docker compose -f docker-compose.dev.yml down   # free ports, then full stack
+docker compose down                             # free ports, then infra-only
+```
+
 ### Stop and clean up
 
 ```bash
@@ -186,9 +193,12 @@ curl http://localhost:3001/
 Local development (without Docker image rebuild):
 
 ```bash
+docker compose stop web   # required if novacommerce-web already publishes :3001
 pnpm install
 pnpm --filter @novacommerce/web run dev
 ```
+
+`next dev --port 3001` and the Compose `web` service cannot listen on 3001 at the same time. The API container on `:3000` can stay up.
 
 ---
 
@@ -356,7 +366,22 @@ docker compose exec postgres psql -U novacommerce -d novacommerce -c "SELECT COU
 
 ### Port conflicts
 
-Change host port mappings in `docker-compose.yml` if 5432, 6379, 9200, 9000, 3000–3002, or 8000 are already in use.
+`Bind for 0.0.0.0:5433 failed: port is already allocated` almost always means the **other** Compose file is already up. Full stack (`docker-compose.yml`) and infra-only (`docker-compose.dev.yml`) both map `${POSTGRES_HOST_PORT:-5433}:5432`.
+
+```bash
+docker ps --filter publish=5433
+docker compose -f docker-compose.dev.yml down   # if novacommerce-dev-postgres holds 5433
+docker compose down                             # if novacommerce-postgres holds 5433
+```
+
+Host listeners on `5433` that show `com.docker.backend` / `wslrelay` are Docker's port proxy for that container — not a separate local PostgreSQL install.
+
+`listen EADDRINUSE :::3001` while running `pnpm --filter @novacommerce/web run dev` means Compose `web` (or another Next process) already bound that port:
+
+```bash
+docker ps --filter publish=3001
+docker compose stop web
+```
 
 ### Kafka (future profile only)
 

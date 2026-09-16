@@ -111,6 +111,8 @@ Type checking is performed as part of each package's `build` script (`tsc`, `nes
 
 ### Local development servers
 
+Start infra and apply migrations first (`docker compose -f docker-compose.dev.yml up -d`, then `pnpm db:migrate:deploy`). Gateway `start:dev` loads the repo `.env`. Web talks to that Gateway when `NEXT_PUBLIC_AUTH_ADAPTER` is unset — copy `apps/web/.env.example` to `apps/web/.env.local`. If `novacommerce-web` is already up from `docker compose up -d`, stop it first (`docker compose stop web`) so Next can bind `:3001`.
+
 ```bash
 pnpm --filter @novacommerce/gateway run start:dev
 pnpm --filter @novacommerce/web run dev
@@ -129,8 +131,10 @@ pnpm db:migrate:deploy
 ```bash
 cp .env.example .env
 docker compose -f docker-compose.dev.yml up -d    # infra only
-docker compose up -d                               # full stack
+docker compose up -d                               # full stack (stop the infra-only stack first)
 ```
+
+Do not run both Compose files together — they share host ports `5433`, `6379`, `9200`, and `9000`.
 
 See [docker.md](./docker.md) for full Docker workflow.
 

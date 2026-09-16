@@ -13,8 +13,8 @@ describe('getProductBreadcrumbs', () => {
     expect(product).toBeDefined();
     expect(getProductBreadcrumbs(product!)).toEqual([
       { href: '/', label: 'Home' },
-      { href: '/shop?category=electronics', label: 'Electronics' },
-      { href: '/shop?category=smartphones', label: 'Smartphones' },
+      { href: '/shop/electronics', label: 'Electronics' },
+      { href: '/shop/smartphones', label: 'Smartphones' },
       { href: '/products/iphone-17-pro', label: 'iPhone 17 Pro', current: true },
     ]);
   });

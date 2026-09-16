@@ -119,7 +119,7 @@ export default function DesignSystemPage() {
         id="overlays"
         index={10}
         title="Overlays and navigation"
-        description="Dialog, dropdown, sheet, tooltip, tabs and toast — all keyboard accessible via Radix."
+        description="Dialog, dropdown, sheet, tooltip and tabs are Radix. Toasts use React-Toastify."
       >
         <OverlaySpecimens />
       </ShowcaseSection>

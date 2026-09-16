@@ -28,7 +28,7 @@ Admin authentication is a separate concern in `apps/admin` and must not reuse th
 | OAuth / social sign-in | Pending (button disabled) |
 | Remember Me backend field | Not in Identity login DTO — cookie lifetime only |
 | Register profile fields (name, terms, marketing) | Collected in UI only — not sent yet |
-| Full account dashboard (profile, addresses, orders) | Implemented as presentation UI with mock fixtures. User / Order Gateway adapters pending. Sign out lives on `/account?section=security`. Orders list/detail/confirmation live on `/orders`. |
+| Full account dashboard (profile, addresses, orders) | Profile, addresses, and notification preferences use Gateway `/users/me*` via `userClient` (create-on-404, edit/delete/default address, preference PATCH). Payment/loyalty/wishlist/recent-order rails remain empty until those APIs are wired. Sign out on `/account?section=security`. Orders list/detail/confirmation live on `/orders` (still fixture-backed on the storefront). |
 
 Frontend route guards are **UX only**. Gateway / Identity authorization remains authoritative.
 

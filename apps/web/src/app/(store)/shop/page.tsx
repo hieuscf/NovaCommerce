@@ -1,39 +1,49 @@
 import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 import { Container } from '@novacommerce/ui/components/container';
 import { ProductListing } from '@/components/commerce/listing/product-listing';
-import { applyShopQuery } from '@/lib/catalog/apply-shop-query';
-import { catalogProducts, shopFacets } from '@/lib/mock-data/catalog';
-import { parseShopQuery } from '@/lib/url/shop-query';
-import { getShopHeader } from '@/lib/view-models/shop';
+import { getShopPageModel } from '@/lib/catalog/get-shop-page';
+import { parseShopQuery, shopHref } from '@/lib/url/shop-query';
+
+export const dynamic = 'force-dynamic';
 
 interface ShopPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
 export async function generateMetadata({ searchParams }: ShopPageProps): Promise<Metadata> {
-  const header = getShopHeader(parseShopQuery(await searchParams));
+  const model = getShopPageModel(await searchParams);
   return {
-    title: header.title,
-    description: header.description,
+    title: model?.header.title ?? 'Shop',
+    description: model?.header.description,
   };
 }
 
 export default async function ShopPage({ searchParams }: ShopPageProps) {
-  const query = parseShopQuery(await searchParams);
-  const header = getShopHeader(query);
-  const listing = applyShopQuery(catalogProducts, query);
+  const params = await searchParams;
+  const parsed = parseShopQuery(params);
+  if (!parsed.collection && parsed.categories.length === 1) {
+    redirect(shopHref(parsed));
+  }
+
+  const model = getShopPageModel(params);
+  if (!model) {
+    redirect('/shop');
+  }
 
   return (
-    <Container size="wide" className="py-8 lg:py-12">
-      <ProductListing
-        query={query}
-        header={header}
-        facets={shopFacets}
-        products={listing.items}
-        total={listing.total}
-        page={listing.page}
-        totalPages={listing.totalPages}
-      />
-    </Container>
+    <div className="bg-page-canvas min-h-svh">
+      <Container size="wide" className="py-8 lg:py-10">
+        <ProductListing
+          query={model.query}
+          header={model.header}
+          facets={model.facets}
+          products={model.products}
+          total={model.total}
+          page={model.page}
+          totalPages={model.totalPages}
+        />
+      </Container>
+    </div>
   );
 }

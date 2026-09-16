@@ -1,7 +1,12 @@
+'use client';
+
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
+import { Button } from '@novacommerce/ui/components/button';
 import { Container } from '@novacommerce/ui/components/container';
+import { ErrorState } from '@novacommerce/ui/components/error-state';
 import { OrderListPage } from '@/components/commerce/orders/order-list-page';
+import { AccountProvider, useAccount } from '@/features/account/account-context';
 import { getOrderListPage } from '@/lib/orders/get-order-list';
 import { ACCOUNT_SECTION_LABELS, type AccountSection } from '@/lib/view-models/account';
 import {
@@ -11,6 +16,7 @@ import {
   AccountPaymentMethods,
 } from './account-aside-cards';
 import { AccountHeaderArt } from './account-header-art';
+import { AccountNotificationsPanel } from './account-notifications-panel';
 import { AccountPendingPanel } from './account-pending-panel';
 import { AccountProfileCard } from './account-profile-card';
 import { AccountQuickActions } from './account-quick-actions';
@@ -27,11 +33,11 @@ function AccountPageHeader({ section }: { section: AccountSection }) {
         </Link>
         <ChevronRight className="size-3.5" aria-hidden="true" />
         {section === 'overview' ? (
-          <span className="font-medium text-foreground/80">Account</span>
+          <span className="font-medium text-foreground/80">My Account</span>
         ) : (
           <>
             <Link href="/account" className="hover:text-foreground">
-              Account
+              My Account
             </Link>
             <ChevronRight className="size-3.5" aria-hidden="true" />
             <span className="font-medium text-foreground/80">{ACCOUNT_SECTION_LABELS[section]}</span>
@@ -58,23 +64,38 @@ function AccountSectionPanel({ section }: { section: AccountSection }) {
       return <AccountProfileCard />;
     case 'security':
       return <AccountSecurityPanel />;
+    case 'notifications':
+      return <AccountNotificationsPanel />;
     case 'help':
       return <AccountHelp />;
     case 'wishlist':
-    case 'notifications':
       return <AccountPendingPanel section={section} />;
     default:
       return null;
   }
 }
 
-export function AccountDashboard({ section }: { section: AccountSection }) {
-  if (section === 'orders') {
-    const query = { status: 'all' as const, page: 1 };
-    return <OrderListPage list={getOrderListPage(query)} query={query} />;
-  }
-
+function AccountDashboardBody({ section }: { section: AccountSection }) {
+  const { status, error, reload } = useAccount();
   const overview = section === 'overview';
+
+  if (status === 'error') {
+    return (
+      <div className="bg-background min-h-svh">
+        <Container size="wide" className="relative py-12">
+          <ErrorState
+            title="Could not load your account"
+            description={error ?? 'Please try again.'}
+            action={
+              <Button type="button" onClick={() => void reload()}>
+                Try again
+              </Button>
+            }
+          />
+        </Container>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-background min-h-svh">
@@ -107,5 +128,18 @@ export function AccountDashboard({ section }: { section: AccountSection }) {
         </div>
       </Container>
     </div>
+  );
+}
+
+export function AccountDashboard({ section }: { section: AccountSection }) {
+  if (section === 'orders') {
+    const query = { status: 'all' as const, page: 1 };
+    return <OrderListPage list={getOrderListPage(query)} query={query} />;
+  }
+
+  return (
+    <AccountProvider>
+      <AccountDashboardBody section={section} />
+    </AccountProvider>
   );
 }

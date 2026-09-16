@@ -25,7 +25,7 @@ export function AccountSecurityPanel() {
       </div>
       <h2 className="mt-4 text-lg font-bold text-foreground">Account security</h2>
       <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-        You are signed in. Password management will connect when the User API is wired.
+        You are signed in. Password reset remains available from the login flow.
       </p>
       <p className="mt-4 text-sm text-muted-foreground">
         Session status: <span className="font-medium text-foreground">{status}</span>

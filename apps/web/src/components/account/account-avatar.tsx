@@ -1,12 +1,56 @@
 import { cn } from '@/lib/utils';
 
+function initialsFromName(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) {
+    return 'NC';
+  }
+  if (parts.length === 1) {
+    return parts[0]!.slice(0, 2).toUpperCase();
+  }
+  return `${parts[0]![0] ?? ''}${parts[1]![0] ?? ''}`.toUpperCase();
+}
+
 export function AccountAvatar({
   size = 44,
+  name,
+  imageUrl,
   className,
 }: {
   size?: number;
+  name?: string;
+  imageUrl?: string;
   className?: string;
 }) {
+  if (imageUrl) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element -- remote avatar URL from User API
+      <img
+        src={imageUrl}
+        alt=""
+        width={size}
+        height={size}
+        className={cn('shrink-0 rounded-full object-cover', className)}
+        style={{ width: size, height: size }}
+      />
+    );
+  }
+
+  if (name) {
+    return (
+      <span
+        className={cn(
+          'grid shrink-0 place-items-center rounded-full bg-primary-tint text-primary',
+          className,
+        )}
+        style={{ width: size, height: size, fontSize: Math.max(12, size * 0.32) }}
+        aria-hidden="true"
+      >
+        <span className="font-bold tracking-tight">{initialsFromName(name)}</span>
+      </span>
+    );
+  }
+
   return (
     <span
       className={cn('relative shrink-0 overflow-hidden rounded-full', className)}

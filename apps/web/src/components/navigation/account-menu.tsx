@@ -8,8 +8,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@novacommerce/ui/components/dropdown-menu';
 import { useSession } from '@/features/auth/use-session';
@@ -34,10 +32,8 @@ export function AccountMenu() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuLabel>Account</DropdownMenuLabel>
-        <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href="/account">Your account</Link>
+          <Link href="/account">My Account</Link>
         </DropdownMenuItem>
         <DropdownMenuItem
           variant="destructive"

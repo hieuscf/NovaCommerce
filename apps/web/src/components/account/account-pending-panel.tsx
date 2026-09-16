@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Bell, Heart } from 'lucide-react';
+import { Heart } from 'lucide-react';
 import { Button } from '@novacommerce/ui/components/button';
 import { EmptyState } from '@novacommerce/ui/components/empty-state';
 import { accountSectionHref, type AccountSection } from '@/lib/view-models/account';
@@ -11,11 +11,6 @@ const PENDING: Partial<
     icon: Heart,
     title: 'Wishlist is coming next',
     description: 'Saved items will appear here when the customer wishlist API is available.',
-  },
-  notifications: {
-    icon: Bell,
-    title: 'No notifications yet',
-    description: 'Order and account alerts will appear here when Notification APIs are connected.',
   },
 };
 

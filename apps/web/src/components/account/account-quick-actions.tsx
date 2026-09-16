@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { ArrowRight, CreditCard, FileText, Heart, MapPin } from 'lucide-react';
-import { accountQuickActions } from '@/lib/mock-data/account';
-import { accountSectionHref } from '@/lib/view-models/account';
+import { ACCOUNT_QUICK_ACTIONS, accountSectionHref } from '@/lib/view-models/account';
 import { cn } from '@/lib/utils';
 import { AccountCard } from './account-card';
 
@@ -23,7 +22,7 @@ export function AccountQuickActions() {
     <AccountCard>
       <h2 className="text-base font-bold text-foreground">Quick Actions</h2>
       <div className="mt-4 grid gap-3.5 sm:grid-cols-2 xl:grid-cols-4">
-        {accountQuickActions.map((action) => {
+        {ACCOUNT_QUICK_ACTIONS.map((action) => {
           const Icon = ACTION_ICONS[action.section];
           return (
             <Link

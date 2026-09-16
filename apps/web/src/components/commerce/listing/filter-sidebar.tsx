@@ -1,15 +1,15 @@
 'use client';
 
+import { useState, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { Star } from 'lucide-react';
 import { Checkbox } from '@novacommerce/ui/components/checkbox';
-import { Input } from '@novacommerce/ui/components/input';
-import { Label } from '@novacommerce/ui/components/label';
-import { RadioGroup, RadioGroupItem } from '@novacommerce/ui/components/radio-group';
-import { Button } from '@novacommerce/ui/components/button';
-import { shopHref, type ShopQuery } from '@/lib/url/shop-query';
-import type { ShopFacets } from '@/lib/view-models/shop';
-import { FilterSection } from './filter-section';
+import { clearShopFilters, hasActiveShopFilters, shopHref, type ShopQuery } from '@/lib/url/shop-query';
+import { getShopChildCollections, type ShopFacets } from '@/lib/view-models/shop';
+import { cn } from '@/lib/utils';
+import { PriceRangeFilter } from './price-range-filter';
+
+const VISIBLE_FACETS = 5;
 
 function toggleValue(values: readonly string[], value: string): string[] {
   return values.includes(value) ? values.filter((item) => item !== value) : [...values, value];
@@ -18,26 +18,50 @@ function toggleValue(values: readonly string[], value: string): string[] {
 function FilterCheckRow({
   id,
   label,
+  count,
   checked,
   onChange,
 }: {
   id: string;
   label: string;
+  count?: number;
   checked: boolean;
   onChange: (next: boolean) => void;
 }) {
   return (
-    <label
-      htmlFor={id}
-      className="flex min-h-11 cursor-pointer items-center gap-3 rounded-lg px-1 hover:bg-muted/70"
-    >
-      <Checkbox
-        id={id}
-        checked={checked}
-        onCheckedChange={(value) => onChange(value === true)}
-      />
-      <span className="text-sm text-copy">{label}</span>
+    <label htmlFor={id} className="flex min-h-9 cursor-pointer items-center gap-2.5 rounded-lg px-0.5">
+      <Checkbox id={id} checked={checked} onCheckedChange={(value) => onChange(value === true)} />
+      <span className="min-w-0 flex-1 truncate text-sm text-copy">{label}</span>
+      {count != null ? (
+        <span className="text-xs tabular-nums text-muted-foreground">{count}</span>
+      ) : null}
     </label>
+  );
+}
+
+function FacetList({
+  items,
+  renderItem,
+}: {
+  items: readonly { slug: string }[];
+  renderItem: (slug: string, index: number) => ReactNode;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const visible = expanded ? items : items.slice(0, VISIBLE_FACETS);
+
+  return (
+    <div className="space-y-1">
+      {visible.map((item, index) => renderItem(item.slug, index))}
+      {items.length > VISIBLE_FACETS ? (
+        <button
+          type="button"
+          className="mt-1 px-0.5 text-sm font-medium text-primary hover:underline"
+          onClick={() => setExpanded((current) => !current)}
+        >
+          {expanded ? 'Show less' : '+ Show more'}
+        </button>
+      ) : null}
+    </div>
   );
 }
 
@@ -51,140 +75,176 @@ export function FilterSidebar({
   idPrefix?: string;
 }) {
   const router = useRouter();
-  const [minPrice, setMinPrice] = useState(query.minPrice?.toString() ?? '');
-  const [maxPrice, setMaxPrice] = useState(query.maxPrice?.toString() ?? '');
+  const childCategories = query.collection ? getShopChildCollections(query.collection) : [];
+  const filterChildren = childCategories.length > 0;
+  const canClear = hasActiveShopFilters(query);
 
   function navigate(next: ShopQuery) {
     router.push(shopHref(next));
   }
 
-  function applyPrice() {
-    const min = minPrice === '' ? undefined : Number(minPrice);
-    const max = maxPrice === '' ? undefined : Number(maxPrice);
+  function onCategoryChange(slug: string, checked: boolean) {
+    if (filterChildren) {
+      navigate({
+        ...query,
+        categories: checked
+          ? [...query.categories, slug]
+          : query.categories.filter((item) => item !== slug),
+        page: 1,
+      });
+      return;
+    }
+
+    if (checked) {
+      navigate({
+        ...query,
+        collection: slug,
+        categories: [],
+        page: 1,
+      });
+      return;
+    }
+
     navigate({
       ...query,
-      minPrice: min != null && Number.isFinite(min) ? min : undefined,
-      maxPrice: max != null && Number.isFinite(max) ? max : undefined,
+      collection: query.collection === slug ? undefined : query.collection,
+      categories: query.categories.filter((item) => item !== slug),
       page: 1,
     });
   }
 
   return (
     <div className="flex flex-col">
-      <h2 className="text-base font-bold text-foreground">Filters</h2>
+      <div className="mb-5 flex items-center justify-between gap-3">
+        <h2 className="text-base font-bold text-foreground">Filter</h2>
+        {canClear ? (
+          <button
+            type="button"
+            className="text-sm font-medium text-primary hover:underline"
+            onClick={() => navigate(clearShopFilters(query))}
+          >
+            Clear all
+          </button>
+        ) : (
+          <span className="text-sm text-muted-foreground">Clear all</span>
+        )}
+      </div>
 
-      <FilterSection title="Categories">
-        {facets.categories.map((option) => (
-          <FilterCheckRow
-            key={option.slug}
-            id={`${idPrefix}-category-${option.slug}`}
-            label={option.name}
-            checked={query.categories.includes(option.slug)}
-            onChange={() =>
-              navigate({
-                ...query,
-                categories: toggleValue(query.categories, option.slug),
-                page: 1,
-              })
+      <section className="border-b border-border/70 py-4 first:pt-0">
+        <h3 className="mb-3 text-sm font-semibold text-foreground">Price Range</h3>
+        <PriceRangeFilter
+          minPrice={query.minPrice}
+          maxPrice={query.maxPrice}
+          onCommit={({ minPrice, maxPrice }) => navigate({ ...query, minPrice, maxPrice, page: 1 })}
+        />
+      </section>
+
+      <section className="border-b border-border/70 py-4">
+        <h3 className="mb-3 text-sm font-semibold text-foreground">Brand</h3>
+        <FacetList
+          items={facets.brands}
+          renderItem={(slug) => {
+            const option = facets.brands.find((item) => item.slug === slug);
+            if (!option) {
+              return null;
             }
-          />
-        ))}
-      </FilterSection>
+            return (
+              <FilterCheckRow
+                key={option.slug}
+                id={`${idPrefix}-brand-${option.slug}`}
+                label={option.name}
+                count={option.count}
+                checked={query.brands.includes(option.slug)}
+                onChange={() =>
+                  navigate({
+                    ...query,
+                    brands: toggleValue(query.brands, option.slug),
+                    page: 1,
+                  })
+                }
+              />
+            );
+          }}
+        />
+      </section>
 
-      <FilterSection title="Brand">
-        {facets.brands.map((option) => (
-          <FilterCheckRow
-            key={option.slug}
-            id={`${idPrefix}-brand-${option.slug}`}
-            label={option.name}
-            checked={query.brands.includes(option.slug)}
-            onChange={() =>
-              navigate({
-                ...query,
-                brands: toggleValue(query.brands, option.slug),
-                page: 1,
-              })
+      <section className="border-b border-border/70 py-4">
+        <h3 className="mb-3 text-sm font-semibold text-foreground">Category</h3>
+        <FacetList
+          items={facets.categories}
+          renderItem={(slug) => {
+            const option = facets.categories.find((item) => item.slug === slug);
+            if (!option) {
+              return null;
             }
-          />
-        ))}
-      </FilterSection>
+            const checked = filterChildren
+              ? query.categories.includes(option.slug)
+              : query.collection === option.slug || query.categories.includes(option.slug);
+            return (
+              <FilterCheckRow
+                key={option.slug}
+                id={`${idPrefix}-category-${option.slug}`}
+                label={option.name}
+                count={option.count}
+                checked={checked}
+                onChange={(next) => onCategoryChange(option.slug, next)}
+              />
+            );
+          }}
+        />
+      </section>
 
-      <FilterSection title="Price">
-        <div className="grid grid-cols-[1fr_auto_1fr] items-end gap-2 px-1">
-          <div className="space-y-1.5">
-            <Label htmlFor={`${idPrefix}-min-price`} className="text-xs text-muted-foreground">
-              Min
-            </Label>
-            <Input
-              id={`${idPrefix}-min-price`}
-              type="number"
-              inputMode="decimal"
-              min={0}
-              placeholder="0"
-              value={minPrice}
-              className="h-10"
-              onChange={(event) => setMinPrice(event.target.value)}
-            />
-          </div>
-          <span className="mb-2.5 text-muted-foreground" aria-hidden="true">
-            —
-          </span>
-          <div className="space-y-1.5">
-            <Label htmlFor={`${idPrefix}-max-price`} className="text-xs text-muted-foreground">
-              Max
-            </Label>
-            <Input
-              id={`${idPrefix}-max-price`}
-              type="number"
-              inputMode="decimal"
-              min={0}
-              placeholder="Any"
-              value={maxPrice}
-              className="h-10"
-              onChange={(event) => setMaxPrice(event.target.value)}
-            />
-          </div>
+      <section className="border-b border-border/70 py-4">
+        <h3 className="mb-3 text-sm font-semibold text-foreground">Rating</h3>
+        <div className="space-y-1">
+          {(facets.ratings ?? []).map((option) => {
+            const selected = query.rating === option.value;
+            return (
+              <button
+                key={option.value}
+                type="button"
+                className={cn(
+                  'flex min-h-9 w-full items-center gap-2 rounded-lg px-0.5 text-left',
+                  selected && 'font-medium text-foreground',
+                )}
+                aria-pressed={selected}
+                onClick={() =>
+                  navigate({
+                    ...query,
+                    rating: selected ? undefined : option.value,
+                    page: 1,
+                  })
+                }
+              >
+                <span className="flex items-center gap-0.5 text-warning" aria-hidden="true">
+                  {Array.from({ length: 5 }, (_, index) => (
+                    <Star
+                      key={index}
+                      className={cn(
+                        'size-3.5',
+                        index < option.value ? 'fill-current' : 'fill-transparent text-border',
+                      )}
+                    />
+                  ))}
+                </span>
+                <span className="text-sm text-copy">& up</span>
+                <span className="ml-auto text-xs tabular-nums text-muted-foreground">{option.count}</span>
+              </button>
+            );
+          })}
         </div>
-        <Button type="button" variant="secondary" size="sm" className="mt-3 w-full" onClick={applyPrice}>
-          Apply price
-        </Button>
-      </FilterSection>
+      </section>
 
-      <FilterSection title="Rating">
-        <RadioGroup
-          value={query.rating ? String(query.rating) : 'any'}
-          onValueChange={(value) =>
-            navigate({
-              ...query,
-              rating: value === '4' ? 4 : value === '3' ? 3 : undefined,
-              page: 1,
-            })
-          }
-          className="gap-0 px-1"
-        >
-          <label htmlFor={`${idPrefix}-rating-any`} className="flex min-h-11 cursor-pointer items-center gap-3">
-            <RadioGroupItem id={`${idPrefix}-rating-any`} value="any" />
-            <span className="text-sm text-copy">Any rating</span>
-          </label>
-          <label htmlFor={`${idPrefix}-rating-4`} className="flex min-h-11 cursor-pointer items-center gap-3">
-            <RadioGroupItem id={`${idPrefix}-rating-4`} value="4" />
-            <span className="text-sm text-copy">4★ &amp; up</span>
-          </label>
-          <label htmlFor={`${idPrefix}-rating-3`} className="flex min-h-11 cursor-pointer items-center gap-3">
-            <RadioGroupItem id={`${idPrefix}-rating-3`} value="3" />
-            <span className="text-sm text-copy">3★ &amp; up</span>
-          </label>
-        </RadioGroup>
-      </FilterSection>
-
-      <FilterSection title="Availability">
+      <section className="py-4 last:pb-0">
+        <h3 className="mb-3 text-sm font-semibold text-foreground">Availability</h3>
         <FilterCheckRow
           id={`${idPrefix}-in-stock`}
           label="In stock"
+          count={facets.inStockCount}
           checked={query.inStock}
           onChange={(checked) => navigate({ ...query, inStock: checked, page: 1 })}
         />
-      </FilterSection>
+      </section>
     </div>
   );
 }

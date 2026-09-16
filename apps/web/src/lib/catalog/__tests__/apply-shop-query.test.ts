@@ -27,6 +27,21 @@ describe('applyShopQuery', () => {
     expect(phones.items.every((product) => product.categorySlug === 'smartphones')).toBe(true);
   });
 
+  it('narrows a collection path with an extra category filter', () => {
+    const electronics = applyShopQuery(
+      catalogProducts,
+      parseShopQuery({}, { collection: 'electronics' }),
+    );
+    const laptops = applyShopQuery(
+      catalogProducts,
+      parseShopQuery({ category: 'laptops' }, { collection: 'electronics' }),
+    );
+
+    expect(laptops.total).toBeGreaterThan(0);
+    expect(laptops.total).toBeLessThan(electronics.total);
+    expect(laptops.items.every((product) => product.categorySlug === 'laptops')).toBe(true);
+  });
+
   it('sorts by price ascending', () => {
     const result = applyShopQuery(catalogProducts, parseShopQuery({ sort: 'price-asc' }));
     const prices = result.items.map((product) => product.price);

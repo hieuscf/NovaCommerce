@@ -24,7 +24,7 @@ import { AccountMenu } from './account-menu';
 const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/shop', label: 'Shop', caret: true },
-  { href: '/shop?category=electronics', label: 'Categories', caret: true },
+  { href: '/shop/electronics', label: 'Categories', caret: true },
   { href: '/shop?sale=true', label: 'Deals' },
   { href: '/about', label: 'About' },
   { href: '/contact', label: 'Contact' },
@@ -67,7 +67,14 @@ export function SiteHeader() {
 
           <nav className="hidden items-center gap-1 lg:flex" aria-label="Main navigation">
             {navLinks.map((link) => {
-              const current = link.href === '/' ? pathname === '/' : pathname.startsWith(link.href);
+              const current =
+                link.href === '/'
+                  ? pathname === '/'
+                  : link.href === '/shop'
+                    ? pathname === '/shop' || pathname.startsWith('/shop/')
+                    : link.href.startsWith('/shop')
+                      ? false
+                      : pathname.startsWith(link.href.split('?')[0] ?? link.href);
               return (
                 <Link
                   key={link.href}
@@ -205,7 +212,7 @@ export function SiteHeader() {
                           onClick={() => setMobileOpen(false)}
                           className="rounded-xl px-4 py-3 text-sm font-medium text-foreground hover:bg-muted"
                         >
-                          Account
+                          My Account
                         </Link>
                         <Button
                           type="button"

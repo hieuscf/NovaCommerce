@@ -1,3 +1,4 @@
+import './config/preload-local-env';
 import 'reflect-metadata';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
@@ -6,6 +7,7 @@ import { loadAppConfig } from '@novacommerce/infrastructure';
 import { AppModule } from './app.module';
 import { API_V1_PREFIX } from './common/constants';
 import { createOpenApiDocument } from './config/swagger.config';
+import { resolveCorsOrigins } from './config/load-local-env';
 
 async function bootstrap(): Promise<void> {
   const config = loadAppConfig();
@@ -25,10 +27,10 @@ async function bootstrap(): Promise<void> {
     }),
   );
 
-  const corsOrigin = process.env.CORS_ORIGIN;
-  if (corsOrigin) {
+  const corsOrigins = resolveCorsOrigins();
+  if (corsOrigins) {
     app.enableCors({
-      origin: corsOrigin.split(',').map((value) => value.trim()),
+      origin: corsOrigins,
       credentials: true,
     });
   }

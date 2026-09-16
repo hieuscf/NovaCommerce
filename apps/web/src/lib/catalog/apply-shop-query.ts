@@ -27,6 +27,14 @@ export function applyShopQuery(
       }
     }
 
+    if (query.collection) {
+      const inCollection =
+        product.categorySlug === query.collection || product.departmentSlug === query.collection;
+      if (!inCollection) {
+        return false;
+      }
+    }
+
     if (query.categories.length > 0) {
       const inCategory = query.categories.some(
         (slug) => product.categorySlug === slug || product.departmentSlug === slug,

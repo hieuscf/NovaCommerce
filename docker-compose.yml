@@ -1,3 +1,7 @@
+# Full stack (infra + API/web/admin). Mutually exclusive with docker-compose.dev.yml:
+# both publish host ports 5433, 6379, 9200, 9000, 9001. If `up` fails with
+# "port is already allocated", stop the other stack first:
+#   docker compose -f docker-compose.dev.yml down
 name: novacommerce
 
 x-logging: &default-logging
@@ -139,6 +143,7 @@ services:
       MINIO_BUCKET: ${MINIO_BUCKET:-novacommerce}
       MINIO_USE_SSL: ${MINIO_USE_SSL:-false}
       JWT_SECRET: ${JWT_SECRET:-change-me-to-a-long-random-string}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3001,http://localhost:3002}
       AI_SERVICE_URL: http://ai-service:8000
     ports:
       - "3000:3000"
@@ -189,6 +194,8 @@ services:
       PORT: 3001
       HOSTNAME: 0.0.0.0
     ports:
+      # Host 3001 is also used by `pnpm --filter @novacommerce/web run dev`.
+      # Stop this service first if you need Next hot reload: docker compose stop web
       - "3001:3001"
     depends_on:
       api:

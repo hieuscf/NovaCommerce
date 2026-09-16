@@ -26,9 +26,10 @@ function SelectTrigger({
     <SelectPrimitive.Trigger
       data-slot="select-trigger"
       className={cn(
-        'flex h-11 w-full items-center justify-between gap-2 rounded-xl border border-input bg-surface px-4 py-2',
-        'text-body-sm text-foreground shadow-sm transition-colors duration-fast',
-        'data-placeholder:text-muted-foreground focus-ring',
+        'flex h-11 w-full items-center justify-between gap-2 rounded-xl border border-border bg-surface px-4 py-2',
+        'text-body-sm font-medium text-ink shadow-sm transition-colors duration-fast',
+        'hover:border-primary/25 hover:bg-surface',
+        'data-placeholder:font-normal data-placeholder:text-muted-foreground focus-ring',
         'disabled:cursor-not-allowed disabled:opacity-50',
         'aria-invalid:border-destructive aria-invalid:focus-visible:ring-destructive',
         '[&_svg]:pointer-events-none [&_svg:not([class*="size-"])]:size-4',
@@ -38,7 +39,7 @@ function SelectTrigger({
     >
       <span className="truncate text-left">{children}</span>
       <SelectPrimitive.Icon asChild>
-        <ChevronDownIcon className="shrink-0 text-muted-foreground" aria-hidden="true" />
+        <ChevronDownIcon className="shrink-0 text-copy" aria-hidden="true" />
       </SelectPrimitive.Icon>
     </SelectPrimitive.Trigger>
   );
@@ -97,8 +98,8 @@ function SelectItem({
       className={cn(
         'relative flex w-full cursor-default select-none items-center gap-2 rounded-sm py-2 pr-8 pl-2.5',
         'text-body-sm text-foreground outline-none transition-colors duration-fast',
-        'focus:bg-muted data-highlighted:bg-muted',
-        'data-[state=checked]:font-medium data-[state=checked]:text-primary',
+        'focus:bg-accent-soft data-highlighted:bg-accent-soft',
+        'data-[state=checked]:bg-accent-soft data-[state=checked]:font-semibold data-[state=checked]:text-primary-strong',
         'data-disabled:pointer-events-none data-disabled:opacity-50',
         className,
       )}

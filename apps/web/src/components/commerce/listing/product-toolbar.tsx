@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { SlidersHorizontal } from 'lucide-react';
+import { LayoutGrid, List, SlidersHorizontal } from 'lucide-react';
 import { Button } from '@novacommerce/ui/components/button';
 import {
   Select,
@@ -19,33 +19,29 @@ import {
 } from '@novacommerce/ui/components/sheet';
 import { shopHref, type ShopQuery } from '@/lib/url/shop-query';
 import {
-  formatResultRange,
-  SHOP_PAGE_SIZE,
+  formatProductCount,
   SHOP_SORT_LABELS,
   SHOP_SORTS,
   type ShopFacets,
   type ShopSort,
 } from '@/lib/view-models/shop';
+import { cn } from '@/lib/utils';
 import { FilterSidebar } from './filter-sidebar';
 
 export function ProductToolbar({
   query,
   total,
-  page,
   facets,
 }: {
   query: ShopQuery;
   total: number;
-  page: number;
   facets: ShopFacets;
 }) {
   const router = useRouter();
 
   return (
-    <div className="flex min-w-0 flex-wrap items-center justify-between gap-3 sm:flex-nowrap sm:justify-end">
-      <p className="text-sm tabular-nums text-muted-foreground">
-        {formatResultRange({ total, page, pageSize: SHOP_PAGE_SIZE })}
-      </p>
+    <div className="flex min-w-0 flex-wrap items-center gap-3">
+      <p className="mr-auto text-sm font-medium tabular-nums text-copy">{formatProductCount(total)}</p>
 
       <Sheet>
         <SheetTrigger asChild>
@@ -54,7 +50,7 @@ export function ProductToolbar({
             Filters
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="w-full max-w-sm p-6">
+        <SheetContent side="left" className="w-full max-w-sm overflow-y-auto p-6">
           <SheetHeader className="p-0">
             <SheetTitle className="sr-only">Filters</SheetTitle>
           </SheetHeader>
@@ -62,8 +58,33 @@ export function ProductToolbar({
         </SheetContent>
       </Sheet>
 
+      <div className="flex items-center gap-1 rounded-xl border border-border/80 bg-surface p-1">
+        <Button
+          type="button"
+          size="icon-sm"
+          variant="ghost"
+          aria-label="Grid view"
+          aria-pressed={query.view === 'grid'}
+          className={cn(query.view === 'grid' && 'bg-primary-tint text-primary')}
+          onClick={() => router.push(shopHref({ ...query, view: 'grid' }))}
+        >
+          <LayoutGrid className="size-4" aria-hidden="true" />
+        </Button>
+        <Button
+          type="button"
+          size="icon-sm"
+          variant="ghost"
+          aria-label="List view"
+          aria-pressed={query.view === 'list'}
+          className={cn(query.view === 'list' && 'bg-primary-tint text-primary')}
+          onClick={() => router.push(shopHref({ ...query, view: 'list' }))}
+        >
+          <List className="size-4" aria-hidden="true" />
+        </Button>
+      </div>
+
       <div className="flex min-w-0 items-center gap-2">
-        <span className="hidden text-sm font-medium text-copy sm:inline">Sort by</span>
+        <span className="hidden text-sm text-copy sm:inline">Sort by:</span>
         <Select
           value={query.sort}
           onValueChange={(value) => {
@@ -73,9 +94,9 @@ export function ProductToolbar({
         >
           <SelectTrigger
             aria-label="Sort products"
-            className="h-11 w-[196px] rounded-xl border-border bg-surface font-medium text-ink sm:w-[220px]"
+            className="h-10 w-[168px] rounded-xl border-border bg-surface font-medium text-ink sm:w-[188px]"
           >
-            <SelectValue placeholder="Featured" />
+            <SelectValue placeholder="Featured">{SHOP_SORT_LABELS[query.sort]}</SelectValue>
           </SelectTrigger>
           <SelectContent>
             {SHOP_SORTS.map((sort) => (

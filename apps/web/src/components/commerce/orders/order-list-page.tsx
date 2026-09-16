@@ -17,6 +17,7 @@ import {
 import { AccountSidebar } from '@/components/account/account-sidebar';
 import { OrderStatusBadge } from '@/components/commerce/orders/order-status-badge';
 import { ShopBreadcrumb } from '@/components/commerce/listing/shop-breadcrumb';
+import { AccountProvider } from '@/features/account/account-context';
 import { cn } from '@/lib/utils';
 import { ordersHref, type OrdersQuery } from '@/lib/url/orders-query';
 import {
@@ -39,6 +40,7 @@ export function OrderListPage({
   query: OrdersQuery;
 }) {
   return (
+    <AccountProvider>
     <div className="bg-page-canvas min-h-svh">
       <Container size="wide" className="py-8 lg:py-10">
         <div className="grid items-start gap-5 lg:grid-cols-[248px_minmax(0,1fr)]">
@@ -67,6 +69,7 @@ export function OrderListPage({
         </div>
       </Container>
     </div>
+    </AccountProvider>
   );
 }
 

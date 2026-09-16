@@ -15,9 +15,11 @@ describe('parseShopQuery', () => {
         maxPrice: '900',
         rating: '4',
         availability: 'in-stock',
+        view: 'list',
       }),
     ).toEqual({
       q: 'laptop',
+      collection: undefined,
       categories: ['electronics'],
       brands: ['Apple', 'Sony'],
       minPrice: 100,
@@ -26,13 +28,22 @@ describe('parseShopQuery', () => {
       inStock: true,
       sort: 'price-asc',
       sale: true,
+      view: 'list',
       page: 2,
+    });
+  });
+
+  it('reads a collection from the path separately from facet categories', () => {
+    expect(parseShopQuery({ category: 'laptops' }, { collection: 'electronics' })).toMatchObject({
+      collection: 'electronics',
+      categories: ['laptops'],
     });
   });
 
   it('ignores invalid sort and page values', () => {
     expect(parseShopQuery({ sort: 'drop-table', page: '-1' })).toEqual({
       q: undefined,
+      collection: undefined,
       categories: [],
       brands: [],
       minPrice: undefined,
@@ -41,6 +52,7 @@ describe('parseShopQuery', () => {
       inStock: false,
       sort: 'featured',
       sale: false,
+      view: 'grid',
       page: 1,
     });
   });
@@ -54,7 +66,7 @@ describe('parseShopQuery', () => {
 });
 
 describe('shopHref', () => {
-  it('omits default featured sort and page 1', () => {
+  it('canonicalizes a single category onto /shop/[category]', () => {
     expect(
       shopHref({
         categories: ['smartphones'],
@@ -62,8 +74,24 @@ describe('shopHref', () => {
         inStock: false,
         sort: 'featured',
         sale: false,
+        view: 'grid',
         page: 1,
       }),
-    ).toBe('/shop?category=smartphones');
+    ).toBe('/shop/smartphones');
+  });
+
+  it('keeps extra category filters on a collection path', () => {
+    expect(
+      shopHref({
+        collection: 'electronics',
+        categories: ['laptops'],
+        brands: ['Apple'],
+        inStock: false,
+        sort: 'featured',
+        sale: false,
+        view: 'grid',
+        page: 1,
+      }),
+    ).toBe('/shop/electronics?category=laptops&brand=Apple');
   });
 });

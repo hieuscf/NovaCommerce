@@ -93,14 +93,14 @@ export function getProductBreadcrumbs(product: ProductViewModel): ShopCrumb[] {
 
   if (department && product.departmentSlug && !sameCollection) {
     crumbs.push({
-      href: `/shop?category=${product.departmentSlug}`,
+      href: `/shop/${product.departmentSlug}`,
       label: department.name,
     });
   }
 
   if (category && product.categorySlug) {
     crumbs.push({
-      href: `/shop?category=${product.categorySlug}`,
+      href: `/shop/${product.categorySlug}`,
       label: category.name,
     });
   } else {

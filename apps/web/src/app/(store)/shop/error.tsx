@@ -22,14 +22,16 @@ export default function ShopError({
   }, [error]);
 
   return (
-    <Container className="flex min-h-[60vh] items-center justify-center py-16">
-      <ProductListingErrorState
-        action={
-          <Button type="button" onClick={reset}>
-            Try again
-          </Button>
-        }
-      />
-    </Container>
+    <div className="bg-page-canvas min-h-svh">
+      <Container className="flex min-h-[60vh] items-center justify-center py-16">
+        <ProductListingErrorState
+          action={
+            <Button type="button" onClick={reset}>
+              Try again
+            </Button>
+          }
+        />
+      </Container>
+    </div>
   );
 }

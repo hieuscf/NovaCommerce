@@ -78,8 +78,11 @@ describe('Toaster', () => {
       toast.dismiss(id);
     });
 
-    await waitFor(() => {
-      expect(screen.queryByText('Temporary message')).not.toBeInTheDocument();
-    });
+    await waitFor(
+      () => {
+        expect(screen.queryByText('Temporary message')).not.toBeInTheDocument();
+      },
+      { timeout: 3000 },
+    );
   });
 });

@@ -103,7 +103,7 @@ apps/web/src/
 │   ├── global-error.tsx
 │   └── not-found.tsx
 ├── components/
-│   ├── account/         Alloy account dashboard (presentation fixtures until User/Order APIs)
+│   ├── account/         Alloy account dashboard (User Gateway profile/addresses/preferences)
 │   ├── auth/            auth-specific UI (not primitives)
 │   ├── commerce/        product cards, listing (PLP), product detail (PDP), cart, checkout, orders, merchandising
 │   ├── feedback/        API / page loading wrappers
@@ -124,6 +124,7 @@ apps/web/src/
 │   ├── cart/            cart page fixture selection until Cart Gateway exists
 │   ├── checkout/        checkout page fixture selection until Checkout Gateway exists
 │   ├── orders/          order list/detail/confirmation fixtures until Order Gateway exists
+│   ├── user/            User Gateway adapter (`userClient`) for account profile/addresses/preferences
 │   ├── view-models/     UI contracts (no backend entities)
 │   ├── mock-data/       presentation fixtures until Gateway adapters exist
 │   ├── env.ts
@@ -168,7 +169,8 @@ Both apps use the **Next.js 15 App Router**.
 | Route | Group | Purpose |
 |-------|-------|---------|
 | `/` | `(store)` | Homepage |
-| `/shop` | `(store)` | Product listing. Filters/sort/page live in the URL (`category`, `brand`, `sort`, `page`, …). Catalog photos until the Catalog API is wired. |
+| `/shop` | `(store)` | Product listing for the full catalog. Remaining filters/sort/page live in the URL (`brand`, `sort`, `page`, `view`, …). Catalog photos until the Catalog API is wired. |
+| `/shop/[category]` | `(store)` | Collection listing (for example `/shop/electronics`). Extra leaf filters stay in the query (`category`, `brand`, …). Unknown slugs use `not-found`. |
 | `/products/[slug]` | `(store)` | Product detail. Gallery, variants, reviews, and related products use presentation fixtures until the Catalog Gateway is wired. |
 | `/cart` | `(store)` | Shopping cart. Line items, quantity, remove, summary, and recommendations use presentation fixtures until `GET /api/v1/users/me/cart` is wired. Checkout and PayPal buttons navigate to `/checkout` and do not invent Payment APIs. |
 | `/checkout` | `(store)` | Protected Alloy checkout (customer + shipping, then Payment Gateway, then review). Presentation fixtures until Cart / User / Checkout Gateway adapters are wired. Payment tiles are presentation methods (`card`, `paypal`, `qr_pay`, `google_pay`) and map to Gateway `paymentProvider` (`vnpay`, `paypal`, `momo`) when checkout is wired. Card/OTP fields stay in the browser and are never posted. Place order navigates to `/orders/confirmed` as a preview success state — it does not call `POST /users/me/checkout`. |
@@ -177,7 +179,7 @@ Both apps use the **Next.js 15 App Router**.
 | `/orders/[orderNumber]` | `(store)` | Protected order detail (timeline, items, shipping, payment, totals). Unknown numbers use `not-found`. |
 | `/login` `/register` `/forgot-password` `/reset-password` `/verify-email` | `(auth)` | Authentication |
 | `/unauthorized` | `(store)` | 403 access-restricted |
-| `/account` | `(store)` | Protected Alloy dashboard (profile, addresses, security). Sections via `?section=`. Not nested `/account/*`. Orders live on `/orders` (`/account?section=orders` redirects there). |
+| `/account` | `(store)` | Protected Alloy dashboard. Profile, addresses, and notification preferences load from Gateway `GET/PATCH /users/me*` via `userClient`. Payment methods, loyalty, wishlist, and recent-order rails stay empty until those APIs are wired on the storefront. Sections via `?section=`. Orders live on `/orders`. |
 
 Reserved (do not create empty pages): `/categories`, `/search`, `/account/*`. Account sections stay on `/account?section=` except **Orders**, which is `/orders`. Customer `/orders` is not the Admin reserved `/orders` console route.
 
@@ -193,7 +195,7 @@ Reserved: `/catalog`, `/inventory`, `/orders`, `/customers`, `/promotions`, `/se
 
 Shareable, reloadable state belongs in the URL.
 
-Examples: `/shop?q=laptop&sort=price-asc&sale=true&page=2`, `/shop?category=smartphones&brand=Apple`, `/account?section=security`, `/orders?status=shipped&page=2`
+Examples: `/shop?q=laptop&sort=price-asc&sale=true&page=2`, `/shop/smartphones?brand=Apple`, `/account?section=security`, `/orders?status=shipped&page=2`
 
 Parsers live in `lib/url/`. Do not put search/sort/pagination into global React state.
 
@@ -269,7 +271,7 @@ Next.js boundaries:
 
 - `error.tsx` — local route segment
 - `(store)/error.tsx` / `(console)/error.tsx` — feature-local
-- `(store)/shop/error.tsx` — catalog listing load failure (`ErrorState`, retry). Empty filter matches stay `EmptyState`.
+- `(store)/shop/error.tsx` — catalog listing load failure (`ErrorState`, retry). Empty filter matches stay `EmptyState`. Unknown `/shop/[category]` slugs stay `not-found.tsx`.
 - `(store)/products/[slug]/error.tsx` — product detail load failure. Unknown slugs stay `not-found.tsx`.
 - `(store)/cart/error.tsx` — cart load failure. An empty cart stays `EmptyState`.
 - `(store)/checkout/error.tsx` — checkout load failure. An empty selected cart stays `EmptyState`.

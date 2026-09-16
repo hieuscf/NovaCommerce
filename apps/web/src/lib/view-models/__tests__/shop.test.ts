@@ -1,16 +1,31 @@
 import { describe, expect, it } from 'vitest';
-import { formatResultRange, getShopHeader } from '../shop';
+import { formatProductCount, formatResultRange, getShopHeader } from '../shop';
 import { parseShopQuery } from '@/lib/url/shop-query';
 
 describe('getShopHeader', () => {
-  it('uses a catalog title instead of marketing copy on the root listing', () => {
+  it('uses Shop as the root listing title', () => {
     expect(getShopHeader(parseShopQuery({}))).toMatchObject({
-      title: 'All products',
+      title: 'Shop',
     });
   });
 
-  it('names a single selected collection', () => {
-    expect(getShopHeader(parseShopQuery({ category: 'smartphones' })).title).toBe('Smartphones');
+  it('names a collection from the path and links parent crumbs to /shop/[category]', () => {
+    const header = getShopHeader(parseShopQuery({}, { collection: 'smartphones' }));
+    expect(header.title).toBe('Smartphones');
+    expect(header.crumbs).toEqual([
+      { href: '/', label: 'Home' },
+      { href: '/shop', label: 'Shop' },
+      { href: '/shop/electronics', label: 'Electronics' },
+      { href: '/shop/smartphones', label: 'Smartphones', current: true },
+    ]);
+  });
+});
+
+describe('formatProductCount', () => {
+  it('formats the catalog size shown in the listing toolbar', () => {
+    expect(formatProductCount(1)).toBe('1 product');
+    expect(formatProductCount(7)).toBe('7 products');
+    expect(formatProductCount(1248)).toBe('1,248 products');
   });
 });
 

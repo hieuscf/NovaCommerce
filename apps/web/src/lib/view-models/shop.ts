@@ -1,6 +1,8 @@
-import type { ShopQuery } from '@/lib/url/shop-query';
+import type { ShopQuery, ShopRating } from '@/lib/url/shop-query';
 
 export const SHOP_PAGE_SIZE = 12;
+
+export const SHOP_PRICE_MAX = 5000;
 
 export const SHOP_SORTS = ['featured', 'price-asc', 'price-desc', 'newest', 'rating'] as const;
 
@@ -14,14 +16,24 @@ export const SHOP_SORT_LABELS: Record<ShopSort, string> = {
   rating: 'Best Rating',
 };
 
+export const SHOP_RATING_OPTIONS: readonly ShopRating[] = [5, 4, 3, 2];
+
 export interface ShopFacetOption {
   readonly slug: string;
   readonly name: string;
+  readonly count?: number;
+}
+
+export interface ShopRatingFacet {
+  readonly value: ShopRating;
+  readonly count: number;
 }
 
 export interface ShopFacets {
   readonly categories: readonly ShopFacetOption[];
   readonly brands: readonly ShopFacetOption[];
+  readonly ratings?: readonly ShopRatingFacet[];
+  readonly inStockCount?: number;
 }
 
 export interface ShopCrumb {
@@ -45,7 +57,8 @@ export interface ShopCollection {
 const SHOP_COLLECTIONS: Record<string, ShopCollection> = {
   electronics: {
     name: 'Electronics',
-    description: 'Premium devices and accessories from leading brands.',
+    description:
+      'Discover the latest electronics, from smartphones and laptops to smart home devices and accessories.',
   },
   smartphones: {
     name: 'Smartphones',
@@ -96,22 +109,56 @@ export function getShopCollection(slug: string | undefined): ShopCollection | un
   return SHOP_COLLECTIONS[slug];
 }
 
-export function getShopHeader(query: ShopQuery): ShopHeaderViewModel {
-  const selected = query.categories;
-  const collection = selected.length === 1 ? SHOP_COLLECTIONS[selected[0] ?? ''] : undefined;
+export function isShopCollectionSlug(slug: string): boolean {
+  return slug in SHOP_COLLECTIONS;
+}
 
-  if (collection && selected[0]) {
+export function listShopCollectionSlugs(): string[] {
+  return Object.keys(SHOP_COLLECTIONS);
+}
+
+export function shopCollectionHref(slug: string): string {
+  return `/shop/${slug}`;
+}
+
+export function getShopChildCollections(parentSlug: string): ShopFacetOption[] {
+  return Object.entries(SHOP_COLLECTIONS)
+    .filter(([, collection]) => collection.parent?.slug === parentSlug)
+    .map(([slug, collection]) => ({ slug, name: collection.name }));
+}
+
+export function getShopRootCollections(): ShopFacetOption[] {
+  return Object.entries(SHOP_COLLECTIONS)
+    .filter(([, collection]) => !collection.parent)
+    .map(([slug, collection]) => ({ slug, name: collection.name }));
+}
+
+function collectionSlugForHeader(query: ShopQuery): string | undefined {
+  if (query.collection) {
+    return query.collection;
+  }
+  if (query.categories.length === 1) {
+    return query.categories[0];
+  }
+  return undefined;
+}
+
+export function getShopHeader(query: ShopQuery): ShopHeaderViewModel {
+  const selected = collectionSlugForHeader(query);
+  const collection = selected ? SHOP_COLLECTIONS[selected] : undefined;
+
+  if (collection && selected) {
     const crumbs: ShopCrumb[] = [
       { href: '/', label: 'Home' },
       { href: '/shop', label: 'Shop' },
     ];
     if (collection.parent) {
       crumbs.push({
-        href: `/shop?category=${collection.parent.slug}`,
+        href: shopCollectionHref(collection.parent.slug),
         label: collection.parent.name,
       });
     }
-    crumbs.push({ href: `/shop?category=${selected[0]}`, label: collection.name, current: true });
+    crumbs.push({ href: shopCollectionHref(selected), label: collection.name, current: true });
     return {
       title: collection.name,
       description: collection.description,
@@ -119,7 +166,7 @@ export function getShopHeader(query: ShopQuery): ShopHeaderViewModel {
     };
   }
 
-  if (selected.length > 1) {
+  if (query.categories.length > 1) {
     return {
       title: 'Filtered products',
       description: 'Products matching the selected categories.',
@@ -131,13 +178,18 @@ export function getShopHeader(query: ShopQuery): ShopHeaderViewModel {
   }
 
   return {
-    title: 'All products',
-    description: 'Browse the NovaCommerce catalog.',
+    title: 'Shop',
+    description: 'Discover the latest products, from everyday essentials to flagship devices.',
     crumbs: [
       { href: '/', label: 'Home' },
       { href: '/shop', label: 'Shop', current: true },
     ],
   };
+}
+
+export function formatProductCount(total: number): string {
+  const formatted = new Intl.NumberFormat('en-US').format(total);
+  return total === 1 ? '1 product' : `${formatted} products`;
 }
 
 export function formatResultRange({
@@ -165,4 +217,11 @@ export function formatResultRange({
   }
 
   return `${from}–${to} of ${total}`;
+}
+
+export function formatPriceBound(amount: number, max = SHOP_PRICE_MAX): string {
+  if (amount >= max) {
+    return `$${max.toLocaleString('en-US')}+`;
+  }
+  return `$${amount.toLocaleString('en-US')}`;
 }

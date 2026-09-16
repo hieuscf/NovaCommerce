@@ -16,14 +16,14 @@ export type AccountOrderStatus = 'Delivered' | 'Shipped' | 'Processing';
 
 export interface AccountProfileViewModel {
   readonly name: string;
-  readonly email: string;
+  readonly phoneNumber?: string;
+  readonly avatarUrl?: string;
   readonly membershipLabel: string;
   readonly membershipNote: string;
-  readonly verified: boolean;
 }
 
 export interface AccountStatViewModel {
-  readonly id: 'orders' | 'spent' | 'points';
+  readonly id: 'addresses' | 'preferences' | 'member';
   readonly value: string;
   readonly label: string;
 }
@@ -47,9 +47,14 @@ export interface AccountOrderViewModel {
 export interface AccountAddressViewModel {
   readonly id: string;
   readonly label: string;
-  readonly recipient: string;
   readonly line1: string;
-  readonly line2: string;
+  readonly line2?: string;
+  readonly city: string;
+  readonly state: string;
+  readonly postalCode: string;
+  readonly country: string;
+  readonly isDefault: boolean;
+  readonly formattedSecondary: string;
 }
 
 export interface AccountPaymentMethodViewModel {
@@ -71,6 +76,13 @@ export const ACCOUNT_SECTION_LABELS: Record<AccountSection, string> = {
   security: 'Security',
   help: 'Help & Support',
 };
+
+export const ACCOUNT_QUICK_ACTIONS: readonly AccountQuickActionViewModel[] = [
+  { section: 'orders', title: 'View Orders', note: 'Track your orders', tone: 'brand' },
+  { section: 'addresses', title: 'Manage Addresses', note: 'Delivery locations', tone: 'brand' },
+  { section: 'payment', title: 'Payment Methods', note: 'Cards & wallets', tone: 'success' },
+  { section: 'wishlist', title: 'Wishlist', note: 'Your favorite items', tone: 'rose' },
+];
 
 export function accountSectionHref(section: AccountSection): string {
   if (section === 'orders') {

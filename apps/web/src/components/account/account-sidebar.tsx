@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import {
   Bell,
@@ -12,7 +14,8 @@ import {
   Crown,
   ArrowRight,
 } from 'lucide-react';
-import { accountProfile } from '@/lib/mock-data/account';
+import { Skeleton } from '@novacommerce/ui/components/skeleton';
+import { useAccount } from '@/features/account/account-context';
 import {
   ACCOUNT_SECTION_LABELS,
   accountSectionHref,
@@ -38,14 +41,30 @@ const NAV_ITEMS: readonly {
 ];
 
 export function AccountSidebar({ section }: { section: AccountSection }) {
+  const { profile, status } = useAccount();
+
   return (
     <AccountCard className="h-fit" padded={false}>
       <div className="flex items-center gap-3 p-5">
-        <AccountAvatar size={44} />
-        <div className="min-w-0 leading-tight">
-          <p className="truncate text-sm font-bold text-foreground">{accountProfile.name}</p>
-          <p className="truncate text-[11px] text-muted-foreground">{accountProfile.email}</p>
-        </div>
+        {status === 'loading' || !profile ? (
+          <>
+            <Skeleton className="size-11 rounded-full" />
+            <div className="min-w-0 flex-1 space-y-2">
+              <Skeleton className="h-4 w-28" />
+              <Skeleton className="h-3 w-36" />
+            </div>
+          </>
+        ) : (
+          <>
+            <AccountAvatar size={44} name={profile.name} imageUrl={profile.avatarUrl} />
+            <div className="min-w-0 leading-tight">
+              <p className="truncate text-sm font-bold text-foreground">{profile.name}</p>
+              <p className="truncate text-[11px] text-muted-foreground">
+                {profile.phoneNumber ?? profile.membershipLabel}
+              </p>
+            </div>
+          </>
+        )}
       </div>
 
       <nav className="flex flex-col gap-1 px-3 pb-4" aria-label="Account">
@@ -76,13 +95,17 @@ export function AccountSidebar({ section }: { section: AccountSection }) {
           <div className="flex items-start gap-2.5">
             <Crown className="size-[18px] shrink-0 text-primary" aria-hidden="true" />
             <div className="leading-tight">
-              <p className="text-[12.5px] font-bold text-primary">{accountProfile.membershipLabel}</p>
-              <p className="mt-1 text-[10.5px] text-muted-foreground">{accountProfile.membershipNote}</p>
+              <p className="text-[12.5px] font-bold text-primary">
+                {profile?.membershipLabel ?? 'Member'}
+              </p>
+              <p className="mt-1 text-[10.5px] text-muted-foreground">
+                {profile?.membershipNote ?? 'Manage your NovaCommerce account.'}
+              </p>
               <Link
                 href={accountSectionHref('overview')}
                 className="mt-2.5 inline-flex items-center gap-1.5 text-[11.5px] font-semibold text-primary"
               >
-                View benefits
+                View overview
                 <ArrowRight className="size-3.5" aria-hidden="true" />
               </Link>
             </div>

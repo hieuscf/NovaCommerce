@@ -1,5 +1,8 @@
 # Infrastructure-only stack for local development without rebuilding application images.
 # Usage: docker compose -f docker-compose.dev.yml up -d
+#
+# Mutually exclusive with docker-compose.yml — both publish host ports 5433, 6379,
+# 9200, 9000, 9001. Do not run `docker compose up -d` while this stack is running.
 
 name: novacommerce-dev
 

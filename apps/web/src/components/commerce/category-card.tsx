@@ -23,7 +23,7 @@ export function CategoryCard({
   const useIllustration = compact && illustration;
 
   return (
-    <Link href={`/shop?category=${category.slug}`} className={cn('group block', className)}>
+    <Link href={`/shop/${category.slug}`} className={cn('group block', className)}>
       <Card
         className={cn(
           'overflow-hidden border-border/80 bg-surface p-0 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md',
