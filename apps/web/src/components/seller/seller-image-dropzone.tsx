@@ -1,11 +1,15 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ImageIcon, X } from 'lucide-react';
+import { CloudUpload, FileText, ImageIcon, X } from 'lucide-react';
 import { Label } from '@novacommerce/ui/components/label';
 import { cn } from '@/lib/utils';
 
-const ACCEPT = 'image/png,image/jpeg';
+const IMAGE_ACCEPT = 'image/png,image/jpeg';
+
+function isImageFile(file: File) {
+  return file.type === 'image/png' || file.type === 'image/jpeg';
+}
 
 export function SellerImageDropzone({
   id,
@@ -14,6 +18,9 @@ export function SellerImageDropzone({
   hint,
   value,
   error,
+  accept = IMAGE_ACCEPT,
+  hideOptionalLabel = false,
+  compact = false,
   onChange,
   onBlur,
 }: {
@@ -23,15 +30,19 @@ export function SellerImageDropzone({
   hint: string;
   value: File | null;
   error?: string;
+  accept?: string;
+  hideOptionalLabel?: boolean;
+  compact?: boolean;
   onChange: (file: File | null) => void;
   onBlur?: () => void;
 }) {
   const [dragOver, setDragOver] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const errorId = `${id}-error`;
+  const imagePreview = Boolean(value && isImageFile(value) && previewUrl);
 
   useEffect(() => {
-    if (!value) {
+    if (!value || !isImageFile(value)) {
       setPreviewUrl(null);
       return;
     }
@@ -48,21 +59,32 @@ export function SellerImageDropzone({
 
   return (
     <div className="grid gap-2">
-      <Label htmlFor={id}>
-        {label}
-        {required ? (
-          <span className="text-destructive" aria-hidden="true">
-            {' '}
-            *
-          </span>
-        ) : (
-          <span className="font-normal text-muted-foreground"> (Optional)</span>
-        )}
-      </Label>
+      {hideOptionalLabel ? (
+        <Label htmlFor={id} className="sr-only">
+          {label}
+        </Label>
+      ) : (
+        <Label htmlFor={id}>
+          {label}
+          {required ? (
+            <span className="text-destructive" aria-hidden="true">
+              {' '}
+              *
+            </span>
+          ) : (
+            <span className="font-normal text-muted-foreground"> (Optional)</span>
+          )}
+        </Label>
+      )}
       <div
         className={cn(
-          'relative flex min-h-[10.5rem] items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed transition-colors',
-          dragOver ? 'border-primary bg-primary/10' : 'border-primary/25 bg-primary/[0.03]',
+          'relative flex items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed transition-colors',
+          compact ? 'min-h-31' : 'min-h-[10.5rem]',
+          dragOver
+            ? 'border-primary bg-primary/10'
+            : compact
+              ? 'border-primary/20 bg-white'
+              : 'border-primary/25 bg-primary/[0.03]',
           error && 'border-destructive',
         )}
         onDragOver={(event) => {
@@ -79,7 +101,7 @@ export function SellerImageDropzone({
         <input
           id={id}
           type="file"
-          accept={ACCEPT}
+          accept={accept}
           className="sr-only"
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? errorId : undefined}
@@ -89,15 +111,15 @@ export function SellerImageDropzone({
             event.target.value = '';
           }}
         />
-        {previewUrl ? (
+        {imagePreview ? (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element -- local object URL preview */}
-            <img src={previewUrl} alt="" className="absolute inset-0 size-full object-cover" />
+            <img src={previewUrl ?? ''} alt="" className="absolute inset-0 size-full object-cover" />
             <label
               htmlFor={id}
               className="absolute inset-0 grid cursor-pointer place-items-center bg-ink/40 text-[13px] font-semibold text-white opacity-0 transition-opacity hover:opacity-100 focus-within:opacity-100"
             >
-              Replace image
+              Replace file
             </label>
             <button
               type="button"
@@ -108,15 +130,42 @@ export function SellerImageDropzone({
               <X className="size-4" aria-hidden="true" />
             </button>
           </>
+        ) : value ? (
+          <div className="flex flex-col items-center gap-2 px-4 py-6 text-center">
+            <FileText className="size-6 text-primary" aria-hidden="true" />
+            <p className="max-w-full truncate text-[13px] font-semibold text-ink">{value.name}</p>
+            <label htmlFor={id} className="cursor-pointer text-[12px] font-semibold text-primary">
+              Replace file
+            </label>
+            <button
+              type="button"
+              className="text-[12px] font-medium text-muted-foreground hover:text-ink"
+              onClick={() => onChange(null)}
+            >
+              Remove
+            </button>
+          </div>
         ) : (
           <label
             htmlFor={id}
-            className="flex cursor-pointer flex-col items-center gap-2 px-4 py-8 text-center"
+            className={cn(
+              'flex cursor-pointer flex-col items-center text-center',
+              compact ? 'gap-1 px-2 py-5' : 'gap-2 px-4 py-8',
+            )}
           >
-            <span className="grid size-11 place-items-center rounded-xl bg-primary/10 text-primary">
-              <ImageIcon className="size-5" aria-hidden="true" />
-            </span>
-            <span className="text-[13px] font-semibold text-primary">
+            {compact ? (
+              <CloudUpload className="size-7 text-primary" strokeWidth={1.6} aria-hidden="true" />
+            ) : (
+              <span className="grid size-11 place-items-center rounded-xl bg-primary/10 text-primary">
+                <ImageIcon className="size-5" aria-hidden="true" />
+              </span>
+            )}
+            <span
+              className={cn(
+                'font-semibold text-primary',
+                compact ? 'text-[12px] leading-snug' : 'text-[13px]',
+              )}
+            >
               Click to upload or drag and drop
             </span>
             <span className="text-[12px] text-muted-foreground">{hint}</span>

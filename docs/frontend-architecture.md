@@ -183,7 +183,7 @@ Both apps use the **Next.js 15 App Router**.
 | `/login` `/register` `/forgot-password` `/reset-password` `/verify-email` | `(auth)` | Authentication |
 | `/unauthorized` | `(store)` | 403 access-restricted |
 | `/account` | `(store)` | Protected Alloy dashboard. Profile, addresses, and notification preferences load from Gateway `GET/PATCH /users/me*` via `userClient`. Payment methods load from `GET/POST/DELETE /users/me/payment-methods` (saved cards: brand/last4/expiry only — **never CVV**; CVV re-entered at checkout). Loyalty, wishlist, and recent-order rails stay empty until those APIs are wired. Sections via `?section=`. Orders live on `/orders`. |
-| `/seller` | `(store)` | Public Seller Center. Unregistered visitors must complete the Alloy onboarding wizard (business information, shop details, terms & verification, complete). Registered sellers will see a different workspace later. Status is presentation-only (`unregistered`) until the deferred Seller module has a Gateway adapter — do not invent Seller APIs. |
+| `/seller` | `(store)` | Public Seller Center. Unregistered visitors must complete the Alloy onboarding wizard (business information, shop details, verification with selling-model cards and origin-document uploads, terms & conditions, complete). Registered sellers will see a different workspace later. Status is presentation-only (`unregistered`) until the deferred Seller module has a Gateway adapter — do not invent Seller APIs. |
 
 Reserved (do not create empty pages): `/categories`, `/search`, `/account/*`. Account sections stay on `/account?section=` except **Orders**, which is `/orders`. Customer `/orders` is not the Admin reserved `/orders` console route.
 

@@ -1,7 +1,7 @@
 # NovaCommerce Design System
 
 > Version: 1.0  
-> Last updated: 2026-09-16  
+> Last updated: 2026-09-17  
 > Status: Active — Web v1 foundation
 
 ## Visual Philosophy
@@ -133,7 +133,7 @@ shadcn/ui foundation, customized for NovaCommerce:
 - **Homepage canvas (`1920w light`):** wide container, hero + 264px offer rail, then guarantees/categories/featured + dark promo rail
 - **Hero art:** CSS `HeroArt` cluster on the homepage (matches the Alloy storefront prototype). `HeroProductScene` remains available as Three.js progressive enhancement elsewhere.
 - **Login / Register:** Alloy split layout — `AuthSplitShell` + `LoginPodiumArt` (visual aside, form card, social row). Auth logic stays on `LoginForm` / `RegisterForm` / `authClient`.
-- **Seller Center:** `/seller` — unregistered Alloy onboarding (promo aside + 4-step application). Registered workspace is a follow-up. No Seller API yet (`docs/domain-model.md` defers the module).
+- **Seller Center:** `/seller` — unregistered Alloy onboarding (promo aside + 5-step application: business, shop, verification with selling-model cards and origin-document uploads, terms, complete). Registered workspace is a follow-up. No Seller API yet (`docs/domain-model.md` defers the module).
 - **Merch shots:** compact category/product cards use `ProductShape` clay illustrations; shop listing still uses catalog photos.
 
 ### App: `apps/admin`

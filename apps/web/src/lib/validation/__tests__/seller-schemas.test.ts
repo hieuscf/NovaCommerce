@@ -38,8 +38,13 @@ const valid = {
   facebookUrl: '',
   instagramUrl: '',
   websiteUrl: '',
-  documentType: 'business_license',
-  documentNumber: 'BL-1001',
+  sellingModel: 'retail',
+  authorizationLetter: null,
+  qualityCertificate: null,
+  originInvoice: null,
+  acceptTerms: true,
+  acceptSellerAgreement: true,
+  acceptPrivacy: true,
 };
 
 describe('sellerRegisterSchema', () => {
@@ -136,6 +141,26 @@ describe('sellerRegisterSchema', () => {
     expect(result.success).toBe(false);
     if (result.success) return;
     expect(result.error.flatten().fieldErrors.websiteUrl?.[0]).toMatch(/valid website url/i);
+  });
+
+  it('requires a selling model and accepted terms', () => {
+    const missingModel = sellerRegisterSchema.safeParse({
+      ...valid,
+      sellingModel: '',
+    });
+    expect(missingModel.success).toBe(false);
+    if (!missingModel.success) {
+      expect(missingModel.error.flatten().fieldErrors.sellingModel?.[0]).toMatch(/required/i);
+    }
+
+    const missingTerms = sellerRegisterSchema.safeParse({
+      ...valid,
+      acceptTerms: false,
+    });
+    expect(missingTerms.success).toBe(false);
+    if (!missingTerms.success) {
+      expect(missingTerms.error.flatten().fieldErrors.acceptTerms?.[0]).toMatch(/terms of service/i);
+    }
   });
 });
 

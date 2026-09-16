@@ -5,8 +5,10 @@ export const SHOP_NAME_MAX_LENGTH = 50;
 export const SHOP_DESCRIPTION_MAX_LENGTH = 500;
 export const SHOP_LOGO_MAX_BYTES = 2 * 1024 * 1024;
 export const SHOP_BANNER_MAX_BYTES = 5 * 1024 * 1024;
+export const VERIFICATION_DOCUMENT_MAX_BYTES = 5 * 1024 * 1024;
 
 const PNG_JPEG_TYPES = new Set(['image/png', 'image/jpeg']);
+const PNG_JPEG_PDF_TYPES = new Set(['image/png', 'image/jpeg', 'application/pdf']);
 
 const requiredText = (label: string, max: number) =>
   z.string().trim().min(1, `${label} is required`).max(max, `${label} is too long`);
@@ -30,15 +32,21 @@ export function toShopSlug(value: string): string {
     .slice(0, 80);
 }
 
-function isImageFile(value: unknown): value is File {
+function isUploadFile(value: unknown): value is File {
   return typeof File !== 'undefined' && value instanceof File;
 }
 
-function imageFileSchema(options: { label: string; maxBytes: number; required: boolean }) {
+function fileSchema(options: {
+  label: string;
+  maxBytes: number;
+  required: boolean;
+  allowedTypes: Set<string>;
+  typeMessage: string;
+}) {
   const maxMb = options.maxBytes / (1024 * 1024);
 
   return z
-    .custom<File | null>((value) => value == null || isImageFile(value))
+    .custom<File | null>((value) => value == null || isUploadFile(value))
     .superRefine((value, ctx) => {
       if (value == null) {
         if (options.required) {
@@ -47,10 +55,10 @@ function imageFileSchema(options: { label: string; maxBytes: number; required: b
         return;
       }
 
-      if (!PNG_JPEG_TYPES.has(value.type)) {
+      if (!options.allowedTypes.has(value.type)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `${options.label} must be PNG or JPG`,
+          message: options.typeMessage,
         });
       }
 
@@ -61,6 +69,28 @@ function imageFileSchema(options: { label: string; maxBytes: number; required: b
         });
       }
     });
+}
+
+function imageFileSchema(options: { label: string; maxBytes: number; required: boolean }) {
+  return fileSchema({
+    ...options,
+    allowedTypes: PNG_JPEG_TYPES,
+    typeMessage: `${options.label} must be PNG or JPG`,
+  });
+}
+
+function documentFileSchema(label: string) {
+  return fileSchema({
+    label,
+    maxBytes: VERIFICATION_DOCUMENT_MAX_BYTES,
+    required: false,
+    allowedTypes: PNG_JPEG_PDF_TYPES,
+    typeMessage: `${label} must be PDF, PNG, or JPG`,
+  });
+}
+
+function requiredAccepted(message: string) {
+  return z.boolean().refine((value) => value, message);
 }
 
 function optionalHttpUrl(label: string) {
@@ -83,11 +113,11 @@ export const sellerRegisterSchema = z.object({
   businessName: requiredText('Business name', 120),
   businessType: z.string().min(1, 'Business type is required'),
   legalBusinessName: requiredText('Legal business name', 160),
-  identityNumber: identityNumber('CCCD / passport number'),
-  businessLicenseNumber: requiredText('Business registration certificate (GPKD)', 40),
-  taxId: requiredText('Tax code (MST)', 40),
+  identityNumber: identityNumber('National ID / passport number'),
+  businessLicenseNumber: requiredText('Business registration certificate', 40),
+  taxId: requiredText('Tax ID', 40),
   legalRepresentativeName: requiredText('Legal representative name', 120),
-  legalRepresentativeId: identityNumber('Legal representative CCCD'),
+  legalRepresentativeId: identityNumber('Legal representative ID'),
   businessEmail: emailSchema,
   phoneCountry: z.string().min(1, 'Country code is required'),
   phone: z
@@ -127,8 +157,13 @@ export const sellerRegisterSchema = z.object({
   facebookUrl: optionalHttpUrl('Facebook page'),
   instagramUrl: optionalHttpUrl('Instagram'),
   websiteUrl: optionalHttpUrl('Website'),
-  documentType: z.string().min(1, 'Document type is required'),
-  documentNumber: requiredText('Document number', 80),
+  sellingModel: z.string().min(1, 'Business model is required'),
+  authorizationLetter: documentFileSchema('Brand distribution authorization'),
+  qualityCertificate: documentFileSchema('Product quality certificate'),
+  originInvoice: documentFileSchema('Import invoice'),
+  acceptTerms: requiredAccepted('You must accept the Terms of Service'),
+  acceptSellerAgreement: requiredAccepted('You must accept the Seller Agreement'),
+  acceptPrivacy: requiredAccepted('You must accept the Privacy Policy'),
 });
 
 export type SellerRegisterFormValues = z.infer<typeof sellerRegisterSchema>;
@@ -165,6 +200,14 @@ export const SELLER_SHOP_FIELDS = [
 ] as const satisfies readonly (keyof SellerRegisterFormValues)[];
 
 export const SELLER_VERIFICATION_FIELDS = [
-  'documentType',
-  'documentNumber',
+  'sellingModel',
+  'authorizationLetter',
+  'qualityCertificate',
+  'originInvoice',
+] as const satisfies readonly (keyof SellerRegisterFormValues)[];
+
+export const SELLER_TERMS_FIELDS = [
+  'acceptTerms',
+  'acceptSellerAgreement',
+  'acceptPrivacy',
 ] as const satisfies readonly (keyof SellerRegisterFormValues)[];

@@ -1,6 +1,8 @@
 import type {
   SellerDialCodeViewModel,
   SellerOptionViewModel,
+  SellerSellingModelViewModel,
+  SellerVerificationDocumentViewModel,
 } from '@/lib/view-models/seller';
 
 /**
@@ -48,8 +50,41 @@ export const sellerShopCategories: readonly SellerOptionViewModel[] = [
   { value: 'other', label: 'Other' },
 ];
 
-export const sellerDocumentTypes: readonly SellerOptionViewModel[] = [
-  { value: 'business_license', label: 'Business license' },
-  { value: 'tax_certificate', label: 'Tax certificate' },
-  { value: 'national_id', label: 'National ID' },
+export const sellerSellingModels: readonly SellerSellingModelViewModel[] = [
+  {
+    value: 'retail',
+    label: 'Regular retail',
+    description: 'Sell directly to consumers (personal brands and small shops).',
+  },
+  {
+    value: 'official',
+    label: 'Official Store / Mall',
+    description: 'Authorized brand distributor, importer, or authorized dealer.',
+  },
+  {
+    value: 'manufacturer',
+    label: 'Manufacturer',
+    description: 'Factory, workshop, or products sold under your own brand.',
+  },
+];
+
+export const sellerVerificationDocuments: readonly SellerVerificationDocumentViewModel[] = [
+  {
+    field: 'authorizationLetter',
+    title: 'Brand distribution authorization',
+    description: 'Required for Official Store / Mall and authorized distributors.',
+    icon: 'authorization',
+  },
+  {
+    field: 'qualityCertificate',
+    title: 'Product quality / food safety certificate',
+    description: 'Applies to cosmetics, supplements, and similar regulated goods.',
+    icon: 'quality',
+  },
+  {
+    field: 'originInvoice',
+    title: 'Import invoice / origin document',
+    description: 'Proof of product origin and how goods entered your catalog.',
+    icon: 'origin',
+  },
 ];

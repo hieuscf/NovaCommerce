@@ -22,6 +22,7 @@ import { cn } from '@/lib/utils';
 import {
   SELLER_BUSINESS_FIELDS,
   SELLER_SHOP_FIELDS,
+  SELLER_TERMS_FIELDS,
   SELLER_VERIFICATION_FIELDS,
   SHOP_DESCRIPTION_MAX_LENGTH,
   SHOP_NAME_MAX_LENGTH,
@@ -33,6 +34,8 @@ import type { SellerPageViewModel, SellerRegisterStepId } from '@/lib/view-model
 import { SellerFlag } from './seller-flag';
 import { SellerImageDropzone } from './seller-image-dropzone';
 import { SellerRegisterStepper } from './seller-register-stepper';
+import { SellerRegisterTermsStep } from './seller-register-terms-step';
+import { SellerRegisterVerificationStep } from './seller-register-verification-step';
 
 const fieldClass =
   'h-11 rounded-xl border-border bg-white text-[13.5px] placeholder:text-muted-foreground';
@@ -99,8 +102,13 @@ export function SellerRegisterForm({
       facebookUrl: '',
       instagramUrl: '',
       websiteUrl: '',
-      documentType: '',
-      documentNumber: '',
+      sellingModel: '',
+      authorizationLetter: null,
+      qualityCertificate: null,
+      originInvoice: null,
+      acceptTerms: false,
+      acceptSellerAgreement: false,
+      acceptPrivacy: false,
     },
   });
 
@@ -134,6 +142,12 @@ export function SellerRegisterForm({
 
     if (step === 'verification') {
       const valid = await form.trigger([...SELLER_VERIFICATION_FIELDS]);
+      if (valid) await goToStep('terms');
+      return;
+    }
+
+    if (step === 'terms') {
+      const valid = await form.trigger([...SELLER_TERMS_FIELDS]);
       if (valid) await goToStep('complete');
     }
   }
@@ -153,15 +167,21 @@ export function SellerRegisterForm({
           }
         : step === 'verification'
           ? {
-              title: 'Terms & Verification',
+              title: 'Verification',
               description:
-                'We use this information to confirm you are authorized to sell. Keep it accurate so review stays fast.',
+                'To ensure a safe and trustworthy marketplace, we need some additional information and documents. Please provide the details below.',
             }
-          : {
-              title: 'Application received',
-              description:
-                'Thanks for applying. Our team will review your details and email you when your seller profile is ready.',
-            };
+          : step === 'terms'
+            ? {
+                title: 'Terms & Conditions',
+                description:
+                  'Review and accept the seller terms so we can process your application.',
+              }
+            : {
+                title: 'Application received',
+                description:
+                  'Thanks for applying. Our team will review your details and email you when your seller profile is ready.',
+              };
 
   return (
     <div
@@ -274,7 +294,7 @@ export function SellerRegisterForm({
 
               <div className="grid gap-2">
                 <Label htmlFor="seller-identityNumber">
-                  Số CCCD / Hộ chiếu
+                  National ID / Passport
                   <RequiredMark />
                 </Label>
                 <Controller
@@ -284,7 +304,7 @@ export function SellerRegisterForm({
                     <Input
                       id="seller-identityNumber"
                       autoComplete="off"
-                      placeholder="Nhập số CCCD hoặc hộ chiếu"
+                      placeholder="Enter national ID or passport number"
                       className={fieldClass}
                       aria-invalid={errors.identityNumber ? true : undefined}
                       aria-describedby={errors.identityNumber ? 'seller-identityNumber-error' : undefined}
@@ -383,11 +403,11 @@ export function SellerRegisterForm({
           </section>
 
           <section className="space-y-4">
-            <SectionTitle>Hộ kinh doanh / Doanh nghiệp</SectionTitle>
+            <SectionTitle>Business Registration</SectionTitle>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="grid gap-2 sm:col-span-2">
                 <Label htmlFor="seller-businessLicenseNumber">
-                  Giấy chứng nhận đăng ký kinh doanh (GPKD)
+                  Business Registration Certificate
                   <RequiredMark />
                 </Label>
                 <Controller
@@ -396,7 +416,7 @@ export function SellerRegisterForm({
                   render={({ field }) => (
                     <Input
                       id="seller-businessLicenseNumber"
-                      placeholder="Nhập số GPKD"
+                      placeholder="Enter certificate number"
                       className={fieldClass}
                       aria-invalid={errors.businessLicenseNumber ? true : undefined}
                       aria-describedby={
@@ -414,7 +434,7 @@ export function SellerRegisterForm({
 
               <div className="grid gap-2">
                 <Label htmlFor="seller-taxId">
-                  Mã số thuế (MST)
+                  Tax ID
                   <RequiredMark />
                 </Label>
                 <Controller
@@ -423,7 +443,7 @@ export function SellerRegisterForm({
                   render={({ field }) => (
                     <Input
                       id="seller-taxId"
-                      placeholder="MST cá nhân hoặc MST doanh nghiệp"
+                      placeholder="Personal or business tax ID"
                       className={fieldClass}
                       aria-invalid={errors.taxId ? true : undefined}
                       aria-describedby={errors.taxId ? 'seller-taxId-error' : undefined}
@@ -436,7 +456,7 @@ export function SellerRegisterForm({
 
               <div className="grid gap-2">
                 <Label htmlFor="seller-legalRepresentativeName">
-                  Tên người đại diện theo pháp luật
+                  Legal Representative Name
                   <RequiredMark />
                 </Label>
                 <Controller
@@ -446,7 +466,7 @@ export function SellerRegisterForm({
                     <Input
                       id="seller-legalRepresentativeName"
                       autoComplete="name"
-                      placeholder="Nhập họ và tên"
+                      placeholder="Enter full name"
                       className={fieldClass}
                       aria-invalid={errors.legalRepresentativeName ? true : undefined}
                       aria-describedby={
@@ -466,7 +486,7 @@ export function SellerRegisterForm({
 
               <div className="grid gap-2">
                 <Label htmlFor="seller-legalRepresentativeId">
-                  CCCD người đại diện
+                  Legal Representative ID
                   <RequiredMark />
                 </Label>
                 <Controller
@@ -476,7 +496,7 @@ export function SellerRegisterForm({
                     <Input
                       id="seller-legalRepresentativeId"
                       autoComplete="off"
-                      placeholder="Nhập số CCCD"
+                      placeholder="Enter ID number"
                       className={fieldClass}
                       aria-invalid={errors.legalRepresentativeId ? true : undefined}
                       aria-describedby={
@@ -916,89 +936,24 @@ export function SellerRegisterForm({
       ) : null}
 
       {step === 'verification' ? (
-        <form
-          className="mt-7 space-y-5"
-          noValidate
-          onSubmit={(event) => {
-            event.preventDefault();
+        <SellerRegisterVerificationStep
+          form={form}
+          page={page}
+          onBack={() => void goToStep('shop')}
+          onSubmit={() => {
             void handleNext();
           }}
-        >
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="grid gap-2">
-              <Label htmlFor="seller-documentType">
-                Document Type
-                <RequiredMark />
-              </Label>
-              <Controller
-                control={form.control}
-                name="documentType"
-                render={({ field }) => (
-                  <Select value={field.value || undefined} onValueChange={field.onChange}>
-                    <SelectTrigger
-                      id="seller-documentType"
-                      className={selectClass}
-                      aria-invalid={errors.documentType ? true : undefined}
-                      aria-describedby={errors.documentType ? 'seller-documentType-error' : undefined}
-                    >
-                      <SelectValue placeholder="Select document type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {page.documentTypes.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              <FieldError id="seller-documentType-error" message={errors.documentType?.message} />
-            </div>
+        />
+      ) : null}
 
-            <div className="grid gap-2">
-              <Label htmlFor="seller-documentNumber">
-                Document Number
-                <RequiredMark />
-              </Label>
-              <Controller
-                control={form.control}
-                name="documentNumber"
-                render={({ field }) => (
-                  <Input
-                    id="seller-documentNumber"
-                    placeholder="Enter document number"
-                    className={fieldClass}
-                    aria-invalid={errors.documentNumber ? true : undefined}
-                    aria-describedby={errors.documentNumber ? 'seller-documentNumber-error' : undefined}
-                    {...field}
-                  />
-                )}
-              />
-              <FieldError id="seller-documentNumber-error" message={errors.documentNumber?.message} />
-            </div>
-          </div>
-
-          <Alert variant="info">
-            <Shield aria-hidden="true" />
-            <AlertContent>
-              <AlertTitle>What happens next</AlertTitle>
-              <AlertDescription>
-                We will email you if we need supporting documents. You can continue shopping while
-                we review your application.
-              </AlertDescription>
-            </AlertContent>
-          </Alert>
-
-          <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:justify-between">
-            <Button type="button" variant="secondary" className="rounded-full" onClick={() => void goToStep('shop')}>
-              Back
-            </Button>
-            <Button type="submit" className="rounded-full px-7">
-              Submit application
-            </Button>
-          </div>
-        </form>
+      {step === 'terms' ? (
+        <SellerRegisterTermsStep
+          form={form}
+          onBack={() => void goToStep('verification')}
+          onSubmit={() => {
+            void handleNext();
+          }}
+        />
       ) : null}
 
       {step === 'complete' ? (

@@ -15,6 +15,16 @@ describe('getSellerPage', () => {
     expect(page.businessTypes.length).toBeGreaterThan(0);
     expect(page.cities.some((item) => item.label === 'Ho Chi Minh City')).toBe(true);
     expect(page.dialCodes[0]?.dial).toBe('+84');
+    expect(page.sellingModels.map((item) => item.value)).toEqual([
+      'retail',
+      'official',
+      'manufacturer',
+    ]);
+    expect(page.verificationDocuments.map((item) => item.field)).toEqual([
+      'authorizationLetter',
+      'qualityCertificate',
+      'originInvoice',
+    ]);
   });
 
   it('can preview the registered branch without calling a Seller API', () => {

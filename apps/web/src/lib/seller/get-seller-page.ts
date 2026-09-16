@@ -2,9 +2,10 @@ import {
   sellerBusinessTypes,
   sellerCities,
   sellerDialCodes,
-  sellerDocumentTypes,
+  sellerSellingModels,
   sellerShopCategories,
   sellerStates,
+  sellerVerificationDocuments,
 } from '@/lib/mock-data/seller';
 import type { SellerPageStatus, SellerPageViewModel } from '@/lib/view-models/seller';
 
@@ -29,6 +30,7 @@ export function getSellerPage(
     states: sellerStates,
     dialCodes: sellerDialCodes,
     shopCategories: sellerShopCategories,
-    documentTypes: sellerDocumentTypes,
+    sellingModels: sellerSellingModels,
+    verificationDocuments: sellerVerificationDocuments,
   };
 }

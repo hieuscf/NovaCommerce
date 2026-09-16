@@ -30,17 +30,20 @@ describe('SellerPage', () => {
     expect(screen.getByRole('heading', { level: 1, name: /start your business/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Become a Seller' })).toBeInTheDocument();
     expect(screen.getByRole('list', { name: 'Seller registration progress' })).toHaveTextContent(
-      'Business Information',
+      'Verification',
+    );
+    expect(screen.getByRole('list', { name: 'Seller registration progress' })).toHaveTextContent(
+      'Terms & Conditions',
     );
     expect(screen.getByLabelText(/^business name/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/business type/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/legal business name/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/số cccd \/ hộ chiếu/i)).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Hộ kinh doanh / Doanh nghiệp' })).toBeInTheDocument();
-    expect(screen.getByLabelText(/giấy chứng nhận đăng ký kinh doanh/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/mã số thuế/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/tên người đại diện theo pháp luật/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/cccd người đại diện/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/national id \/ passport/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Business Registration' })).toBeInTheDocument();
+    expect(screen.getByLabelText(/business registration certificate/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^tax id/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/legal representative name/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/legal representative id/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/business email/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/phone number/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/address line 1/i)).toBeInTheDocument();
@@ -131,3 +134,95 @@ describe('SellerRegisterForm shop details', () => {
     expect(await screen.findByRole('heading', { name: 'Become a Seller' })).toBeInTheDocument();
   });
 });
+
+describe('SellerRegisterForm verification', () => {
+  it('renders business model and document uploads from the Alloy step 3 layout', () => {
+    render(<SellerRegisterForm page={getSellerPage()} initialStep="verification" />);
+
+    expect(screen.getByRole('heading', { name: 'Verification' })).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /to ensure a safe and trustworthy marketplace, we need some additional information and documents/i,
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Business model' })).toBeInTheDocument();
+    expect(screen.getByText('Regular retail')).toBeInTheDocument();
+    expect(screen.getByText('Official Store / Mall')).toBeInTheDocument();
+    expect(screen.getByText('Manufacturer')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Origin and authorization documents' })).toBeInTheDocument();
+    expect(
+      screen.getByText(/please upload any supporting documents you have/i),
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText(/brand distribution authorization/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/product quality \/ food safety certificate/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/import invoice \/ origin document/i)).toBeInTheDocument();
+    expect(screen.getAllByText('Click to upload or drag and drop')).toHaveLength(3);
+    expect(screen.getAllByText('PDF, JPG, PNG (max 5MB)')).toHaveLength(3);
+    expect(screen.getByText('Your information is secure')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Back' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Next Step' })).toBeEnabled();
+  });
+
+  it('keeps the user on verification when no business model is selected', async () => {
+    const user = userEvent.setup();
+    render(<SellerRegisterForm page={getSellerPage()} initialStep="verification" />);
+
+    await user.click(screen.getByRole('button', { name: 'Next Step' }));
+
+    expect(await screen.findByText('Business model is required')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Verification' })).toBeInTheDocument();
+  });
+
+  it('advances to terms after a business model is selected', async () => {
+    const user = userEvent.setup();
+    render(<SellerRegisterForm page={getSellerPage()} initialStep="verification" />);
+
+    await user.click(screen.getByText('Regular retail'));
+    await user.click(screen.getByRole('button', { name: 'Next Step' }));
+
+    expect(await screen.findByRole('heading', { name: 'Terms & Conditions' })).toBeInTheDocument();
+  });
+
+  it('returns to shop details from verification', async () => {
+    const user = userEvent.setup();
+    render(<SellerRegisterForm page={getSellerPage()} initialStep="verification" />);
+
+    await user.click(screen.getByRole('button', { name: 'Back' }));
+
+    expect(await screen.findByRole('heading', { name: 'Shop Details' })).toBeInTheDocument();
+  });
+});
+
+describe('SellerRegisterForm terms', () => {
+  it('renders the terms checkboxes', () => {
+    render(<SellerRegisterForm page={getSellerPage()} initialStep="terms" />);
+
+    expect(screen.getByRole('heading', { name: 'Terms & Conditions' })).toBeInTheDocument();
+    expect(screen.getByLabelText(/terms of service/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/seller agreement/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/privacy policy/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Submit application' })).toBeInTheDocument();
+  });
+
+  it('keeps the user on terms when agreements are not accepted', async () => {
+    const user = userEvent.setup();
+    render(<SellerRegisterForm page={getSellerPage()} initialStep="terms" />);
+
+    await user.click(screen.getByRole('button', { name: 'Submit application' }));
+
+    expect(await screen.findByText('You must accept the Terms of Service')).toBeInTheDocument();
+    expect(screen.getByText('You must accept the Seller Agreement')).toBeInTheDocument();
+    expect(screen.getByText('You must accept the Privacy Policy')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Terms & Conditions' })).toBeInTheDocument();
+  });
+
+  it('returns to verification from terms', async () => {
+    const user = userEvent.setup();
+    render(<SellerRegisterForm page={getSellerPage()} initialStep="terms" />);
+
+    await user.click(screen.getByRole('button', { name: 'Back' }));
+
+    expect(await screen.findByRole('heading', { name: 'Verification' })).toBeInTheDocument();
+  });
+});
+

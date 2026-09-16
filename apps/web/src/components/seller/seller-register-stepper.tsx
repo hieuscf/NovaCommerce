@@ -50,7 +50,7 @@ export function SellerRegisterStepper({
               </span>
               <span
                 className={cn(
-                  'hidden whitespace-nowrap text-[13px] font-semibold lg:inline',
+                  'hidden whitespace-nowrap text-[12px] font-semibold xl:inline',
                   currentStep || complete ? 'text-ink' : 'text-muted-foreground',
                 )}
               >
