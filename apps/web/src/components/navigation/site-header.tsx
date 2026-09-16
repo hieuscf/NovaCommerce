@@ -25,7 +25,7 @@ const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/shop', label: 'Shop', caret: true },
   { href: '/shop/electronics', label: 'Categories', caret: true },
-  { href: '/shop?sale=true', label: 'Deals' },
+  { href: '/seller', label: 'Seller' },
   { href: '/about', label: 'About' },
   { href: '/contact', label: 'Contact' },
 ];

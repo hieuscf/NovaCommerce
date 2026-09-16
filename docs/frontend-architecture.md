@@ -98,7 +98,7 @@ Only directories justified by current code exist. Empty feature folders are not 
 apps/web/src/
 ├── app/
 │   ├── (auth)/          login, register, password, verify
-│   ├── (store)/         home, shop, product detail, cart, checkout, orders, account + storefront layout
+│   ├── (store)/         home, shop, product detail, cart, checkout, orders, account, seller + storefront layout
 │   ├── error.tsx
 │   ├── global-error.tsx
 │   └── not-found.tsx
@@ -106,6 +106,7 @@ apps/web/src/
 │   ├── account/         Alloy account dashboard (User Gateway profile/addresses/preferences)
 │   ├── auth/            auth-specific UI (not primitives)
 │   ├── commerce/        product cards, listing (PLP), product detail (PDP), cart, checkout, orders, merchandising
+│   ├── seller/          Alloy seller onboarding (unregistered wizard; registered workspace pending Seller Gateway)
 │   ├── feedback/        API / page loading wrappers
 │   ├── layout/
 │   ├── marketing/
@@ -125,6 +126,7 @@ apps/web/src/
 │   ├── checkout/        checkout via Gateway `checkoutClient` (start/complete); payment tiles stay presentation-mapped
 │   ├── orders/          order list via Gateway `orderClient`; detail/confirmation fixtures until detail adapter exists
 │   ├── payment/         saved payment methods via Gateway (`paymentMethodsClient`; no CVV at rest)
+│   ├── seller/          `/seller` onboarding status — always unregistered until Seller Gateway exists
 │   ├── user/            User Gateway adapter (`userClient`) for account profile/addresses/preferences
 │   ├── view-models/     UI contracts (no backend entities)
 │   ├── mock-data/       presentation fixtures until Gateway adapters exist
@@ -181,6 +183,7 @@ Both apps use the **Next.js 15 App Router**.
 | `/login` `/register` `/forgot-password` `/reset-password` `/verify-email` | `(auth)` | Authentication |
 | `/unauthorized` | `(store)` | 403 access-restricted |
 | `/account` | `(store)` | Protected Alloy dashboard. Profile, addresses, and notification preferences load from Gateway `GET/PATCH /users/me*` via `userClient`. Payment methods load from `GET/POST/DELETE /users/me/payment-methods` (saved cards: brand/last4/expiry only — **never CVV**; CVV re-entered at checkout). Loyalty, wishlist, and recent-order rails stay empty until those APIs are wired. Sections via `?section=`. Orders live on `/orders`. |
+| `/seller` | `(store)` | Public Seller Center. Unregistered visitors must complete the Alloy onboarding wizard (business information, shop details, terms & verification, complete). Registered sellers will see a different workspace later. Status is presentation-only (`unregistered`) until the deferred Seller module has a Gateway adapter — do not invent Seller APIs. |
 
 Reserved (do not create empty pages): `/categories`, `/search`, `/account/*`. Account sections stay on `/account?section=` except **Orders**, which is `/orders`. Customer `/orders` is not the Admin reserved `/orders` console route.
 

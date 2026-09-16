@@ -13,6 +13,7 @@ describe('isCustomerProtectedPath', () => {
   it('leaves public storefront and auth routes open', () => {
     expect(isCustomerProtectedPath('/')).toBe(false);
     expect(isCustomerProtectedPath('/shop')).toBe(false);
+    expect(isCustomerProtectedPath('/seller')).toBe(false);
     expect(isCustomerProtectedPath('/login')).toBe(false);
     expect(isCustomerProtectedPath('/unauthorized')).toBe(false);
     expect(isCustomerProtectedPath('/account-recovery')).toBe(false);
