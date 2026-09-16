@@ -56,6 +56,35 @@ describe('IntegrationEvent envelope', () => {
     });
   });
 
+  it('maps ProductCreated to catalog.product_created', () => {
+    const record: OutboxRecord = {
+      id: 'outbox-product-1',
+      aggregateId: 'product-1',
+      aggregateType: 'Product',
+      eventType: 'ProductCreated',
+      payload: {
+        name: 'Nova Headphones',
+        slug: 'nova-headphones',
+        status: 'draft',
+        price: 99.99,
+        currency: 'USD',
+        images: [],
+        attributes: [],
+        createdAt: '2026-01-01T00:00:00.000Z',
+        updatedAt: '2026-01-01T00:00:00.000Z',
+      },
+      createdAt: new Date('2026-01-01T00:00:00.000Z'),
+      processedAt: null,
+      retryCount: 0,
+      lastError: null,
+    };
+
+    const event = buildIntegrationEventFromOutbox(record);
+
+    expect(event.eventType).toBe('catalog.product_created');
+    expect(event.aggregateId).toBe('product-1');
+  });
+
   it('throws when P0 payload is invalid', () => {
     const record: OutboxRecord = {
       id: 'outbox-2',

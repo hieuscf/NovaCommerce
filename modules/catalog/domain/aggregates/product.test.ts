@@ -29,6 +29,13 @@ describe('Product aggregate', () => {
     expect(product.getStatus()).toBe(ProductStatus.DRAFT);
     expect(events).toHaveLength(1);
     expect(events[0]).toBeInstanceOf(ProductCreatedEvent);
+    expect((events[0] as ProductCreatedEvent).payload).toMatchObject({
+      name: 'Nova Headphones',
+      slug: 'nova-headphones',
+      status: ProductStatus.DRAFT,
+      price: 99.99,
+      currency: 'USD',
+    });
   });
 
   it('publishes product and emits ProductPublished', () => {
@@ -40,8 +47,10 @@ describe('Product aggregate', () => {
     expect(product.getStatus()).toBe(ProductStatus.PUBLISHED);
 
     const events = product.pullDomainEvents();
-    expect(events).toHaveLength(1);
-    expect(events[0]).toBeInstanceOf(ProductPublishedEvent);
+    expect(events.some((event) => event instanceof ProductPublishedEvent)).toBe(true);
+    expect(events.some((event) => event instanceof ProductUpdatedEvent)).toBe(true);
+    const updated = events.find((event) => event instanceof ProductUpdatedEvent) as ProductUpdatedEvent;
+    expect(updated.payload.status).toBe(ProductStatus.PUBLISHED);
   });
 
   it('rejects publishing archived product', () => {
@@ -78,6 +87,13 @@ describe('Product aggregate', () => {
     const events = product.pullDomainEvents();
     expect(events).toHaveLength(1);
     expect(events[0]).toBeInstanceOf(ProductUpdatedEvent);
+    expect((events[0] as ProductUpdatedEvent).payload).toMatchObject({
+      name: 'Nova Headphones Pro',
+      slug: 'nova-headphones',
+      status: ProductStatus.DRAFT,
+      price: 99.99,
+      currency: 'USD',
+    });
   });
 
   it('rejects duplicate variant sku', () => {

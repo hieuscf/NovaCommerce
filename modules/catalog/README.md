@@ -18,11 +18,11 @@
 | Event | Trigger |
 |-------|---------|
 | ProductCreated | Product.create() |
-| ProductUpdated | Product details, variants, images, price, unpublish, archive |
+| ProductUpdated | Product details, variants, images, price, publish, unpublish, archive |
 | ProductPublished | Product.publish() |
 | ProductPriceChanged | Product.changePrice() |
 
-Events are persisted atomically via Outbox inside `PrismaProductRepository.save()`.
+Events are persisted atomically via Outbox inside `PrismaProductRepository.save()`. `ProductCreated` and `ProductUpdated` carry a product snapshot (`name`, `slug`, `status`, `price`, `currency`, images, attributes, timestamps) so Search can project OpenSearch documents without querying Catalog.
 
 ## Repository Interfaces
 

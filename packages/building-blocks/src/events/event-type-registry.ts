@@ -7,6 +7,7 @@ export const DOMAIN_TO_INTEGRATION_EVENT_TYPE = {
   OrderCreated: 'order.created',
   StockReserved: 'inventory.stock_reserved',
   PaymentSucceeded: 'payment.completed',
+  ProductCreated: 'catalog.product_created',
   ProductUpdated: 'catalog.product_updated',
   CartItemAdded: 'cart.item_added',
   CheckoutCompleted: 'checkout.completed',

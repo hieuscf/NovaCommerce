@@ -4,6 +4,7 @@ import { ProductAttribute } from '../entities/product-attribute';
 import { ProductImage } from '../entities/product-image';
 import { ProductOption } from '../entities/product-option';
 import { ProductVariant } from '../entities/product-variant';
+import type { ProductEventPayload } from '../events/product-event.payload';
 import { ProductCreatedEvent } from '../events/product-created.event';
 import { ProductPriceChangedEvent } from '../events/product-price-changed.event';
 import { ProductPublishedEvent } from '../events/product-published.event';
@@ -36,7 +37,7 @@ export class Product extends AggregateRoot<string> {
   static create(id: string, name: ProductName, slug: ProductSlug, basePrice: Money, categoryId?: string): Result<Product, CatalogDomainError> {
     const now = new Date();
     const product = new Product(id, now, now, name, slug, basePrice, ProductStatus.DRAFT, categoryId);
-    product.addDomainEvent(new ProductCreatedEvent(id, now, { name: name.value, slug: slug.value }));
+    product.addDomainEvent(new ProductCreatedEvent(id, now, product.toEventPayload()));
     return Result.ok(product);
   }
 
@@ -62,7 +63,7 @@ export class Product extends AggregateRoot<string> {
     this.updatedAt = new Date();
     this.addDomainEvent(new ProductPriceChangedEvent(this.id, new Date(), { amount: newPrice.amount, currency: newPrice.currency }));
     if (previous.amount !== newPrice.amount || previous.currency !== newPrice.currency) {
-      this.addDomainEvent(new ProductUpdatedEvent(this.id, new Date(), { name: this.name.value }));
+      this.addDomainEvent(new ProductUpdatedEvent(this.id, new Date(), this.toEventPayload()));
     }
     return Result.ok(undefined);
   }
@@ -98,7 +99,7 @@ export class Product extends AggregateRoot<string> {
     }
 
     this.updatedAt = new Date();
-    this.addDomainEvent(new ProductUpdatedEvent(this.id, new Date(), { name: this.name.value }));
+    this.addDomainEvent(new ProductUpdatedEvent(this.id, new Date(), this.toEventPayload()));
     return Result.ok(undefined);
   }
 
@@ -112,6 +113,7 @@ export class Product extends AggregateRoot<string> {
     this.status = ProductStatus.PUBLISHED;
     this.updatedAt = new Date();
     this.addDomainEvent(new ProductPublishedEvent(this.id, new Date(), {}));
+    this.addDomainEvent(new ProductUpdatedEvent(this.id, new Date(), this.toEventPayload()));
     return Result.ok(undefined);
   }
 
@@ -121,7 +123,7 @@ export class Product extends AggregateRoot<string> {
     }
     this.status = ProductStatus.DRAFT;
     this.updatedAt = new Date();
-    this.addDomainEvent(new ProductUpdatedEvent(this.id, new Date(), { name: this.name.value }));
+    this.addDomainEvent(new ProductUpdatedEvent(this.id, new Date(), this.toEventPayload()));
     return Result.ok(undefined);
   }
 
@@ -131,7 +133,7 @@ export class Product extends AggregateRoot<string> {
     }
     this.status = ProductStatus.ARCHIVED;
     this.updatedAt = new Date();
-    this.addDomainEvent(new ProductUpdatedEvent(this.id, new Date(), { name: this.name.value }));
+    this.addDomainEvent(new ProductUpdatedEvent(this.id, new Date(), this.toEventPayload()));
     return Result.ok(undefined);
   }
 
@@ -145,7 +147,7 @@ export class Product extends AggregateRoot<string> {
     }
     this.variants.push(variant);
     this.updatedAt = new Date();
-    this.addDomainEvent(new ProductUpdatedEvent(this.id, new Date(), { name: this.name.value }));
+    this.addDomainEvent(new ProductUpdatedEvent(this.id, new Date(), this.toEventPayload()));
     return Result.ok(undefined);
   }
 
@@ -155,7 +157,7 @@ export class Product extends AggregateRoot<string> {
     }
     this.images.push(image);
     this.updatedAt = new Date();
-    this.addDomainEvent(new ProductUpdatedEvent(this.id, new Date(), { name: this.name.value }));
+    this.addDomainEvent(new ProductUpdatedEvent(this.id, new Date(), this.toEventPayload()));
     return Result.ok(undefined);
   }
 
@@ -168,4 +170,24 @@ export class Product extends AggregateRoot<string> {
   getImages(): readonly ProductImage[] { return this.images; }
   getAttributes(): readonly ProductAttribute[] { return this.attributes; }
   getOptions(): readonly ProductOption[] { return this.options; }
+
+  private toEventPayload(): ProductEventPayload {
+    return {
+      name: this.name.value,
+      slug: this.slug.value,
+      status: this.status,
+      price: this.basePrice.amount,
+      currency: this.basePrice.currency,
+      ...(this.categoryId ? { categoryId: this.categoryId } : {}),
+      images: [...this.images]
+        .sort((left, right) => left.getSortOrder() - right.getSortOrder())
+        .map((image) => image.getUrl()),
+      attributes: this.attributes.map((attribute) => ({
+        name: attribute.getName(),
+        value: attribute.getValue(),
+      })),
+      createdAt: this.createdAt.toISOString(),
+      updatedAt: this.updatedAt.toISOString(),
+    };
+  }
 }

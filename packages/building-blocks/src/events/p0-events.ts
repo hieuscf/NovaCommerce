@@ -15,8 +15,30 @@ export interface PaymentSucceededV1Payload {
   readonly orderId: string;
 }
 
+export interface ProductCreatedV1Payload {
+  readonly name: string;
+  readonly slug: string;
+  readonly status?: string;
+  readonly price?: number;
+  readonly currency?: string;
+  readonly categoryId?: string;
+  readonly images?: readonly string[];
+  readonly attributes?: readonly { readonly name: string; readonly value: string }[];
+  readonly createdAt?: string;
+  readonly updatedAt?: string;
+}
+
 export interface ProductUpdatedV1Payload {
   readonly name: string;
+  readonly slug?: string;
+  readonly status?: string;
+  readonly price?: number;
+  readonly currency?: string;
+  readonly categoryId?: string;
+  readonly images?: readonly string[];
+  readonly attributes?: readonly { readonly name: string; readonly value: string }[];
+  readonly createdAt?: string;
+  readonly updatedAt?: string;
 }
 
 export interface CartItemAddedV1Payload {
@@ -46,6 +68,12 @@ export type PaymentSucceededV1 = IntegrationEvent<PaymentSucceededV1Payload> & {
   readonly aggregateType: 'Payment';
 };
 
+export type ProductCreatedV1 = IntegrationEvent<ProductCreatedV1Payload> & {
+  readonly eventType: 'catalog.product_created';
+  readonly eventVersion: 1;
+  readonly aggregateType: 'Product';
+};
+
 export type ProductUpdatedV1 = IntegrationEvent<ProductUpdatedV1Payload> & {
   readonly eventType: 'catalog.product_updated';
   readonly eventVersion: 1;
@@ -68,6 +96,7 @@ export type P0IntegrationEvent =
   | OrderCreatedV1
   | StockReservedV1
   | PaymentSucceededV1
+  | ProductCreatedV1
   | ProductUpdatedV1
   | CartItemAddedV1
   | CheckoutCompletedV1;
@@ -82,6 +111,8 @@ const P0_PAYLOAD_VALIDATORS: Record<
   'inventory.stock_reserved': (payload) =>
     typeof payload.orderId === 'string' && typeof payload.quantity === 'number',
   'payment.completed': (payload) => typeof payload.orderId === 'string',
+  'catalog.product_created': (payload) =>
+    typeof payload.name === 'string' && typeof payload.slug === 'string',
   'catalog.product_updated': (payload) => typeof payload.name === 'string',
   'cart.item_added': (payload) =>
     typeof payload.productId === 'string' && typeof payload.quantity === 'number',

@@ -1,6 +1,7 @@
 import type { DomainEvent } from '@novacommerce/building-blocks';
+import type { ProductEventPayload } from './product-event.payload';
 
-export interface ProductUpdatedPayload { readonly name: string }
+export type ProductUpdatedPayload = ProductEventPayload;
 
 export class ProductUpdatedEvent implements DomainEvent {
   readonly eventName = 'ProductUpdated';

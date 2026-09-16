@@ -34,6 +34,8 @@ export {
   type P0IntegrationEvent,
   type PaymentSucceededV1,
   type PaymentSucceededV1Payload,
+  type ProductCreatedV1,
+  type ProductCreatedV1Payload,
   type ProductUpdatedV1,
   type ProductUpdatedV1Payload,
   type StockReservedV1,
