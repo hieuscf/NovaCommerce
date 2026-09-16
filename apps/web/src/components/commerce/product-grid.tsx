@@ -4,7 +4,7 @@ import { productShapeBySlug } from '@/components/commerce/product-shape';
 import { cn } from '@/lib/utils';
 
 export interface ProductGridProps {
-  products: ProductViewModel[];
+  products: readonly ProductViewModel[];
   loading?: boolean;
   columns?: 2 | 3 | 4 | 5;
   variant?: 'default' | 'compact';

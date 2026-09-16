@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
-import { CartPage } from '@/components/commerce/cart/cart-page';
-import { getCartPage } from '@/lib/cart/get-cart-page';
+import { CartContainer } from '@/components/commerce/cart/cart-container';
 
 export const metadata: Metadata = {
   title: 'Shopping Cart',
@@ -8,6 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function CartRoutePage() {
-  const cart = getCartPage();
-  return <CartPage cart={cart} />;
+  return <CartContainer />;
 }

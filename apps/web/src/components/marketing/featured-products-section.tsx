@@ -6,13 +6,19 @@ import { Button } from '@novacommerce/ui/components/button';
 import { Container } from '@novacommerce/ui/components/container';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@novacommerce/ui/components/tabs';
 import { ProductGrid } from '@/components/commerce/product-grid';
-import { featuredProducts } from '@/lib/mock-data/homepage';
+import type { ProductViewModel } from '@/lib/view-models/product';
 import { cn } from '@/lib/utils';
 
 const tabClassName =
   'h-6 rounded-none border-b-2 border-transparent px-0 text-sm text-muted-foreground shadow-none data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-ink data-[state=active]:shadow-none';
 
-export function FeaturedProductsSection({ embedded = false }: { embedded?: boolean }) {
+export function FeaturedProductsSection({
+  embedded = false,
+  products,
+}: {
+  embedded?: boolean;
+  products: readonly ProductViewModel[];
+}) {
   const body = (
     <>
       <div className={cn('flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between', embedded ? 'mb-4' : 'mb-8')}>
@@ -42,13 +48,13 @@ export function FeaturedProductsSection({ embedded = false }: { embedded?: boole
           </TabsTrigger>
         </TabsList>
         <TabsContent value="bestsellers">
-          <ProductGrid products={featuredProducts} columns={embedded ? 5 : 4} variant="compact" />
+          <ProductGrid products={products} columns={embedded ? 5 : 4} variant="compact" />
         </TabsContent>
         <TabsContent value="new">
           <ProductGrid
             products={[
-              ...featuredProducts.filter((product) => product.badge === 'new'),
-              ...featuredProducts.filter((product) => product.badge !== 'new'),
+              ...products.filter((product) => product.badge === 'new'),
+              ...products.filter((product) => product.badge !== 'new'),
             ]}
             columns={embedded ? 5 : 4}
             variant="compact"
@@ -56,7 +62,7 @@ export function FeaturedProductsSection({ embedded = false }: { embedded?: boole
         </TabsContent>
         <TabsContent value="sale">
           <ProductGrid
-            products={featuredProducts.filter((product) => product.compareAtPrice !== undefined)}
+            products={products.filter((product) => product.compareAtPrice !== undefined)}
             columns={embedded ? 5 : 4}
             variant="compact"
           />

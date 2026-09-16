@@ -87,7 +87,14 @@ This destroys local PostgreSQL data.
 
 ## Seed Strategy
 
-No seed script is implemented yet. Seed data will be added when Application layer modules require deterministic development fixtures.
+Development seeds live under `prisma/seed/` and are applied with Prisma `db execute`:
+
+| Script | Purpose |
+|--------|---------|
+| `pnpm --filter @novacommerce/database run seed:dev` | Permissions + admin user + sample catalog |
+| `pnpm --filter @novacommerce/database run seed:catalog` | Sample categories + published products only |
+
+`seed_catalog_products.sql` inserts 5 categories and 6 published products (with images, attributes, and variants) so storefront `/` and `/shop` have real Gateway data.
 
 ## Outbox Pattern
 

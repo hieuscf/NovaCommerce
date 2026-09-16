@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
-import { CheckoutPage } from '@/components/commerce/checkout/checkout-page';
-import { getCheckoutPage } from '@/lib/checkout/get-checkout-page';
+import { CheckoutContainer } from '@/components/commerce/checkout/checkout-container';
 
 export const metadata: Metadata = {
   title: 'Checkout',
@@ -9,6 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function CheckoutRoutePage() {
-  const checkout = getCheckoutPage();
-  return <CheckoutPage checkout={checkout} />;
+  return <CheckoutContainer />;
 }

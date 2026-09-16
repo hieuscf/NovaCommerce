@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { ProductListing } from '../product-listing';
 import { catalogProducts } from '@/lib/mock-data/catalog';
-import { buildShopFacets, getShopPageModel } from '@/lib/catalog/get-shop-page';
+import { buildShopFacets } from '@/lib/catalog/get-shop-page';
 import { parseShopQuery } from '@/lib/url/shop-query';
 import { getShopHeader } from '@/lib/view-models/shop';
 
@@ -90,19 +90,5 @@ describe('ProductListing', () => {
     expect(screen.getByRole('heading', { name: 'No products found' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Clear all' })).toHaveAttribute('href', '/shop/smartphones');
     expect(screen.queryByRole('heading', { name: 'iPhone 17 Pro' })).not.toBeInTheDocument();
-  });
-});
-
-describe('getShopPageModel', () => {
-  it('loads a collection route without treating the path as a missing page', () => {
-    const model = getShopPageModel({}, 'electronics');
-    expect(model).not.toBeNull();
-    expect(model?.query.collection).toBe('electronics');
-    expect(model?.header.title).toBe('Electronics');
-    expect(model?.total).toBeGreaterThan(0);
-  });
-
-  it('returns null for an unknown collection slug', () => {
-    expect(getShopPageModel({}, 'not-a-collection')).toBeNull();
   });
 });

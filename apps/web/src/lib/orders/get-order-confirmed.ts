@@ -8,8 +8,8 @@ import {
 
 /**
  * Presentation lookup for the post-checkout confirmation page. Replace with
- * the Checkout / Order Gateway response later. This preview always shows the
- * Alloy fixture order and does not call `POST /users/me/checkout`.
+ * the Checkout / Order Gateway response later. Layout still uses the Alloy
+ * fixture; the order itself is created by Gateway Checkout on Place order.
  */
 export function getOrderConfirmed(): OrderConfirmedViewModel {
   const detail = getOrderDetail(CONFIRMED_ORDER_NUMBER);

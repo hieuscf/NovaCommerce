@@ -14,6 +14,7 @@ export function generateStaticParams() {
   return listShopCollectionSlugs().map((category) => ({ category }));
 }
 
+export const dynamic = 'force-dynamic';
 export const dynamicParams = false;
 
 export async function generateMetadata({
@@ -35,7 +36,7 @@ export default async function ShopCollectionPage({
   searchParams,
 }: ShopCollectionPageProps) {
   const { category } = await params;
-  const model = getShopPageModel(await searchParams, category);
+  const model = await getShopPageModel(await searchParams, category);
 
   if (!model) {
     notFound();

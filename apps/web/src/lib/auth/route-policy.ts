@@ -1,4 +1,4 @@
-const CUSTOMER_PROTECTED_PREFIXES = ['/account', '/orders', '/checkout'] as const;
+const CUSTOMER_PROTECTED_PREFIXES = ['/account', '/orders', '/checkout', '/cart'] as const;
 
 const AUTH_SURFACE_PATHS = [
   '/login',

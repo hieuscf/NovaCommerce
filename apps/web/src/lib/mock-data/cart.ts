@@ -1,6 +1,6 @@
 /**
- * Presentation fixture for the Alloy cart page until Gateway
- * `GET /api/v1/users/me/cart` is wired. Line names/images come from the catalog.
+ * Presentation fixture for checkout / UI tests.
+ * Live `/cart` loads Gateway `GET /api/v1/users/me/cart` via `cartClient`.
  */
 export interface CartFixtureLine {
   readonly id: string;

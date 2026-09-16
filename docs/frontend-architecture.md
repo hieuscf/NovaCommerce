@@ -120,9 +120,9 @@ apps/web/src/
 │   ├── auth/            session, route policy, auth API
 │   ├── validation/      Zod schemas
 │   ├── url/             shareable query parsers
-│   ├── catalog/         listing + PDP fixture selection until Catalog Gateway exists
-│   ├── cart/            cart page fixture selection until Cart Gateway exists
-│   ├── checkout/        checkout page fixture selection until Checkout Gateway exists
+│   ├── catalog/         shop/home via Gateway `catalogClient`; PDP fixtures until detail adapter exists
+│   ├── cart/            cart via Gateway `cartClient`; header badge still fixture-backed
+│   ├── checkout/        checkout via Gateway `checkoutClient` (start/complete); payment tiles stay presentation-mapped
 │   ├── orders/          order list via Gateway `orderClient`; detail/confirmation fixtures until detail adapter exists
 │   ├── user/            User Gateway adapter (`userClient`) for account profile/addresses/preferences
 │   ├── view-models/     UI contracts (no backend entities)
@@ -168,12 +168,12 @@ Both apps use the **Next.js 15 App Router**.
 
 | Route | Group | Purpose |
 |-------|-------|---------|
-| `/` | `(store)` | Homepage |
-| `/shop` | `(store)` | Product listing for the full catalog. Remaining filters/sort/page live in the URL (`brand`, `sort`, `page`, `view`, …). Catalog photos until the Catalog API is wired. |
-| `/shop/[category]` | `(store)` | Collection listing (for example `/shop/electronics`). Extra leaf filters stay in the query (`category`, `brand`, …). Unknown slugs use `not-found`. |
+| `/` | `(store)` | Homepage. Category + featured product rails load from Gateway `GET /categories` + `GET /products?status=published` via `catalogClient`. Hero/promo/benefits stay static. |
+| `/shop` | `(store)` | Product listing for the full catalog. Remaining filters/sort/page live in the URL (`brand`, `sort`, `page`, `view`, …). Loads published products from Gateway (capped fetch) then applies presentation filters via `applyShopQuery`. |
+| `/shop/[category]` | `(store)` | Collection listing (for example `/shop/electronics`). Extra leaf filters stay in the query (`category`, `brand`, …). Unknown slugs use `not-found`. Same Gateway catalog source as `/shop`. |
 | `/products/[slug]` | `(store)` | Product detail. Gallery, variants, reviews, and related products use presentation fixtures until the Catalog Gateway is wired. |
-| `/cart` | `(store)` | Shopping cart. Line items, quantity, remove, summary, and recommendations use presentation fixtures until `GET /api/v1/users/me/cart` is wired. Checkout and PayPal buttons navigate to `/checkout` and do not invent Payment APIs. |
-| `/checkout` | `(store)` | Protected Alloy checkout (customer + shipping, then Payment Gateway, then review). Presentation fixtures until Cart / User / Checkout Gateway adapters are wired. Payment tiles are presentation methods (`card`, `paypal`, `qr_pay`, `google_pay`) and map to Gateway `paymentProvider` (`vnpay`, `paypal`, `momo`) when checkout is wired. Card/OTP fields stay in the browser and are never posted. Place order navigates to `/orders/confirmed` as a preview success state — it does not call `POST /users/me/checkout`. |
+| `/cart` | `(store)` | Protected shopping cart. Loads Gateway `GET /users/me/cart` via `cartClient` (client-side after session restore; creates User profile on 404). Line merchandising joins Catalog by `productId`. Qty/remove/add persist through PATCH/DELETE/POST when line/product ids are Gateway UUIDs. Checkout and PayPal buttons navigate to `/checkout` and do not invent Payment APIs. |
+| `/checkout` | `(store)` | Protected Alloy checkout. Loads Gateway cart + User profile/addresses via `CheckoutContainer`, then Place order calls `POST /users/me/checkout` + `.../complete` (upserts shipping address first). Payment tiles (`card`, `paypal`, `qr_pay`, `google_pay`) map to Gateway `paymentProvider` (`vnpay`, `paypal`, `momo`). Card/OTP fields stay in the browser and are never posted. Success navigates to `/orders/confirmed`; the created order is listed on `/orders`. Requires seeded inventory for the default warehouse. |
 | `/orders` | `(store)` | Protected customer order list (account sidebar + status filters + pagination). Query: `status` (`all` default, plus `processing`, `shipped`, `delivered`, `cancelled`), `page`. Loads live history from Gateway `GET /users/me/orders` via `orderClient` (client-side after session restore). Alloy filters map to domain statuses (`processing`→`pending`, `shipped`→`confirmed`, `delivered`→`completed`, `cancelled`→`cancelled`). `/account?section=orders` uses the same container. |
 | `/orders/confirmed` | `(store)` | Protected Alloy order confirmation. Shown after checkout preview; does not invent Payment or Order APIs. |
 | `/orders/[orderNumber]` | `(store)` | Protected order detail (timeline, items, shipping, payment, totals). Unknown numbers use `not-found`. |

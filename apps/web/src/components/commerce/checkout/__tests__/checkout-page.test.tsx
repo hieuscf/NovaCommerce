@@ -1,13 +1,23 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { CheckoutPage } from '../checkout-page';
 import { getCheckoutPage } from '@/lib/checkout/get-checkout-page';
 
-const { push } = vi.hoisted(() => ({ push: vi.fn() }));
+const { push, placeCheckoutOrder } = vi.hoisted(() => ({
+  push: vi.fn(),
+  placeCheckoutOrder: vi.fn().mockResolvedValue({
+    orderId: 'order-1',
+    orderNumber: 'ORD-ABCDEF12',
+  }),
+}));
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push, replace: vi.fn() }),
+}));
+
+vi.mock('@/lib/checkout/place-order', () => ({
+  placeCheckoutOrder,
 }));
 
 async function fillCardPayment(user: ReturnType<typeof userEvent.setup>) {
@@ -22,6 +32,11 @@ async function fillCardPayment(user: ReturnType<typeof userEvent.setup>) {
 describe('CheckoutPage', () => {
   beforeEach(() => {
     push.mockClear();
+    placeCheckoutOrder.mockClear();
+    placeCheckoutOrder.mockResolvedValue({
+      orderId: 'order-1',
+      orderNumber: 'ORD-ABCDEF12',
+    });
   });
 
   it('renders the Alloy checkout details from the fixture cart', () => {
@@ -101,6 +116,7 @@ describe('CheckoutPage', () => {
     expect(review).toBeTruthy();
     await user.click(within(review!).getByRole('button', { name: 'Place order' }));
     await vi.waitFor(() => {
+      expect(placeCheckoutOrder).toHaveBeenCalled();
       expect(push).toHaveBeenCalledWith('/orders/confirmed');
     });
     expect(screen.queryByRole('heading', { name: 'Order Confirmed!' })).not.toBeInTheDocument();

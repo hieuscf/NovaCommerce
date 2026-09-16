@@ -12,7 +12,7 @@ interface ShopPageProps {
 }
 
 export async function generateMetadata({ searchParams }: ShopPageProps): Promise<Metadata> {
-  const model = getShopPageModel(await searchParams);
+  const model = await getShopPageModel(await searchParams);
   return {
     title: model?.header.title ?? 'Shop',
     description: model?.header.description,
@@ -26,7 +26,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
     redirect(shopHref(parsed));
   }
 
-  const model = getShopPageModel(params);
+  const model = await getShopPageModel(params);
   if (!model) {
     redirect('/shop');
   }

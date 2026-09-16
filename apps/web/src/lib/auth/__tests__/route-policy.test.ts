@@ -7,6 +7,7 @@ describe('isCustomerProtectedPath', () => {
     expect(isCustomerProtectedPath('/account/orders/1')).toBe(true);
     expect(isCustomerProtectedPath('/orders')).toBe(true);
     expect(isCustomerProtectedPath('/checkout')).toBe(true);
+    expect(isCustomerProtectedPath('/cart')).toBe(true);
   });
 
   it('leaves public storefront and auth routes open', () => {

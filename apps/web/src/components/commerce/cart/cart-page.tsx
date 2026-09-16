@@ -9,20 +9,56 @@ import { CartEmptyState } from '@/components/commerce/cart/cart-empty';
 import { CartItemsPanel } from '@/components/commerce/cart/cart-items';
 import { CartRecommendations } from '@/components/commerce/cart/cart-recommendations';
 import { CartSummary } from '@/components/commerce/cart/cart-summary';
+import { cartClient } from '@/lib/cart/client';
+import { mapCartDtoToPage } from '@/lib/cart/get-cart-page';
+import { preserveLineSelection } from '@/lib/cart/mappers';
+import { toFormError } from '@/lib/errors';
 import { summarizeCart, type CartLineViewModel, type CartPageViewModel } from '@/lib/view-models/cart';
 import type { ProductViewModel } from '@/lib/view-models/product';
+
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function isGatewayId(value: string): boolean {
+  return UUID_RE.test(value);
+}
 
 export function CartPage({ cart }: { cart: CartPageViewModel }) {
   const router = useRouter();
   const [lines, setLines] = useState<CartLineViewModel[]>(() => [...cart.lines]);
+  const [recommendations] = useState(() => [...cart.recommendations]);
   const summary = useMemo(() => summarizeCart(lines), [lines]);
 
   function updateLine(id: string, patch: Partial<CartLineViewModel>) {
     setLines((current) => current.map((line) => (line.id === id ? { ...line, ...patch } : line)));
   }
 
+  async function syncFromCartDto(
+    previousSelection: readonly CartLineViewModel[],
+    cartDto: Awaited<ReturnType<typeof cartClient.getCart>>,
+  ) {
+    const mapped = await mapCartDtoToPage(cartDto);
+    setLines(preserveLineSelection(previousSelection, mapped.lines));
+  }
+
   function handleQuantityChange(id: string, quantity: number) {
-    updateLine(id, { quantity });
+    const previous = lines;
+    const optimistic = previous.map((line) => (line.id === id ? { ...line, quantity } : line));
+    setLines(optimistic);
+
+    if (!isGatewayId(id)) {
+      return;
+    }
+
+    void (async () => {
+      try {
+        const cartDto = await cartClient.updateItemQuantity(id, { quantity });
+        await syncFromCartDto(optimistic, cartDto);
+      } catch (error) {
+        setLines(previous);
+        toast.error('Could not update quantity', { description: toFormError(error) });
+      }
+    })();
   }
 
   function handleSelect(id: string, selected: boolean) {
@@ -30,14 +66,31 @@ export function CartPage({ cart }: { cart: CartPageViewModel }) {
   }
 
   function handleRemove(id: string) {
+    const previous = lines;
     const removed = lines.find((line) => line.id === id);
-    setLines((current) => current.filter((line) => line.id !== id));
+    const optimistic = previous.filter((line) => line.id !== id);
+    setLines(optimistic);
     if (removed) {
       toast.success('Removed from cart', { description: removed.name });
     }
+
+    if (!isGatewayId(id)) {
+      return;
+    }
+
+    void (async () => {
+      try {
+        const cartDto = await cartClient.removeItem(id);
+        await syncFromCartDto(optimistic, cartDto);
+      } catch (error) {
+        setLines(previous);
+        toast.error('Could not remove item', { description: toFormError(error) });
+      }
+    })();
   }
 
   function handleAddRecommendation(product: ProductViewModel) {
+    const previous = lines;
     setLines((current) => {
       const existing = current.find((line) => line.productId === product.id);
       if (existing) {
@@ -64,6 +117,25 @@ export function CartPage({ cart }: { cart: CartPageViewModel }) {
       ];
     });
     toast.success('Added to cart', { description: product.name });
+
+    if (!isGatewayId(product.id)) {
+      return;
+    }
+
+    void (async () => {
+      try {
+        const cartDto = await cartClient.addItem({
+          productId: product.id,
+          quantity: 1,
+          unitPriceAmount: product.price,
+          unitPriceCurrency: product.currency,
+        });
+        await syncFromCartDto(previous, cartDto);
+      } catch (error) {
+        setLines(previous);
+        toast.error('Could not add item', { description: toFormError(error) });
+      }
+    })();
   }
 
   function handleCheckout() {
@@ -97,7 +169,7 @@ export function CartPage({ cart }: { cart: CartPageViewModel }) {
           </div>
         )}
 
-        <CartRecommendations products={cart.recommendations} onAdd={handleAddRecommendation} />
+        <CartRecommendations products={recommendations} onAdd={handleAddRecommendation} />
       </Container>
     </div>
   );

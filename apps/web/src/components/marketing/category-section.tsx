@@ -4,10 +4,16 @@ import { Button } from '@novacommerce/ui/components/button';
 import { Container } from '@novacommerce/ui/components/container';
 import { CategoryCard } from '@/components/commerce/category-card';
 import { categoryShapeBySlug } from '@/components/commerce/product-shape';
-import { featuredCategories } from '@/lib/mock-data/homepage';
+import type { CategoryViewModel } from '@/lib/view-models/product';
 import { cn } from '@/lib/utils';
 
-export function CategorySection({ embedded = false }: { embedded?: boolean }) {
+export function CategorySection({
+  embedded = false,
+  categories,
+}: {
+  embedded?: boolean;
+  categories: readonly CategoryViewModel[];
+}) {
   const body = (
     <>
       <div className="mb-4 flex items-end justify-between gap-4">
@@ -27,7 +33,7 @@ export function CategorySection({ embedded = false }: { embedded?: boolean }) {
 
       <div className="relative">
         <div className="flex gap-3.5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {featuredCategories.map((category) => (
+          {categories.map((category) => (
             <CategoryCard
               key={category.id}
               category={category}

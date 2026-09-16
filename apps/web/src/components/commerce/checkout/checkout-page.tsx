@@ -4,6 +4,7 @@ import { useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { toast } from '@novacommerce/ui/components/toast';
 import { Container } from '@novacommerce/ui/components/container';
 import { ShopBreadcrumb } from '@/components/commerce/listing/shop-breadcrumb';
 import { CheckoutDetailsForm } from '@/components/commerce/checkout/checkout-details-form';
@@ -14,6 +15,8 @@ import { CheckoutReviewCard } from '@/components/commerce/checkout/checkout-revi
 import { CheckoutStepper } from '@/components/commerce/checkout/checkout-stepper';
 import { CheckoutSummary } from '@/components/commerce/checkout/checkout-summary';
 import { CheckoutTrustBar } from '@/components/commerce/checkout/checkout-trust-bar';
+import { placeCheckoutOrder } from '@/lib/checkout/place-order';
+import { toFormError } from '@/lib/errors';
 import {
   CHECKOUT_DETAILS_FIELDS,
   CHECKOUT_PAYMENT_FIELDS,
@@ -101,10 +104,18 @@ export function CheckoutPage({ checkout }: { checkout: CheckoutPageViewModel }) 
       return;
     }
     setSubmitting(true);
-    window.setTimeout(() => {
-      setSubmitting(false);
+    try {
+      const values = form.getValues();
+      await placeCheckoutOrder({
+        values,
+        paymentMethod: values.paymentMethod,
+      });
       router.push('/orders/confirmed');
-    }, 400);
+    } catch (error) {
+      toast.error('Could not place order', { description: toFormError(error) });
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   async function handlePrimaryAction() {

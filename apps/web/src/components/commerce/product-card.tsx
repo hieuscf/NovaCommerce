@@ -2,12 +2,16 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { Heart, ShoppingCart, Star } from 'lucide-react';
 import { toast } from '@novacommerce/ui/components/toast';
 import { Badge } from '@novacommerce/ui/components/badge';
 import { Button } from '@novacommerce/ui/components/button';
 import { Card } from '@novacommerce/ui/components/card';
 import { Skeleton, SkeletonText } from '@novacommerce/ui/components/skeleton';
+import { addProductToCart } from '@/lib/cart/add-product-to-cart';
+import { buildLoginHref } from '@/lib/auth/return-url';
 import {
   formatPrice,
   formatReviewCount,
@@ -143,6 +147,8 @@ export function ProductCard({
   illustration,
   className,
 }: ProductCardProps) {
+  const router = useRouter();
+  const [adding, setAdding] = useState(false);
   const listing = variant === 'listing';
   const row = variant === 'row';
   const compact = variant === 'compact';
@@ -150,6 +156,47 @@ export function ProductCard({
   const available = product.inStock !== false;
   const href = productHref(product.slug);
   const specs = [product.brand, product.variant].filter(Boolean).join(' · ');
+
+  async function handleAddToCart() {
+    if (!available || adding) {
+      return;
+    }
+
+    setAdding(true);
+    try {
+      const result = await addProductToCart({
+        productId: product.id,
+        unitPriceAmount: product.price,
+        unitPriceCurrency: product.currency,
+        quantity: 1,
+      });
+
+      if (result.status === 'login_required') {
+        const returnUrl =
+          typeof window !== 'undefined'
+            ? `${window.location.pathname}${window.location.search}`
+            : '/shop';
+        router.push(buildLoginHref(returnUrl, 'session-required'));
+        return;
+      }
+
+      if (result.status === 'unsupported_product') {
+        toast.error('Could not add to cart', {
+          description: 'This product is not available in the live catalog yet.',
+        });
+        return;
+      }
+
+      if (result.status === 'error') {
+        toast.error('Could not add to cart', { description: result.message });
+        return;
+      }
+
+      toast.success('Added to cart', { description: product.name });
+    } finally {
+      setAdding(false);
+    }
+  }
 
   if (row) {
     return (
@@ -180,8 +227,8 @@ export function ProductCard({
             <Button
               className="w-full rounded-xl"
               variant="primary-gradient"
-              disabled={!available}
-              onClick={() => toast.success('Added to cart', { description: product.name })}
+              disabled={!available || adding}
+              onClick={() => void handleAddToCart()}
             >
               <ShoppingCart className="size-4" aria-hidden="true" />
               {available ? 'Add to Cart' : 'Out of stock'}
@@ -304,8 +351,8 @@ export function ProductCard({
             className={cn('min-w-0 flex-1', compact && 'h-9 rounded-pill text-xs shadow-cta', listing && 'rounded-xl')}
             size={compact || listing ? 'sm' : 'default'}
             variant="primary-gradient"
-            disabled={!available}
-            onClick={() => toast.success('Added to cart', { description: product.name })}
+            disabled={!available || adding}
+            onClick={() => void handleAddToCart()}
           >
             {compact ? null : <ShoppingCart className="size-4" aria-hidden="true" />}
             {available ? 'Add to Cart' : 'Out of stock'}

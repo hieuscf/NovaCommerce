@@ -1,6 +1,7 @@
 import type { ProductViewModel } from '@/lib/view-models/product';
 import { applyShopQuery } from '@/lib/catalog/apply-shop-query';
-import { catalogProducts, shopFacets } from '@/lib/mock-data/catalog';
+import { loadPublishedCatalog } from '@/lib/catalog/load-published-catalog';
+import { shopFacets } from '@/lib/mock-data/catalog';
 import { parseShopQuery, type ShopQuery } from '@/lib/url/shop-query';
 import {
   getShopChildCollections,
@@ -90,21 +91,26 @@ export function buildShopFacets(
   };
 }
 
-export function getShopPageModel(
+/**
+ * Loads `/shop` (and `/shop/[category]`) from Gateway published products.
+ * Collection/filter/sort/page remain presentation-layer via `applyShopQuery`.
+ */
+export async function getShopPageModel(
   searchParams: Record<string, string | string[] | undefined>,
   collection?: string,
-): ShopPageModel | null {
+): Promise<ShopPageModel | null> {
   if (collection && !isShopCollectionSlug(collection)) {
     return null;
   }
 
   const query = parseShopQuery(searchParams, { collection });
-  const listing = applyShopQuery(catalogProducts, query);
+  const catalog = await loadPublishedCatalog();
+  const listing = applyShopQuery(catalog.viewModels, query);
 
   return {
     query,
     header: getShopHeader(query),
-    facets: buildShopFacets(catalogProducts, query),
+    facets: buildShopFacets(catalog.viewModels, query),
     products: listing.items,
     total: listing.total,
     page: listing.page,

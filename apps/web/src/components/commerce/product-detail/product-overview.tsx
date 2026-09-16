@@ -1,10 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { toast } from '@novacommerce/ui/components/toast';
 import { ProductGallery } from '@/components/commerce/product-detail/product-gallery';
 import { ProductInfo } from '@/components/commerce/product-detail/product-info';
 import { StickyPurchaseBar } from '@/components/commerce/product-detail/sticky-purchase-bar';
+import { addProductToCart } from '@/lib/cart/add-product-to-cart';
+import { buildLoginHref } from '@/lib/auth/return-url';
 import { formatPrice } from '@/lib/view-models/product';
 import {
   defaultVariantSelection,
@@ -23,11 +26,13 @@ function initialImageId(detail: ProductDetailViewModel): string {
 }
 
 export function ProductOverview({ detail }: { detail: ProductDetailViewModel }) {
+  const router = useRouter();
   const [selected, setSelected] = useState(() =>
     defaultVariantSelection(detail.variants, detail.product.variant),
   );
   const [quantity, setQuantity] = useState(1);
   const [activeImageId, setActiveImageId] = useState(() => initialImageId(detail));
+  const [adding, setAdding] = useState(false);
 
   const inStock = detail.availability === 'in_stock';
 
@@ -40,8 +45,47 @@ export function ProductOverview({ detail }: { detail: ProductDetailViewModel }) 
     }
   }
 
-  function addToCart() {
-    toast.success('Added to cart', { description: `${detail.product.name} × ${quantity}` });
+  async function addToCart() {
+    if (adding) {
+      return;
+    }
+
+    setAdding(true);
+    try {
+      const result = await addProductToCart({
+        productId: detail.product.id,
+        unitPriceAmount: detail.product.price,
+        unitPriceCurrency: detail.product.currency,
+        quantity,
+      });
+
+      if (result.status === 'login_required') {
+        const returnUrl =
+          typeof window !== 'undefined'
+            ? `${window.location.pathname}${window.location.search}`
+            : `/products/${detail.product.slug}`;
+        router.push(buildLoginHref(returnUrl, 'session-required'));
+        return;
+      }
+
+      if (result.status === 'unsupported_product') {
+        toast.error('Could not add to cart', {
+          description: 'Open this product from Shop to use the live catalog cart.',
+        });
+        return;
+      }
+
+      if (result.status === 'error') {
+        toast.error('Could not add to cart', { description: result.message });
+        return;
+      }
+
+      toast.success('Added to cart', {
+        description: `${detail.product.name} × ${quantity}`,
+      });
+    } finally {
+      setAdding(false);
+    }
   }
 
   function buyNow() {
@@ -73,7 +117,7 @@ export function ProductOverview({ detail }: { detail: ProductDetailViewModel }) 
           quantity={quantity}
           onVariantChange={handleVariantChange}
           onQuantityChange={setQuantity}
-          onAddToCart={addToCart}
+          onAddToCart={() => void addToCart()}
           onBuyNow={buyNow}
           onWishlist={saveWishlist}
           onNotify={notifyMe}
@@ -83,7 +127,7 @@ export function ProductOverview({ detail }: { detail: ProductDetailViewModel }) 
         productName={detail.product.name}
         priceLabel={formatPrice(detail.product.price, detail.product.currency)}
         inStock={inStock}
-        onAddToCart={addToCart}
+        onAddToCart={() => void addToCart()}
         onWishlist={saveWishlist}
         onNotify={notifyMe}
       />

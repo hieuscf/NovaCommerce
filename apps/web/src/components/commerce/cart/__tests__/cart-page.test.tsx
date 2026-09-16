@@ -2,7 +2,7 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { CartPage } from '../cart-page';
-import { getCartPage } from '@/lib/cart/get-cart-page';
+import { getCartPageFromFixtures } from '@/lib/cart/get-cart-page';
 
 const { pushMock } = vi.hoisted(() => ({ pushMock: vi.fn() }));
 
@@ -25,7 +25,7 @@ describe('CartPage', () => {
   });
 
   it('renders lines, summary totals, and recommendations from the fixture cart', () => {
-    render(<CartPage cart={getCartPage()} />);
+    render(<CartPage cart={getCartPageFromFixtures()} />);
 
     expect(screen.getByRole('heading', { level: 1, name: 'Shopping Cart' })).toBeInTheDocument();
     expect(screen.queryByText(/review your items and manage your cart/i)).not.toBeInTheDocument();
@@ -50,7 +50,7 @@ describe('CartPage', () => {
   });
 
   it('updates line total and order summary when quantity changes', async () => {
-    render(<CartPage cart={getCartPage()} />);
+    render(<CartPage cart={getCartPageFromFixtures()} />);
 
     const macbook = screen.getByRole('heading', { name: 'MacBook Air M2 13"' }).closest('li');
     expect(macbook).toBeTruthy();
@@ -63,7 +63,7 @@ describe('CartPage', () => {
   });
 
   it('removes a line and shows the empty state when the last item is gone', async () => {
-    render(<CartPage cart={getCartPage()} />);
+    render(<CartPage cart={getCartPageFromFixtures()} />);
 
     await userEvent.click(screen.getByRole('button', { name: 'Remove MacBook Air M2 13" from cart' }));
     await userEvent.click(screen.getByRole('button', { name: 'Remove Sony WH-1000XM5 from cart' }));
@@ -75,7 +75,7 @@ describe('CartPage', () => {
   });
 
   it('adds a recommendation into the cart', async () => {
-    render(<CartPage cart={getCartPage()} />);
+    render(<CartPage cart={getCartPageFromFixtures()} />);
 
     const recs = screen.getByRole('heading', { name: 'You might also like' }).closest('section');
     expect(recs).toBeTruthy();
@@ -87,7 +87,7 @@ describe('CartPage', () => {
   });
 
   it('sends the shopper to checkout without inventing a payment API', async () => {
-    render(<CartPage cart={getCartPage()} />);
+    render(<CartPage cart={getCartPageFromFixtures()} />);
 
     await userEvent.click(screen.getByRole('button', { name: 'Proceed to Checkout' }));
 
