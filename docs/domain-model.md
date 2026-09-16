@@ -81,7 +81,7 @@ Audit date: 2026-09-09. Cross-checked against `event-catalog.md`, `database-desi
 | Notification | Notification | NotificationDelivery | — | — | INotificationRepository | 3 | Delivery tracking | ✅ |
 | Review | Review | ReviewMedia | Rating, ReviewText, ProductReference | — | IReviewRepository | 3 | Rating bounds | ✅ |
 | CMS | Content | — | — | — | IContentRepository | 3 | Content publish lifecycle | ✅ |
-| Search | — | — | — | — | — | consumes ProductUpdated | N/A | ⏳ read-side |
+| Search | — | ProductSearchDocument | — | — | IProductSearchIndex | consumes ProductCreated, ProductUpdated | N/A | ✅ indexer + keyword Search API |
 | Analytics | — | — | — | — | — | consumes OrderCreated etc. | N/A | ⏳ read-side |
 | Seller | TBD | TBD | TBD | — | TBD | TBD | TBD | ⏳ deferred |
 | AI | — | — | — | Python services | — | AI consumption | N/A | 🚧 stub |
@@ -97,7 +97,7 @@ Audit date: 2026-09-09. Cross-checked against `event-catalog.md`, `database-desi
 | AI as bounded context | Listed in domain-model alongside commerce contexts | AI is **external Python platform** (`ai-services/`), not `modules/` TypeScript code | Architecture ADR-004 separates AI microservices | No `modules/ai/`; AI events are consumption-only from commerce |
 | Seller module | Listed with tentative aggregates | **Defer domain implementation** until business requirements are defined | domain-model §4 states insufficient requirements | `modules/seller/` remains scaffold + README only |
 | ReturnRefund | Listed as planned context | **Out of Foundation scope** | Not enough requirements | No module folder yet |
-| Search / Analytics | Listed as contexts | **Read-side only** — no transactional aggregates in domain layer | CQRS pattern per architecture | Indexers/projections in Infrastructure; domain code deferred |
+| Search / Analytics | Search indexer projects Catalog events into OpenSearch; Search API queries that index; Analytics still deferred | **Read-side only** — no transactional aggregates. Search owns `ProductSearchDocument` + `IProductSearchIndex`; Catalog remains source of truth | CQRS pattern per architecture | Search query API implemented (keyword, filter, sort, pagination, cache). Analytics domain deferred |
 | UserCreated event | In event-catalog, missing from original User events list | **Added to User domain** | Align catalog with user lifecycle | `UserCreatedEvent` implemented in `modules/user` |
 | CheckoutStarted / CheckoutCompleted | In event-catalog, missing from original Checkout section | **Added to Checkout domain** | Align catalog with checkout flow | Events implemented in `modules/checkout` |
 | IdentityDisabled | In domain-model, missing from event-catalog | **Documented in both** | Complete identity lifecycle | Added to event-catalog baseline |
@@ -247,11 +247,18 @@ Audit date: 2026-09-09. Cross-checked against `event-catalog.md`, `database-desi
 
 ### Search
 
-Read Model / CQRS — not a transactional aggregate.
+Read Model / CQRS — not a transactional aggregate. Catalog remains the source of truth for Product.
+
+Search owns:
+
+- `ProductSearchDocument` — search/read representation (not the Catalog Product entity)
+- `IProductSearchIndex` — index port (implemented with OpenSearch in Infrastructure)
 
 ```text
-ProductUpdated → Event → Indexer → OpenSearch → Search API
+ProductCreated / ProductUpdated → Event → ProductIndexer → OpenSearch → Search API
 ```
+
+Search does not query PostgreSQL. Search does not update Catalog.
 
 ### Analytics
 
@@ -389,7 +396,7 @@ modules/<context>/
 
 ## 14. Implementation Status
 
-> Domain layer code exists under `modules/*/domain/` for 13 commerce contexts. Application, Infrastructure, and Presentation layers are **not implemented**.
+> Domain layer code exists under `modules/*/domain/` for commerce contexts. Application/Infrastructure/Presentation are implemented for Core Commerce and several extensions. Search has a **read-model indexer** (`ProductSearchDocument`, `IProductSearchIndex`, OpenSearch product index, ProductCreated/ProductUpdated handlers) and a **keyword Search API** (filters, sort, pagination, Redis cache). Analytics remain pending.
 
 | Module | Domain Code | Files | Notes |
 |--------|-------------|------:|-------|
@@ -406,7 +413,7 @@ modules/<context>/
 | notification | ✅ | 7 | Notification delivery aggregate |
 | review | ✅ | 10 | Review + rating |
 | cms | ✅ | 6 | Content aggregate |
-| search | ⏳ | 0 | Read-side — deferred |
+| search | ✅ | indexer + query API | Read model: `ProductSearchDocument`, `IProductSearchIndex`, ProductCreated/ProductUpdated indexer, `GET /api/v1/search/products` |
 | analytics | ⏳ | 0 | Read-side — deferred |
 | seller | ⏳ | 0 | Requirements pending |
 | AI | N/A | — | Python `ai-services/api` stub only |

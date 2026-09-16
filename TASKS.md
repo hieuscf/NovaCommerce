@@ -374,19 +374,19 @@
 
 ## 5.1 Search
 
-- [ ] Define Search domain boundary
-- [ ] Configure OpenSearch
-- [ ] Define product search index
-- [ ] Build product indexer
-- [ ] Consume `ProductCreated`
-- [ ] Consume `ProductUpdated`
-- [ ] Implement keyword search
-- [ ] Implement filtering
-- [ ] Implement sorting
-- [ ] Implement pagination
-- [ ] Implement Search API
-- [ ] Add search caching
-- [ ] Add Search tests
+- [x] Define Search domain boundary
+- [x] Configure OpenSearch
+- [x] Define product search index
+- [x] Build product indexer
+- [x] Consume `ProductCreated`
+- [x] Consume `ProductUpdated`
+- [x] Implement keyword search
+- [x] Implement filtering
+- [x] Implement sorting
+- [x] Implement pagination
+- [x] Implement Search API
+- [x] Add search caching
+- [x] Add Search tests
 
 > Search must not query PostgreSQL directly.
 

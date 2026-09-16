@@ -12,7 +12,7 @@ Status
 
 Last Updated
 
-2026-09-16
+2026-09-17
 
 ---
 
@@ -31,11 +31,11 @@ Last Updated
 | Pull Request Process | ✅ Complete   |     100% | `.github/PULL_REQUEST_TEMPLATE.md` (NovaCommerce-specific) |
 | Monorepo Scaffold    | 🚧 In Progress |      65% | apps, packages, workers, ai-services, `modules/` + domain code |
 | Domain Modeling      | ✅ Complete   |     100% | `docs/domain-model.md` v0.2.0 — audited, reconciliation documented |
-| Domain Implementation | 🚧 In Progress |      65% | 13/16 modules — domain layer only; search/analytics/seller deferred |
+| Domain Implementation | 🚧 In Progress |      75% | Search query API reads OpenSearch; analytics/seller still deferred |
 | Database Design      | ✅ Complete   |     100% | `docs/database-design.md` v1.0.0 — synced with Prisma + PostgreSQL (46 tables) |
 | API Design           | ✅ Complete   |     100% | `docs/api-guidelines.md` synchronized with Gateway infrastructure |
 | Backend              | 🚧 In Progress |      65% | Gateway `/api/v1` + Core Commerce Flow (Identity → Order → Inventory events) |
-| Frontend             | 🚧 In Progress |      85% | Architecture foundation + `@novacommerce/frontend` client; homepage + Alloy `/login` `/register` `/account` dashboard + `/shop` and `/shop/[category]` listing + `/products/[slug]` PDP + `/cart` + `/checkout` + `/orders` list/detail/confirmation; session restore + global 401/403; admin shell |
+| Frontend             | 🚧 In Progress |      88% | Architecture foundation + `@novacommerce/frontend` client; homepage + Alloy `/login` `/register` `/account` dashboard + `/shop` and `/shop/[category]` listing via Search API + `/products/[slug]` PDP + `/cart` + `/checkout` + `/orders` list/detail/confirmation; header search → `/shop?q=`; session restore + global 401/403; admin shell |
 | AI Platform          | 🚧 In Progress |       5% | FastAPI health endpoint stub |
 | Testing              | 🚧 In Progress |      40% | Backend Vitest + web/admin frontend tests + Playwright smoke foundation; no CI yet |
 | Deployment           | 🚧 Partial    |      50% | Docker Compose + app-level health/readiness + typed env validation |
@@ -148,7 +148,7 @@ Last Updated
 | ReturnRefund | ✅     | ✅ return requests, refund flow, Order/Payment integration, outbox, API, tests |
 | CMS          | ✅     | 🚧 domain only |
 | Notification | ✅     | ✅ event handlers, templates, email/push channels, worker, retry, tests |
-| Search       | ✅     | ⏳ read-side deferred |
+| Search       | ✅     | ✅ indexer + keyword Search API (filters/sort/pagination/cache) over OpenSearch |
 | Analytics    | ✅     | ⏳ read-side deferred |
 | Seller       | ✅     | ⏳ requirements pending |
 | AI           | ✅     | 🚧 Stub        |
@@ -240,9 +240,24 @@ Modules: Payment (✅), Shipping (✅), Promotion (✅), Notification (✅), Rev
 
 ## Milestone 4 — Intelligence
 
-Status: ⏳
+Status: 🚧 Analytics and AI still open. Search query API is implemented and verified (gateway unit/API tests, typecheck, build). Live OpenSearch query tests run when `INTEGRATION_OPENSEARCH_URL` is set.
 
-Modules: Search, Analytics, AI Platform
+Modules: Search (✅ indexer + OpenSearch projection + keyword Search API), Analytics, AI Platform
+
+Search query side:
+
+| Capability | Status | Notes |
+| ---------- | ------ | ----- |
+| Keyword search | ✅ | `multi_match` + nested category name; `q` optional (`match_all` browse) |
+| Filtering | ✅ | Whitelist: `categoryId`, `brandId`, `status`, `minPrice`, `maxPrice` |
+| Sorting | ✅ | `relevance`, `price_*`, `name_*`, `createdAt_*` + `id` tie-breaker |
+| Pagination | ✅ | `page` / `pageSize` (max 100), response `total` / `totalPages` |
+| Search API | ✅ | `GET /api/v1/search/products` (public, OpenAPI) |
+| Caching | ✅ | Redis `ICache`, `search:products:{hash}`, TTL via `SEARCH_CACHE_TTL_SECONDS` |
+| Tests | ✅ | Unit + API. OpenSearch integration skipped unless `INTEGRATION_OPENSEARCH_URL` |
+| PostgreSQL / Catalog | ✅ forbidden | Query path reads OpenSearch documents only |
+
+Known limitations: no availability filter (not on the search document); cache invalidation is TTL-based; offset pagination only; semantic/vector search is out of scope.
 
 ---
 

@@ -303,12 +303,13 @@ See `.env.example` for the full list. Grouped summary:
 | Application | `NODE_ENV`, `PORT`, `WEB_PORT`, `ADMIN_PORT`, `AI_PORT` |
 | Database | `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`, `DATABASE_URL` |
 | Redis | `REDIS_PASSWORD`, `REDIS_URL` |
-| OpenSearch | `OPENSEARCH_HOST`, `OPENSEARCH_PORT`, `OPENSEARCH_URL` |
+| OpenSearch | `OPENSEARCH_URL`, optional `OPENSEARCH_USERNAME`, `OPENSEARCH_PASSWORD`, `OPENSEARCH_PRODUCT_INDEX` |
+| Search cache | optional `SEARCH_CACHE_ENABLED` (default true), `SEARCH_CACHE_TTL_SECONDS` (default 60) |
 | MinIO | `MINIO_ROOT_USER`, `MINIO_ROOT_PASSWORD`, `MINIO_ENDPOINT`, `MINIO_ACCESS_KEY`, `MINIO_SECRET_KEY`, `MINIO_BUCKET`, `MINIO_USE_SSL` |
 | Authentication | `JWT_SECRET` |
 | AI | `AI_SERVICE_URL` |
 | Frontend | `NEXT_PUBLIC_API_URL` (build-time for Docker images) |
-| Worker | `WORKER_POLL_INTERVAL_MS` |
+| Worker | `WORKER_POLL_INTERVAL_MS`, `OPENSEARCH_URL` (product indexer) |
 
 **Build-time vs runtime (Next.js):**
 

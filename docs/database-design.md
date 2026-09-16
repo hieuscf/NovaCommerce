@@ -48,7 +48,7 @@ PostgreSQL (single database)
 
 | Concern | Technology |
 |---------|------------|
-| Search | OpenSearch |
+| Search | OpenSearch (`novacommerce-products` index; override `OPENSEARCH_PRODUCT_INDEX`) |
 | Analytics | Read models / projections |
 | Binary assets | MinIO |
 

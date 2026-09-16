@@ -164,13 +164,16 @@ Update Read Model
 Analytics không sở hữu Order transactional data.
 
 5.4 Product → Search
+ProductCreated
 ProductUpdated
     ↓
-Search Indexer
+ProductIndexer
     ↓
 OpenSearch
 
-Search không query PostgreSQL trực tiếp để thực hiện product search.
+Search không query PostgreSQL trực tiếp để thực hiện product search. Product search index: `novacommerce-products` (`OPENSEARCH_PRODUCT_INDEX`).
+
+Search consumes Catalog integration events `catalog.product_created` and `catalog.product_updated`. Payload is a product snapshot (`name`, `slug`, `status`, `price`, `currency`, `images`, `attributes`, `createdAt`, `updatedAt`; optional `categoryId`). Search maps this into `ProductSearchDocument`; document ID is the Product aggregate ID. Consumers must be idempotent.
 
 5.5 Payment → Order
 PaymentSucceeded
@@ -317,6 +320,7 @@ P0 — Core Commerce
 | OrderCreated | `order.created` | 1 | Order | `orderNumber`, `customerId` |
 | StockReserved | `inventory.stock_reserved` | 1 | InventoryItem | `orderId`, `quantity` |
 | PaymentSucceeded | `payment.completed` | 1 | Payment | `orderId` |
+| ProductCreated | `catalog.product_created` | 1 | Product | `name`, `slug` |
 | ProductUpdated | `catalog.product_updated` | 1 | Product | `name` |
 | CartItemAdded | `cart.item_added` | 1 | Cart | `productId`, `quantity` |
 | CheckoutCompleted | `checkout.completed` | 1 | CheckoutSession | `orderId` |
@@ -334,10 +338,10 @@ ReviewCreated
 P2 — Intelligence / Supporting
 ProductPublished
 Analytics projections
-Search indexing events
+Search indexing events — ProductCreated / ProductUpdated snapshot consumed by Search ProductIndexer (`status`, `price`, `currency`, `images`, `attributes`, `createdAt`, `updatedAt`; optional `categoryId`)
 AI consumption events
 
-P2 event payloads sẽ được chốt khi Search, Analytics và AI use cases được triển khai.
+P2 event payloads for Search indexing are the Catalog ProductCreated / ProductUpdated snapshots. Analytics and AI consumption payloads remain to be finalized with those use cases.
 
 13. Current Status
 
@@ -350,7 +354,7 @@ P2 event payloads sẽ được chốt khi Search, Analytics và AI use cases đ
 | `IEventBus` + `InMemoryEventBus` | ✅ `@novacommerce/building-blocks` |
 | Outbox table | ✅ `outbox_messages` |
 | Outbox Publisher | ✅ `workers/outbox-publisher` — publish via `IEventBus`, mark processed only on success |
-| Module event handlers | ⏳ Not yet wired in Application layer |
+| Module event handlers | 🚧 Inventory, Notification, and Search handlers subscribe on `InMemoryEventBus` |
 
 Delivery semantics: **at-least-once**. A crash after publish but before marking processed may cause duplicate delivery — consumers must be idempotent.
 
