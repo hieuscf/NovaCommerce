@@ -33,7 +33,7 @@ PostgreSQL (single database)
 ├── Order             orders, order_lines, order_adjustments, order_addresses,
 │                     order_payment_references, order_shipment_references
 ├── Inventory         inventory_items, stock_reservations, stock_adjustments
-├── Payment           payments, payment_attempts, payment_transactions
+├── Payment           payments, payment_attempts, payment_transactions, saved_payment_methods
 ├── Shipping          shipments, shipment_items, tracking_records
 ├── Promotion         promotions, promotion_rules, promotion_benefits,
 │                     coupons, coupon_redemptions
@@ -69,7 +69,7 @@ Cross-context references use **UUID columns only** — no Prisma `@relation` acr
 | Checkout | `checkout_sessions`, `checkout_lines`, `checkout_adjustments` |
 | Order | `orders`, `order_lines`, `order_adjustments`, `order_addresses`, `order_payment_references`, `order_shipment_references` |
 | Inventory | `inventory_items`, `stock_reservations`, `stock_adjustments` |
-| Payment | `payments`, `payment_attempts`, `payment_transactions` |
+| Payment | `payments`, `payment_attempts`, `payment_transactions`, `saved_payment_methods` |
 | Shipping | `shipments`, `shipment_items`, `tracking_records` |
 | Promotion | `promotions`, `promotion_rules`, `promotion_benefits`, `coupons`, `coupon_redemptions` |
 | Notification | `notifications`, `notification_deliveries` |
@@ -564,6 +564,26 @@ Unique: `(sku, warehouse_id)`
 | `updated_at` | TIMESTAMP(3) | NOT NULL |
 
 > **Reconciliation:** Domain model places `PaymentTransaction` under `Payment` aggregate (not under `PaymentAttempt`). Both `payment_attempts` and `payment_transactions` FK to `payments`.
+
+#### `saved_payment_methods`
+
+| Column | Type | Constraints |
+|--------|------|-------------|
+| `id` | UUID | PK |
+| `customer_id` | UUID | NOT NULL (logical ref → User) |
+| `provider` | TEXT | NOT NULL (e.g. `stub`, later Stripe/Adyen) |
+| `provider_token` | TEXT | NOT NULL (opaque vault token — never PAN/CVV) |
+| `brand` | TEXT | NOT NULL |
+| `last4` | CHAR(4) | NOT NULL |
+| `exp_month` | INTEGER | NOT NULL |
+| `exp_year` | INTEGER | NOT NULL |
+| `cardholder_name` | TEXT | NOT NULL |
+| `is_default` | BOOLEAN | NOT NULL, DEFAULT false |
+| `created_at` | TIMESTAMP(3) | NOT NULL |
+| `updated_at` | TIMESTAMP(3) | NOT NULL |
+
+Indexes: `(customer_id)`, `(customer_id, is_default)`  
+**Forbidden:** any `cvv` / `cvc` / `pan` / `card_number` column (ADR-006).
 
 ---
 

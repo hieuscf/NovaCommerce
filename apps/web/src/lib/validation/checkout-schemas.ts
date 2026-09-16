@@ -33,14 +33,30 @@ export const checkoutFormSchema = z
       required_error: 'Choose a payment method',
       invalid_type_error: 'Choose a payment method',
     }),
+    /** When set, shopper pays with a vaulted card and must re-enter CVV (ADR-006). */
+    savedPaymentMethodId: z.string().optional(),
     cardNumber: z.string(),
     cardholderName: z.string(),
     cardExpiration: z.string(),
+    /** Collected per charge only — never persisted by NovaCommerce. */
     cardCvv: z.string(),
     otpCode: z.string(),
   })
   .superRefine((values, ctx) => {
     if (values.paymentMethod !== 'card') {
+      return;
+    }
+
+    const usingSavedCard = Boolean(values.savedPaymentMethodId?.trim());
+
+    if (usingSavedCard) {
+      if (!isCardCvvComplete(values.cardCvv)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['cardCvv'],
+          message: 'Enter the CVV for this card',
+        });
+      }
       return;
     }
 
@@ -101,6 +117,7 @@ export const CHECKOUT_DETAILS_FIELDS = [
 
 export const CHECKOUT_PAYMENT_FIELDS = [
   'paymentMethod',
+  'savedPaymentMethodId',
   'cardNumber',
   'cardholderName',
   'cardExpiration',

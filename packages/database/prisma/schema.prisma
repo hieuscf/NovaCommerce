@@ -686,6 +686,25 @@ model Payment {
   @@map("payments")
 }
 
+model SavedPaymentMethod {
+  id             String   @id @default(uuid()) @db.Uuid
+  customerId     String   @map("customer_id") @db.Uuid
+  provider       String
+  providerToken  String   @map("provider_token")
+  brand          String
+  last4          String   @db.Char(4)
+  expMonth       Int      @map("exp_month")
+  expYear        Int      @map("exp_year")
+  cardholderName String   @map("cardholder_name")
+  isDefault      Boolean  @default(false) @map("is_default")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@index([customerId])
+  @@index([customerId, isDefault])
+  @@map("saved_payment_methods")
+}
+
 model PaymentAttempt {
   id            String               @id @default(uuid()) @db.Uuid
   paymentId     String               @map("payment_id") @db.Uuid

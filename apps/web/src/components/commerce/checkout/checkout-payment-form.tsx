@@ -32,6 +32,7 @@ import {
 } from '@/lib/checkout/card-input';
 import { cn } from '@/lib/utils';
 import type { CheckoutFormValues } from '@/lib/validation/checkout-schemas';
+import type { SavedPaymentMethodViewModel } from '@/lib/payment/mappers';
 import {
   formatCartMoney,
   type CartSummaryViewModel,
@@ -65,6 +66,7 @@ export function CheckoutPaymentForm({
   control,
   errors,
   methods,
+  savedCards = [],
   phone,
   summary,
   onBack,
@@ -73,6 +75,7 @@ export function CheckoutPaymentForm({
   control: Control<CheckoutFormValues>;
   errors: FieldErrors<CheckoutFormValues>;
   methods: readonly CheckoutPaymentMethodViewModel[];
+  savedCards?: readonly SavedPaymentMethodViewModel[];
   phone: string;
   summary: CartSummaryViewModel;
   onBack: () => void;
@@ -160,7 +163,14 @@ export function CheckoutPaymentForm({
             ) : null}
 
             {field.value === 'card' ? (
-              <CardFields control={control} errors={errors} phone={phone} otpSeconds={otpSeconds} onResend={handleResend} />
+              <CardFields
+                control={control}
+                errors={errors}
+                savedCards={savedCards}
+                phone={phone}
+                otpSeconds={otpSeconds}
+                onResend={handleResend}
+              />
             ) : field.value === 'qr_pay' ? (
               <QrPayNote />
             ) : field.value ? (
@@ -234,12 +244,14 @@ function QrPayNote() {
 function CardFields({
   control,
   errors,
+  savedCards,
   phone,
   otpSeconds,
   onResend,
 }: {
   control: Control<CheckoutFormValues>;
   errors: FieldErrors<CheckoutFormValues>;
+  savedCards: readonly SavedPaymentMethodViewModel[];
   phone: string;
   otpSeconds: number;
   onResend: () => void;
@@ -248,6 +260,121 @@ function CardFields({
 
   return (
     <div className="mt-5 space-y-5">
+      {savedCards.length > 0 ? (
+        <section className="rounded-2xl border border-border/70 bg-surface p-4 sm:p-5">
+          <h3 className="text-sm font-semibold text-ink">Saved cards</h3>
+          <p className="mt-1 text-xs text-muted-foreground">
+            CVV is never stored. Enter it each time you pay with a saved card.
+          </p>
+          <Controller
+            control={control}
+            name="savedPaymentMethodId"
+            render={({ field }) => (
+              <RadioGroup
+                value={field.value ?? '__new__'}
+                onValueChange={(value) =>
+                  field.onChange(value === '__new__' ? undefined : value)
+                }
+                className="mt-3 space-y-2"
+              >
+                {savedCards.map((card) => (
+                  <label
+                    key={card.id}
+                    className={cn(
+                      'flex cursor-pointer items-center gap-3 rounded-xl border px-3 py-3',
+                      field.value === card.id ? 'border-primary bg-primary-tint/40' : 'border-border/70',
+                    )}
+                  >
+                    <RadioGroupItem value={card.id} />
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-sm font-semibold text-ink">{card.maskedLabel}</span>
+                      <span className="block text-xs text-muted-foreground">
+                        Expires {card.expLabel}
+                        {card.isDefault ? ' · Default' : ''}
+                      </span>
+                    </span>
+                  </label>
+                ))}
+                <label
+                  className={cn(
+                    'flex cursor-pointer items-center gap-3 rounded-xl border px-3 py-3',
+                    !field.value ? 'border-primary bg-primary-tint/40' : 'border-border/70',
+                  )}
+                >
+                  <RadioGroupItem value="__new__" />
+                  <span className="text-sm font-semibold text-ink">Use a new card</span>
+                </label>
+              </RadioGroup>
+            )}
+          />
+        </section>
+      ) : null}
+
+      <Controller
+        control={control}
+        name="savedPaymentMethodId"
+        render={({ field: savedField }) =>
+          savedField.value ? (
+            <section className="rounded-2xl border border-border/70 bg-surface p-4 sm:p-5">
+              <h3 className="text-sm font-semibold text-ink">Confirm with CVV</h3>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Required for this payment. CVV is not saved on your account.
+              </p>
+              <div className="mt-4 max-w-[140px] space-y-2">
+                <Label htmlFor="checkout-cardCvv">CVV / CVC</Label>
+                <Controller
+                  control={control}
+                  name="cardCvv"
+                  render={({ field }) => (
+                    <Input
+                      id="checkout-cardCvv"
+                      inputMode="numeric"
+                      autoComplete="cc-csc"
+                      placeholder="•••"
+                      maxLength={4}
+                      value={field.value}
+                      onChange={(event) => field.onChange(event.target.value.replace(/\D/g, '').slice(0, 4))}
+                      aria-invalid={Boolean(errors.cardCvv)}
+                      aria-describedby={errors.cardCvv ? 'checkout-cardCvv-error' : undefined}
+                    />
+                  )}
+                />
+                <FieldError id="checkout-cardCvv-error" message={errors.cardCvv?.message} />
+              </div>
+            </section>
+          ) : (
+            <NewCardFields
+              control={control}
+              errors={errors}
+              phone={phone}
+              otpSeconds={otpSeconds}
+              canResend={canResend}
+              onResend={onResend}
+            />
+          )
+        }
+      />
+    </div>
+  );
+}
+
+function NewCardFields({
+  control,
+  errors,
+  phone,
+  otpSeconds,
+  canResend,
+  onResend,
+}: {
+  control: Control<CheckoutFormValues>;
+  errors: FieldErrors<CheckoutFormValues>;
+  phone: string;
+  otpSeconds: number;
+  canResend: boolean;
+  onResend: () => void;
+}) {
+  return (
+    <>
       <section className="rounded-2xl border border-border/70 bg-surface p-4 sm:p-5">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-start gap-3">
@@ -256,7 +383,9 @@ function CardFields({
             </span>
             <div>
               <h3 className="text-sm font-semibold text-ink">Card Information</h3>
-              <p className="mt-0.5 text-xs text-muted-foreground">Enter your card details securely</p>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                Enter card details. CVV is used for this payment only and is never saved.
+              </p>
             </div>
           </div>
           <CardNetworkMarks className="hidden sm:flex" />
@@ -416,6 +545,6 @@ function CardFields({
           <FieldError id="checkout-otpCode-error" message={errors.otpCode?.message} />
         </div>
       </section>
-    </div>
+    </>
   );
 }

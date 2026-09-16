@@ -79,4 +79,28 @@ describe('checkoutFormSchema', () => {
     });
     expect(qrPay.success).toBe(true);
   });
+
+  it('requires only CVV when paying with a saved card', () => {
+    const result = checkoutFormSchema.safeParse({
+      ...valid,
+      savedPaymentMethodId: 'card-1',
+      cardNumber: '',
+      cardholderName: '',
+      cardExpiration: '',
+      cardCvv: '123',
+      otpCode: '',
+    });
+    expect(result.success).toBe(true);
+
+    const missingCvv = checkoutFormSchema.safeParse({
+      ...valid,
+      savedPaymentMethodId: 'card-1',
+      cardNumber: '',
+      cardholderName: '',
+      cardExpiration: '',
+      cardCvv: '',
+      otpCode: '',
+    });
+    expect(missingCvv.success).toBe(false);
+  });
 });

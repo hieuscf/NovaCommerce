@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -17,6 +17,8 @@ import { CheckoutSummary } from '@/components/commerce/checkout/checkout-summary
 import { CheckoutTrustBar } from '@/components/commerce/checkout/checkout-trust-bar';
 import { placeCheckoutOrder } from '@/lib/checkout/place-order';
 import { toFormError } from '@/lib/errors';
+import { paymentMethodsClient } from '@/lib/payment/client';
+import { mapSavedPaymentMethodToViewModel, type SavedPaymentMethodViewModel } from '@/lib/payment/mappers';
 import {
   CHECKOUT_DETAILS_FIELDS,
   CHECKOUT_PAYMENT_FIELDS,
@@ -37,6 +39,7 @@ export function CheckoutPage({ checkout }: { checkout: CheckoutPageViewModel }) 
   const [stage, setStage] = useState<CheckoutStage>('details');
   const [lines, setLines] = useState<CartLineViewModel[]>(() => [...checkout.lines]);
   const [submitting, setSubmitting] = useState(false);
+  const [savedCards, setSavedCards] = useState<SavedPaymentMethodViewModel[]>([]);
   const errorSummaryRef = useRef<HTMLDivElement>(null);
   const summary = useMemo(() => summarizeCart(lines), [lines]);
 
@@ -54,6 +57,7 @@ export function CheckoutPage({ checkout }: { checkout: CheckoutPageViewModel }) 
       postalCode: checkout.shipping.postalCode,
       country: checkout.shipping.country,
       paymentMethod: 'card',
+      savedPaymentMethodId: undefined,
       cardNumber: '',
       cardholderName: checkout.customer.fullName,
       cardExpiration: '',
@@ -62,12 +66,36 @@ export function CheckoutPage({ checkout }: { checkout: CheckoutPageViewModel }) 
     },
   });
 
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      try {
+        const list = await paymentMethodsClient.list();
+        if (cancelled) return;
+        const mapped = list.map(mapSavedPaymentMethodToViewModel);
+        setSavedCards(mapped);
+        const defaultCard = mapped.find((card) => card.isDefault) ?? mapped[0];
+        if (defaultCard) {
+          form.setValue('savedPaymentMethodId', defaultCard.id);
+        }
+      } catch {
+        // Checkout still works with a new card when the vault is unavailable.
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [form]);
+
   const watched = form.watch();
   const regions = checkout.regionsByCountry[watched.country] ?? [];
   const crumbs = checkoutCrumbsForStage(stage);
+  const savedCardLabel = savedCards.find((card) => card.id === watched.savedPaymentMethodId)?.maskedLabel;
   const paymentLabel =
-    checkout.paymentMethods.find((method) => method.id === watched.paymentMethod)?.label ??
-    'Not selected';
+    watched.paymentMethod === 'card' && savedCardLabel
+      ? savedCardLabel
+      : (checkout.paymentMethods.find((method) => method.id === watched.paymentMethod)?.label ??
+        'Not selected');
 
   function focusErrorSummary() {
     requestAnimationFrame(() => {
@@ -106,10 +134,12 @@ export function CheckoutPage({ checkout }: { checkout: CheckoutPageViewModel }) 
     setSubmitting(true);
     try {
       const values = form.getValues();
+      // cardCvv stays in the browser only — placeCheckoutOrder never posts CVV (ADR-006).
       await placeCheckoutOrder({
         values,
         paymentMethod: values.paymentMethod,
       });
+      form.setValue('cardCvv', '');
       router.push('/orders/confirmed');
     } catch (error) {
       toast.error('Could not place order', { description: toFormError(error) });
@@ -195,6 +225,7 @@ export function CheckoutPage({ checkout }: { checkout: CheckoutPageViewModel }) 
                     control={form.control}
                     errors={form.formState.errors}
                     methods={checkout.paymentMethods}
+                    savedCards={savedCards}
                     phone={watched.phone}
                     summary={summary}
                     onBack={() => setStage('details')}

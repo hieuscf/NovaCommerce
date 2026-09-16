@@ -59,7 +59,7 @@ export interface AccountAddressViewModel {
 
 export interface AccountPaymentMethodViewModel {
   readonly id: string;
-  readonly brand: 'visa' | 'mastercard';
+  readonly brand: 'visa' | 'mastercard' | 'amex' | 'jcb' | 'card';
   readonly last4: string;
   readonly expires: string;
   readonly isDefault: boolean;

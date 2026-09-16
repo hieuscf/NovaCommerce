@@ -184,13 +184,15 @@ Audit date: 2026-09-09. Cross-checked against `event-catalog.md`, `database-desi
 
 ### Payment
 
-**Aggregate Root:** Payment
+**Aggregate Roots:** Payment, SavedPaymentMethod
 
 | Kind | Names |
 |------|-------|
 | Entities | PaymentAttempt, PaymentTransaction |
-| Value Objects | Money, PaymentReference, PaymentMethod, ProviderReference |
-| Events | PaymentInitiated, PaymentSucceeded, PaymentFailed, PaymentRefunded |
+| Value Objects | Money, PaymentReference, PaymentMethod, ProviderReference, CardBrand, CardLastFour, CardExpiry |
+| Events | PaymentInitiated, PaymentSucceeded, PaymentFailed, PaymentRefunded, SavedPaymentMethodAdded, SavedPaymentMethodRemoved, SavedPaymentMethodDefaultChanged |
+
+**SavedPaymentMethod invariants (ADR-006):** Never store CVV/CVC or full PAN. Persist only opaque `providerToken` + display metadata (`brand`, `last4`, `expMonth`, `expYear`, `cardholderName`). CVV is collected per charge in the client and must not appear in Gateway persistence.
 
 ### Shipping
 
@@ -398,7 +400,7 @@ modules/<context>/
 | checkout | ✅ | 7 | CheckoutSession orchestration root |
 | order | ✅ | 17 | Invariants enforced in aggregate |
 | inventory | ✅ | 13 | Stock reservation invariants |
-| payment | ✅ | 13 | Payment lifecycle events |
+| payment | ✅ | 13 | Payment lifecycle + saved cards (no CVV at rest) |
 | shipping | ✅ | 12 | Shipment lifecycle |
 | promotion | ✅ | 16 | Promotion + Coupon aggregates |
 | notification | ✅ | 7 | Notification delivery aggregate |

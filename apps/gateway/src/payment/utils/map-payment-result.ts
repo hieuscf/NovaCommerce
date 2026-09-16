@@ -9,7 +9,7 @@ import type { PaymentApplicationError } from '../../../../../modules/payment/app
 
 export function mapPaymentResult<T>(
   result: Result<T, PaymentApplicationError>,
-  successStatus = HttpStatus.OK,
+  _successStatus = HttpStatus.OK,
 ): T {
   if (result.isSuccess) {
     return result.getValue();
@@ -24,7 +24,11 @@ export function mapPaymentResult<T>(
     case 'PAYMENT_NOT_REFUNDABLE':
       throw new ConflictException(error.message);
     case 'PAYMENT_NOT_FOUND':
+    case 'PAYMENT_METHOD_NOT_FOUND':
+    case 'USER_NOT_FOUND':
       throw new NotFoundException(error.message);
+    case 'CVV_NOT_ALLOWED':
+      throw new UnprocessableEntityException(error.message);
     default:
       throw new UnprocessableEntityException(error.message);
   }

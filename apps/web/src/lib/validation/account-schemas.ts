@@ -38,3 +38,26 @@ export const notificationPreferencesSchema = z.object({
 });
 
 export type NotificationPreferencesFormData = z.infer<typeof notificationPreferencesSchema>;
+
+/**
+ * Add saved card — CVV/CVC must not appear in this schema (ADR-006).
+ * Shoppers re-enter CVV only when charging at checkout.
+ */
+export const savedCardFormSchema = z.object({
+  cardNumber: z
+    .string()
+    .refine((value) => {
+      const digits = value.replace(/\D/g, '');
+      return digits.length >= 13 && digits.length <= 19;
+    }, 'Enter a valid card number'),
+  cardholderName: z.string().trim().min(2, 'Cardholder name is required').max(120),
+  cardExpiration: z.string().refine((value) => {
+    const digits = value.replace(/\D/g, '');
+    if (digits.length !== 4) return false;
+    const month = Number(digits.slice(0, 2));
+    return month >= 1 && month <= 12;
+  }, 'Enter a valid expiration date (MM/YY)'),
+  isDefault: z.boolean().optional(),
+});
+
+export type SavedCardFormData = z.infer<typeof savedCardFormSchema>;

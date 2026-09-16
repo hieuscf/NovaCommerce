@@ -80,6 +80,7 @@ Tài liệu chính thức của NovaCommerce. AI agents và developers **phải 
 | [ADR-003](./architecture/adrs/Use%20Prisma%20ORM%20with%20PostgreSQL.md) | Prisma ORM + PostgreSQL |
 | [ADR-004](./architecture/adrs/Separate%20AI%20Services%20into%20Python%20Microservices.md) | Python AI Microservices |
 | [ADR-005](./architecture/adrs/Establish%20Frontend%20Architecture%20Foundation.md) | Frontend architecture foundation |
+| [ADR-006](./architecture/adrs/Saved%20Cards%20Never%20Store%20CVV.md) | Saved cards via token — never store CVV |
 
 ---
 

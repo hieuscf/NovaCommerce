@@ -111,6 +111,9 @@ PaymentInitiated	Payment	Payment bắt đầu
 PaymentSucceeded	Payment	Payment thành công
 PaymentFailed	Payment	Payment thất bại
 PaymentRefunded	Payment	Payment được refund
+SavedPaymentMethodAdded	Payment	Thẻ đã lưu (metadata only — không CVV)
+SavedPaymentMethodRemoved	Payment	Thẻ đã xóa khỏi vault storefront
+SavedPaymentMethodDefaultChanged	Payment	Thẻ mặc định thay đổi
 ShipmentCreated	Shipping	Shipment được tạo
 ShipmentDispatched	Shipping	Shipment được dispatch
 ShipmentInTransit	Shipping	Shipment đang vận chuyển

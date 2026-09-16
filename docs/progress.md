@@ -141,7 +141,7 @@ Last Updated
 | Checkout     | ✅     | ✅ orchestration, API, tests (payment handoff via PaymentInitiationService) |
 | Order        | ✅     | ✅ lifecycle, create-from-checkout, query/history/cancel API, outbox, tests |
 | Inventory    | ✅     | ✅ stock, reservations, API, events, tests |
-| Payment      | ✅     | ✅ intent/confirm/fail/refund, provider abstraction, outbox, API, tests |
+| Payment      | ✅     | ✅ intent/confirm/fail/refund, saved cards (token metadata, no CVV), provider abstraction, outbox, API, tests |
 | Shipping     | ✅     | ✅ quotes, create, track, dispatch, provider abstraction, outbox, API, tests |
 | Promotion    | ✅     | ✅ validation, discount calculation, usage limits, outbox, API, tests |
 | Review       | ✅     | ✅ product reviews, rating, moderation, images, API, outbox, tests |
