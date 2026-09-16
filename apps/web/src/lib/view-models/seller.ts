@@ -38,6 +38,19 @@ export interface SellerVerificationDocumentViewModel {
   readonly icon: SellerDocumentIcon;
 }
 
+export interface SellerTermsClauseViewModel {
+  readonly id: string;
+  readonly label: string;
+  readonly text?: string;
+  readonly bullets?: readonly string[];
+}
+
+export interface SellerTermsSectionViewModel {
+  readonly number: string;
+  readonly title: string;
+  readonly clauses: readonly SellerTermsClauseViewModel[];
+}
+
 export interface SellerPageViewModel {
   readonly status: SellerPageStatus;
   readonly businessTypes: readonly SellerOptionViewModel[];
@@ -47,6 +60,7 @@ export interface SellerPageViewModel {
   readonly shopCategories: readonly SellerOptionViewModel[];
   readonly sellingModels: readonly SellerSellingModelViewModel[];
   readonly verificationDocuments: readonly SellerVerificationDocumentViewModel[];
+  readonly termsSections: readonly SellerTermsSectionViewModel[];
 }
 
 export function isSellerRegisterStepComplete(

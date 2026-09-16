@@ -173,9 +173,9 @@ export function SellerRegisterForm({
             }
           : step === 'terms'
             ? {
-                title: 'Terms & Conditions',
+                title: 'Terms and Conditions',
                 description:
-                  'Review and accept the seller terms so we can process your application.',
+                  'Please read and agree to the following terms and conditions to complete your registration as a NovaCommerce seller.',
               }
             : {
                 title: 'Application received',
@@ -949,6 +949,7 @@ export function SellerRegisterForm({
       {step === 'terms' ? (
         <SellerRegisterTermsStep
           form={form}
+          page={page}
           onBack={() => void goToStep('verification')}
           onSubmit={() => {
             void handleNext();

@@ -180,7 +180,7 @@ describe('SellerRegisterForm verification', () => {
     await user.click(screen.getByText('Regular retail'));
     await user.click(screen.getByRole('button', { name: 'Next Step' }));
 
-    expect(await screen.findByRole('heading', { name: 'Terms & Conditions' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Terms and Conditions' })).toBeInTheDocument();
   });
 
   it('returns to shop details from verification', async () => {
@@ -194,26 +194,28 @@ describe('SellerRegisterForm verification', () => {
 });
 
 describe('SellerRegisterForm terms', () => {
-  it('renders the terms checkboxes', () => {
+  it('renders the terms document and agreement checkbox', () => {
     render(<SellerRegisterForm page={getSellerPage()} initialStep="terms" />);
 
-    expect(screen.getByRole('heading', { name: 'Terms & Conditions' })).toBeInTheDocument();
-    expect(screen.getByLabelText(/terms of service/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/seller agreement/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/privacy policy/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Submit application' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Terms and Conditions' })).toBeInTheDocument();
+    expect(screen.getByRole('article', { name: 'Seller terms and conditions' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: '1. General Terms' })).toBeInTheDocument();
+    expect(screen.getByText(/acceptance of terms/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: '9. Limitation of Liability & Dispute Resolution' }),
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText(/terms and conditions and privacy policy/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Complete Registration' })).toBeInTheDocument();
   });
 
   it('keeps the user on terms when agreements are not accepted', async () => {
     const user = userEvent.setup();
     render(<SellerRegisterForm page={getSellerPage()} initialStep="terms" />);
 
-    await user.click(screen.getByRole('button', { name: 'Submit application' }));
+    await user.click(screen.getByRole('button', { name: 'Complete Registration' }));
 
     expect(await screen.findByText('You must accept the Terms of Service')).toBeInTheDocument();
-    expect(screen.getByText('You must accept the Seller Agreement')).toBeInTheDocument();
-    expect(screen.getByText('You must accept the Privacy Policy')).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Terms & Conditions' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Terms and Conditions' })).toBeInTheDocument();
   });
 
   it('returns to verification from terms', async () => {
@@ -223,6 +225,16 @@ describe('SellerRegisterForm terms', () => {
     await user.click(screen.getByRole('button', { name: 'Back' }));
 
     expect(await screen.findByRole('heading', { name: 'Verification' })).toBeInTheDocument();
+  });
+
+  it('advances to complete after the seller terms are accepted', async () => {
+    const user = userEvent.setup();
+    render(<SellerRegisterForm page={getSellerPage()} initialStep="terms" />);
+
+    await user.click(screen.getByLabelText(/terms and conditions and privacy policy/i));
+    await user.click(screen.getByRole('button', { name: 'Complete Registration' }));
+
+    expect(await screen.findByRole('heading', { name: 'Application received' })).toBeInTheDocument();
   });
 });
 

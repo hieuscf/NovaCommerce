@@ -5,6 +5,7 @@ import {
   sellerSellingModels,
   sellerShopCategories,
   sellerStates,
+  sellerTermsSections,
   sellerVerificationDocuments,
 } from '@/lib/mock-data/seller';
 import type { SellerPageStatus, SellerPageViewModel } from '@/lib/view-models/seller';
@@ -32,5 +33,6 @@ export function getSellerPage(
     shopCategories: sellerShopCategories,
     sellingModels: sellerSellingModels,
     verificationDocuments: sellerVerificationDocuments,
+    termsSections: sellerTermsSections,
   };
 }

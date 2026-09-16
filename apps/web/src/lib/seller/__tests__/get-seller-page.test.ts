@@ -25,6 +25,18 @@ describe('getSellerPage', () => {
       'qualityCertificate',
       'originInvoice',
     ]);
+    expect(page.termsSections.map((item) => item.number)).toEqual([
+      '1',
+      '2',
+      '3',
+      '4',
+      '5',
+      '6',
+      '7',
+      '8',
+      '9',
+    ]);
+    expect(page.termsSections[0]?.title).toBe('General Terms');
   });
 
   it('can preview the registered branch without calling a Seller API', () => {
