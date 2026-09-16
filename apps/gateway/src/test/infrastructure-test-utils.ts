@@ -24,6 +24,7 @@ export function createMockOpenSearchClientService(): OpenSearchClientService {
   const client = {
     close: async () => undefined,
     health: async () => ({ status: 'green' as const }),
+    indexExists: async () => true,
     createIndex: async () => undefined,
     deleteIndex: async () => undefined,
     indexDocument: async () => undefined,

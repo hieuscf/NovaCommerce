@@ -29,6 +29,7 @@ import { PromotionModule } from './promotion/promotion.module';
 import { NotificationModule } from './notification/notification.module';
 import { ReviewModule } from './review/review.module';
 import { ReturnRefundModule } from './return-refund/return-refund.module';
+import { SearchModule } from './search/search.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { ReturnRefundModule } from './return-refund/return-refund.module';
     NotificationModule,
     ReviewModule,
     ReturnRefundModule,
+    SearchModule,
     CheckoutModule,
     V1Module,
   ],

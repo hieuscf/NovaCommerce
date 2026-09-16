@@ -7,6 +7,7 @@
     "paths": {
       "@novacommerce/building-blocks": ["../../packages/building-blocks/dist/index.d.ts"],
       "@novacommerce/database": ["../../packages/database/dist/index.d.ts"],
+      "@novacommerce/infrastructure": ["../../packages/infrastructure/dist/index.d.ts"],
       "@prisma/client": ["../../node_modules/.pnpm/@prisma+client@6.5.0_prisma@6.5.0_typescript@5.8.2__typescript@5.8.2/node_modules/@prisma/client"]
     }
   },
@@ -19,12 +20,17 @@
     "../../modules/notification/domain/**/*.ts",
     "../../modules/notification/application/**/*.ts",
     "../../modules/notification/infrastructure/**/*.ts",
-    "../../modules/notification/contracts/**/*.ts"
+    "../../modules/notification/contracts/**/*.ts",
+    "../../modules/search/domain/**/*.ts",
+    "../../modules/search/application/**/*.ts",
+    "../../modules/search/infrastructure/**/*.ts",
+    "../../modules/search/contracts/**/*.ts"
   ],
   "exclude": [
     "src/**/*.test.ts",
     "src/**/*.integration.test.ts",
     "../../modules/inventory/**/*.test.ts",
-    "../../modules/notification/**/*.test.ts"
+    "../../modules/notification/**/*.test.ts",
+    "../../modules/search/**/*.test.ts"
   ]
 }

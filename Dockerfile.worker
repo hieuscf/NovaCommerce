@@ -14,19 +14,23 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY workers/outbox-publisher/package.json ./workers/outbox-publisher/
 COPY packages/building-blocks/package.json ./packages/building-blocks/
 COPY packages/database/package.json ./packages/database/
+COPY packages/infrastructure/package.json ./packages/infrastructure/
 RUN pnpm install --frozen-lockfile
 
 FROM deps AS build
 COPY tsconfig.base.json ./
 COPY modules/inventory ./modules/inventory
 COPY modules/notification ./modules/notification
+COPY modules/search ./modules/search
 COPY modules/tsconfig.json ./modules/tsconfig.json
 COPY packages/building-blocks ./packages/building-blocks
 COPY packages/database ./packages/database
+COPY packages/infrastructure ./packages/infrastructure
 COPY workers/outbox-publisher ./workers/outbox-publisher
 RUN pnpm install --frozen-lockfile
 ENV DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder"
 RUN pnpm --filter @novacommerce/building-blocks run build
+RUN pnpm --filter @novacommerce/infrastructure run build
 RUN pnpm --filter @novacommerce/database run generate
 RUN pnpm --filter @novacommerce/database run build
 RUN pnpm --filter @novacommerce/outbox-worker run build

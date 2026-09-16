@@ -11,6 +11,7 @@
   "dependencies": {
     "@novacommerce/building-blocks": "workspace:*",
     "@novacommerce/database": "workspace:*",
+    "@novacommerce/infrastructure": "workspace:*",
     "@prisma/client": "6.5.0"
   },
   "devDependencies": {

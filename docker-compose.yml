@@ -171,12 +171,15 @@ services:
     environment:
       NODE_ENV: production
       DATABASE_URL: postgresql://${POSTGRES_USER:-novacommerce}:${POSTGRES_PASSWORD:-change-me}@postgres:5432/${POSTGRES_DB:-novacommerce}?schema=public
+      OPENSEARCH_URL: http://opensearch:9200
       WORKER_POLL_INTERVAL_MS: ${WORKER_POLL_INTERVAL_MS:-5000}
     depends_on:
       migrate:
         condition: service_completed_successfully
       api:
         condition: service_started
+      opensearch:
+        condition: service_healthy
     networks:
       - novacommerce
     logging: *default-logging

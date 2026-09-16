@@ -27,6 +27,8 @@ import { applyTestEnvironment } from './test-env';
 interface CreateTestAppOptions {
   readonly enableSwagger?: boolean;
   readonly readinessChecks?: Partial<Record<'database' | 'redis' | 'opensearch' | 'minio', 'up' | 'down'>>;
+  readonly redisCacheService?: RedisCacheService;
+  readonly openSearchClient?: OpenSearchClientService;
 }
 
 export async function createTestApp(
@@ -52,9 +54,9 @@ export async function createTestApp(
       $disconnect: async () => undefined,
     })
     .overrideProvider(RedisCacheService)
-    .useValue(createMockRedisCacheService())
+    .useValue(options.redisCacheService ?? createMockRedisCacheService())
     .overrideProvider(OpenSearchClientService)
-    .useValue(createMockOpenSearchClientService())
+    .useValue(options.openSearchClient ?? createMockOpenSearchClientService())
     .overrideProvider(MinioStorageService)
     .useValue(createMockMinioStorageService())
     .overrideProvider(HealthProbeService)

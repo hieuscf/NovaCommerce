@@ -5,6 +5,7 @@ import {
 import { PrismaClient, PrismaOutboxRepository } from '@novacommerce/database';
 import { registerCommerceEventHandlers } from './register-commerce-handlers';
 import { registerNotificationWorker } from './register-notification-handlers';
+import { registerSearchWorker } from './register-search-handlers';
 
 const POLL_INTERVAL_MS = Number(process.env.WORKER_POLL_INTERVAL_MS ?? 5000);
 const BATCH_SIZE = Number(process.env.WORKER_BATCH_SIZE ?? 10);
@@ -17,6 +18,7 @@ const outboxPublisher = new OutboxPublisher(outboxRepository, eventBus, {
 });
 
 registerCommerceEventHandlers(eventBus, prisma);
+registerSearchWorker(eventBus);
 const { notificationProcessor } = registerNotificationWorker(eventBus, prisma);
 
 let running = true;

@@ -446,6 +446,9 @@ importers:
       '@novacommerce/database':
         specifier: workspace:*
         version: link:../../packages/database
+      '@novacommerce/infrastructure':
+        specifier: workspace:*
+        version: link:../../packages/infrastructure
       '@prisma/client':
         specifier: 6.5.0
         version: 6.5.0(prisma@6.5.0(typescript@5.8.2))(typescript@5.8.2)
