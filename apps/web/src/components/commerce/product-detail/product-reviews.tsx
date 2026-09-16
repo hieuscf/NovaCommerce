@@ -112,22 +112,17 @@ function ReviewCard({ review }: { review: ProductReviewViewModel }) {
 
 export function ProductReviews({ detail }: { detail: ProductDetailViewModel }) {
   return (
-    <section id="reviews" aria-labelledby="reviews-heading" className="scroll-mt-24">
-      <h2 id="reviews-heading" className="text-h3 text-ink">
-        Customer Reviews
-      </h2>
-      <div className="mt-6 space-y-8">
-        <Distribution detail={detail} />
-        {detail.reviews.length === 0 ? (
-          <p className="text-body-sm text-muted-foreground">Reviews will appear here once shoppers share them.</p>
-        ) : (
-          <div>
-            {detail.reviews.map((review) => (
-              <ReviewCard key={review.id} review={review} />
-            ))}
-          </div>
-        )}
-      </div>
-    </section>
+    <div className="space-y-8">
+      <Distribution detail={detail} />
+      {detail.reviews.length === 0 ? (
+        <p className="text-body-sm text-muted-foreground">Reviews will appear here once shoppers share them.</p>
+      ) : (
+        <div>
+          {detail.reviews.map((review) => (
+            <ReviewCard key={review.id} review={review} />
+          ))}
+        </div>
+      )}
+    </div>
   );
 }

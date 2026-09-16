@@ -2,11 +2,16 @@ import { catalogProducts } from '@/lib/mock-data/catalog';
 import { productDetailExtras } from '@/lib/mock-data/product-detail';
 import type { ProductViewModel } from '@/lib/view-models/product';
 import {
+  DEFAULT_PRODUCT_SELLER,
+  DEFAULT_SHIPPING_RETURNS,
   DEFAULT_TRUST_ITEMS,
   getProductBreadcrumbs,
   type ProductDetailViewModel,
   type ProductFeatureViewModel,
+  type ProductHighlightIcon,
+  type ProductHighlightSpecViewModel,
   type ProductImageViewModel,
+  type ProductLifestyleViewModel,
   type ProductRatingDistribution,
   type ProductReviewViewModel,
   type ProductSpecViewModel,
@@ -138,7 +143,49 @@ function fallbackDistribution(product: ProductViewModel): ProductRatingDistribut
   return { 5: five, 4: four, 3: three, 2: two, 1: one };
 }
 
-function relatedProducts(product: ProductViewModel): ProductViewModel[] {
+function inferHighlightIcon(name: string, value: string): ProductHighlightIcon {
+  const hay = `${name} ${value}`.toLowerCase();
+  if (/(display|retina|oled|inch)/.test(hay)) return 'display';
+  if (/(ram|memory)/.test(hay)) return 'memory';
+  if (/(ssd|storage)/.test(hay)) return 'storage';
+  if (/(chip|cpu|processor|core)/.test(hay)) return 'chip';
+  if (/(battery)/.test(hay)) return 'battery';
+  if (/(camera)/.test(hay)) return 'camera';
+  if (/(weight|gram)/.test(hay)) return 'weight';
+  if (/(audio|headphone|anc)/.test(hay)) return 'audio';
+  return 'chip';
+}
+
+function fallbackHighlights(specs: readonly ProductSpecViewModel[]): ProductHighlightSpecViewModel[] {
+  return specs.slice(0, 3).map((spec) => ({
+    id: spec.name.toLowerCase().replace(/\s+/g, '-'),
+    label: spec.value,
+    hint: spec.name,
+    icon: inferHighlightIcon(spec.name, spec.value),
+  }));
+}
+
+function fallbackLifestyle(
+  product: ProductViewModel,
+  images: readonly ProductImageViewModel[],
+): ProductLifestyleViewModel | undefined {
+  const lifestyle = images.find((image) => /life|desk|hand/i.test(image.id)) ?? images.at(-1);
+  if (!lifestyle || lifestyle.url === product.imageUrl) {
+    return images.length > 1 ? { url: images[images.length - 1]!.url, alt: images[images.length - 1]!.alt } : undefined;
+  }
+  return { url: lifestyle.url, alt: lifestyle.alt };
+}
+
+function relatedProducts(product: ProductViewModel, slugs?: readonly string[]): ProductViewModel[] {
+  if (slugs && slugs.length > 0) {
+    const pinned = slugs
+      .map((slug) => catalogProducts.find((item) => item.slug === slug && item.id !== product.id))
+      .filter((item): item is ProductViewModel => Boolean(item));
+    if (pinned.length > 0) {
+      return pinned.slice(0, RELATED_LIMIT);
+    }
+  }
+
   const sameCategory = catalogProducts.filter(
     (item) => item.id !== product.id && item.categorySlug === product.categorySlug,
   );
@@ -167,21 +214,28 @@ export function getProductDetailBySlug(slug: string): ProductDetailViewModel | u
   const extras = productDetailExtras[slug];
   const copy = fallbackDescription(product);
   const availability = product.inStock === false ? 'out_of_stock' : 'in_stock';
+  const images = extras?.images ?? fallbackImages(product);
+  const specifications = extras?.specifications ?? fallbackSpecs(product);
 
   return {
     product,
     shortDescription: extras?.shortDescription ?? copy.short,
     description: extras?.description ?? copy.full,
-    images: extras?.images ?? fallbackImages(product),
+    descriptionTitle: extras?.descriptionTitle ?? 'About this product',
+    images,
     variants: extras?.variants ?? [],
     availability,
-    specifications: extras?.specifications ?? fallbackSpecs(product),
+    highlightSpecs: extras?.highlightSpecs ?? fallbackHighlights(specifications),
+    specifications,
     features: extras?.features ?? fallbackFeatures(product),
     reviews: extras?.reviews ?? fallbackReviews(product),
     ratingDistribution: extras?.ratingDistribution ?? fallbackDistribution(product),
     crumbs: getProductBreadcrumbs(product),
-    related: relatedProducts(product),
+    related: relatedProducts(product, extras?.relatedSlugs),
     trustItems: DEFAULT_TRUST_ITEMS,
+    seller: extras?.seller ?? DEFAULT_PRODUCT_SELLER,
+    lifestyleImage: extras?.lifestyleImage ?? fallbackLifestyle(product, images),
+    shippingReturns: extras?.shippingReturns ?? DEFAULT_SHIPPING_RETURNS,
   };
 }
 

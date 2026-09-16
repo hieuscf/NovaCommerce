@@ -48,8 +48,8 @@ export function PriceDisplay({
         </span>
       ) : null}
       {showDiscountBadge && percent && percent > 0 ? (
-        <span className="rounded-pill bg-secondary/12 px-2 py-0.5 text-caption font-semibold text-secondary">
-          {percent}% OFF
+        <span className="rounded-pill bg-destructive/10 px-2 py-0.5 text-caption font-semibold text-destructive">
+          -{percent}%
         </span>
       ) : null}
     </div>

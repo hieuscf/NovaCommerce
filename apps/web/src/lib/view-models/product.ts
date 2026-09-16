@@ -51,3 +51,7 @@ export function formatReviewCount(count: number): string {
   }
   return String(count);
 }
+
+export function formatExactReviewCount(count: number): string {
+  return new Intl.NumberFormat('en-US').format(count);
+}

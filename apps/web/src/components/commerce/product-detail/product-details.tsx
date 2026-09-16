@@ -1,6 +1,8 @@
 'use client';
 
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useState } from 'react';
+import Image from 'next/image';
+import { Battery, Cpu, Monitor } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@novacommerce/ui/components/tabs';
 import {
   Table,
@@ -10,21 +12,57 @@ import {
   TableHeader,
   TableRow,
 } from '@novacommerce/ui/components/table';
+import { ProductReviews } from '@/components/commerce/product-detail/product-reviews';
+import { formatExactReviewCount } from '@/lib/view-models/product';
 import type { ProductDetailViewModel } from '@/lib/view-models/product-detail';
 import { cn } from '@/lib/utils';
 
-const SECTIONS = [
-  { id: 'description', label: 'Description' },
-  { id: 'specifications', label: 'Specifications' },
-  { id: 'features', label: 'Features' },
-] as const;
+const TAB_TRIGGER =
+  'h-11 rounded-none border-b-2 border-transparent bg-transparent px-0 text-sm font-medium text-muted-foreground shadow-none data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none';
 
-function DescriptionBody({ text }: { text: string }) {
+function DescriptionBody({ detail }: { detail: ProductDetailViewModel }) {
+  const highlights = detail.features.slice(0, 3);
+  const icons = [Cpu, Monitor, Battery];
+
   return (
-    <div className="max-w-[65ch] space-y-4 text-body-sm leading-relaxed text-copy">
-      {text.split('\n\n').map((paragraph) => (
-        <p key={paragraph.slice(0, 48)}>{paragraph}</p>
-      ))}
+    <div className="grid items-center gap-8 md:grid-cols-[minmax(0,1fr)_minmax(220px,0.9fr)]">
+      <div>
+        <h3 className="text-xl font-bold tracking-tight text-ink">{detail.descriptionTitle}</h3>
+        <div className="mt-3 space-y-4 text-body-sm leading-relaxed text-copy">
+          {detail.description.split('\n\n').map((paragraph) => (
+            <p key={paragraph.slice(0, 48)}>{paragraph}</p>
+          ))}
+        </div>
+        {highlights.length > 0 ? (
+          <ul className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+            {highlights.map((feature, index) => {
+              const Icon = icons[index] ?? Cpu;
+              return (
+                <li key={feature.title} className="flex items-start gap-2.5">
+                  <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-primary-tint text-primary">
+                    <Icon className="size-4" strokeWidth={1.75} aria-hidden="true" />
+                  </span>
+                  <span>
+                    <span className="block text-sm font-semibold text-ink">{feature.title}</span>
+                    <span className="block text-[11px] text-muted-foreground">{feature.description}</span>
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        ) : null}
+      </div>
+      {detail.lifestyleImage ? (
+        <div className="relative aspect-[4/3] overflow-hidden rounded-[1.5rem] bg-surface-subtle">
+          <Image
+            src={detail.lifestyleImage.url}
+            alt={detail.lifestyleImage.alt}
+            fill
+            sizes="(max-width: 768px) 100vw, 32vw"
+            className="object-cover"
+          />
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -64,104 +102,72 @@ function SpecificationsBody({ detail }: { detail: ProductDetailViewModel }) {
   );
 }
 
-function FeaturesBody({ detail }: { detail: ProductDetailViewModel }) {
+function ShippingBody({ detail }: { detail: ProductDetailViewModel }) {
   return (
-    <ul className="grid gap-6 sm:grid-cols-2">
-      {detail.features.map((feature) => (
-        <li key={feature.title} className="border-border/80 border-l-2 pl-4">
-          <h3 className="text-sm font-semibold text-foreground">{feature.title}</h3>
-          <p className="mt-1.5 text-body-sm leading-relaxed text-muted-foreground">{feature.description}</p>
-        </li>
+    <div className="max-w-[65ch] space-y-4 text-body-sm leading-relaxed text-copy">
+      <h3 className="text-lg font-semibold text-ink">{detail.shippingReturns.heading}</h3>
+      {detail.shippingReturns.paragraphs.map((paragraph) => (
+        <p key={paragraph.slice(0, 48)}>{paragraph}</p>
       ))}
-    </ul>
-  );
-}
-
-function AccordionSection({
-  id,
-  title,
-  children,
-  defaultOpen = false,
-}: {
-  id: string;
-  title: string;
-  children: ReactNode;
-  defaultOpen?: boolean;
-}) {
-  return (
-    <details
-      className="group border-b border-border py-1 first:pt-0"
-      name="product-details"
-      open={defaultOpen}
-    >
-      <summary
-        id={`${id}-summary`}
-        className={cn(
-          'flex cursor-pointer list-none items-center justify-between py-4 text-sm font-semibold text-foreground',
-          'focus-ring rounded-md [&::-webkit-details-marker]:hidden',
-        )}
-      >
-        {title}
-        <span className="text-muted-foreground transition-transform duration-fast group-open:rotate-45" aria-hidden="true">
-          +
-        </span>
-      </summary>
-      <div className="pb-5">{children}</div>
-    </details>
+    </div>
   );
 }
 
 export function ProductDetails({ detail }: { detail: ProductDetailViewModel }) {
-  const [desktop, setDesktop] = useState(false);
+  const [tab, setTab] = useState('description');
 
   useEffect(() => {
-    const media = window.matchMedia('(min-width: 1024px)');
-    const sync = () => setDesktop(media.matches);
+    const sync = () => {
+      if (window.location.hash === '#reviews') {
+        setTab('reviews');
+      }
+    };
     sync();
-    media.addEventListener('change', sync);
-    return () => media.removeEventListener('change', sync);
+    window.addEventListener('hashchange', sync);
+    return () => window.removeEventListener('hashchange', sync);
   }, []);
 
-  return (
-    <section aria-labelledby="product-details-heading" className="scroll-mt-24">
-      <h2 id="product-details-heading" className="text-h3 text-ink">
-        Product Details
-      </h2>
+  const reviewLabel = `Reviews (${formatExactReviewCount(detail.product.reviewCount)})`;
 
-      {desktop ? (
-        <div className="mt-6">
-          <Tabs defaultValue="description">
-            <TabsList aria-label="Product details">
-              {SECTIONS.map((section) => (
-                <TabsTrigger key={section.id} value={section.id}>
-                  {section.label}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-            <TabsContent value="description" className="pt-2">
-              <DescriptionBody text={detail.description} />
-            </TabsContent>
-            <TabsContent value="specifications" className="pt-2">
-              <SpecificationsBody detail={detail} />
-            </TabsContent>
-            <TabsContent value="features" className="pt-2">
-              <FeaturesBody detail={detail} />
-            </TabsContent>
-          </Tabs>
-        </div>
-      ) : (
-        <div className="mt-2">
-          <AccordionSection id="description" title="Description" defaultOpen>
-            <DescriptionBody text={detail.description} />
-          </AccordionSection>
-          <AccordionSection id="specifications" title="Specifications">
-            <SpecificationsBody detail={detail} />
-          </AccordionSection>
-          <AccordionSection id="features" title="Features">
-            <FeaturesBody detail={detail} />
-          </AccordionSection>
-        </div>
-      )}
+  return (
+    <section
+      aria-labelledby="product-details-heading"
+      className="rounded-[1.75rem] border border-border/70 bg-surface p-5 shadow-card-soft md:p-7"
+    >
+      <h2 id="product-details-heading" className="sr-only">
+        Product details
+      </h2>
+      <Tabs value={tab} onValueChange={setTab}>
+        <TabsList
+          aria-label="Product details"
+          className="h-auto w-full justify-start gap-6 overflow-x-auto rounded-none border-b border-border bg-transparent p-0"
+        >
+          <TabsTrigger value="description" className={TAB_TRIGGER}>
+            Description
+          </TabsTrigger>
+          <TabsTrigger value="specifications" className={TAB_TRIGGER}>
+            Specifications
+          </TabsTrigger>
+          <TabsTrigger value="reviews" className={TAB_TRIGGER}>
+            {reviewLabel}
+          </TabsTrigger>
+          <TabsTrigger value="shipping" className={TAB_TRIGGER}>
+            Shipping & Returns
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="description" className="pt-6">
+          <DescriptionBody detail={detail} />
+        </TabsContent>
+        <TabsContent value="specifications" className="pt-6">
+          <SpecificationsBody detail={detail} />
+        </TabsContent>
+        <TabsContent value="reviews" id="reviews" className={cn('scroll-mt-24 pt-6')}>
+          <ProductReviews detail={detail} />
+        </TabsContent>
+        <TabsContent value="shipping" className="pt-6">
+          <ShippingBody detail={detail} />
+        </TabsContent>
+      </Tabs>
     </section>
   );
 }

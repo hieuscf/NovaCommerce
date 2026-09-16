@@ -1,27 +1,25 @@
 'use client';
 
 import Link from 'next/link';
-import { Check, Heart } from 'lucide-react';
-import { Badge } from '@novacommerce/ui/components/badge';
+import { Heart, ShoppingCart } from 'lucide-react';
 import { Button } from '@novacommerce/ui/components/button';
 import { Label } from '@novacommerce/ui/components/label';
 import { PriceDisplay } from '@/components/commerce/price-display';
 import { ProductRating } from '@/components/commerce/product-rating';
 import { QuantitySelector } from '@/components/commerce/quantity-selector';
 import { VariantSelector } from '@/components/commerce/variant-selector';
-import { TrustIndicators } from '@/components/commerce/product-detail/trust-indicators';
-import { brandHref, formatPrice } from '@/lib/view-models/product';
+import { ProductHighlightSpecs } from '@/components/commerce/product-detail/product-highlight-specs';
+import { brandHref } from '@/lib/view-models/product';
 import type { ProductDetailViewModel } from '@/lib/view-models/product-detail';
-import { cn } from '@/lib/utils';
 
 export interface ProductInfoProps {
   detail: ProductDetailViewModel;
   selected: Record<string, string>;
   quantity: number;
+  adding?: boolean;
   onVariantChange: (groupId: string, optionId: string) => void;
   onQuantityChange: (value: number) => void;
   onAddToCart: () => void;
-  onBuyNow: () => void;
   onWishlist: () => void;
   onNotify: () => void;
 }
@@ -30,76 +28,61 @@ export function ProductInfo({
   detail,
   selected,
   quantity,
+  adding = false,
   onVariantChange,
   onQuantityChange,
   onAddToCart,
-  onBuyNow,
   onWishlist,
   onNotify,
 }: ProductInfoProps) {
-  const { product } = detail;
+  const { product, seller } = detail;
   const inStock = detail.availability === 'in_stock';
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="space-y-3">
-        <div className="flex flex-wrap items-center gap-2">
-          <Link
-            href={brandHref(product.brand)}
-            className="text-caption font-medium tracking-wide text-muted-foreground uppercase hover:text-foreground focus-ring"
-          >
-            {product.brand}
-          </Link>
-          {product.badge ? (
-            <Badge variant={product.badge === 'sale' ? 'sale' : product.badge === 'new' ? 'info' : 'bestseller'}>
-              {product.badge === 'sale' ? 'Sale' : product.badge === 'new' ? 'New' : 'Best seller'}
-            </Badge>
-          ) : null}
+    <div className="flex flex-col gap-5">
+      <div className="space-y-2.5">
+        <Link
+          href={brandHref(product.brand)}
+          className="text-sm font-semibold text-primary hover:text-primary-strong focus-ring"
+        >
+          {product.brand}
+        </Link>
+        <h1 className="text-[1.75rem] leading-tight font-bold tracking-tight text-ink md:text-[2rem]">
+          {product.name}
+        </h1>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+          <ProductRating
+            rating={product.rating}
+            reviewCount={product.reviewCount}
+            href="#reviews"
+            countFormat="exact"
+          />
+          <span className="hidden text-border sm:inline" aria-hidden="true">
+            |
+          </span>
+          <p className="text-muted-foreground">
+            Sold by{' '}
+            <Link href={seller.href} className="font-medium text-foreground hover:text-primary focus-ring">
+              {seller.name}
+            </Link>
+          </p>
         </div>
-        <h1 className="text-h2 text-balance text-ink">{product.name}</h1>
-        <ProductRating
-          rating={product.rating}
-          reviewCount={product.reviewCount}
-          href="#reviews"
-          showScale
-        />
       </div>
 
-      <div className="space-y-2">
-        <PriceDisplay
-          price={product.price}
-          compareAtPrice={product.compareAtPrice}
-          currency={product.currency}
-          discountPercent={product.discountPercent}
-          size="lg"
-          showDiscountBadge
-        />
-        {product.badge === 'sale' && product.compareAtPrice ? (
-          <p className="text-caption text-muted-foreground">
-            You save {formatPrice(product.compareAtPrice - product.price, product.currency)}
-          </p>
-        ) : null}
-      </div>
+      <PriceDisplay
+        price={product.price}
+        compareAtPrice={product.compareAtPrice}
+        currency={product.currency}
+        discountPercent={product.discountPercent}
+        size="lg"
+        showDiscountBadge
+      />
 
       <p className="max-w-[42rem] text-body-sm leading-relaxed text-copy">{detail.shortDescription}</p>
 
-      <VariantSelector groups={detail.variants} selected={selected} onChange={onVariantChange} />
+      <ProductHighlightSpecs specs={detail.highlightSpecs} />
 
-      <p
-        className={cn(
-          'inline-flex items-center gap-1.5 text-sm font-medium',
-          inStock ? 'text-success-strong' : 'text-destructive-strong',
-        )}
-      >
-        {inStock ? (
-          <>
-            <Check className="size-4" aria-hidden="true" />
-            In Stock
-          </>
-        ) : (
-          'Out of Stock'
-        )}
-      </p>
+      <VariantSelector groups={detail.variants} selected={selected} onChange={onVariantChange} />
 
       {inStock ? (
         <div className="space-y-3">
@@ -111,6 +94,7 @@ export function ProductInfo({
             labelledBy="pdp-quantity-label"
             value={quantity}
             onChange={onQuantityChange}
+            className="h-12 rounded-2xl"
           />
         </div>
       ) : (
@@ -122,45 +106,34 @@ export function ProductInfo({
         </div>
       )}
 
-      <div className="flex flex-col gap-3">
+      <div className="flex items-center gap-2.5">
         {inStock ? (
-          <div className="flex gap-2.5">
-            <Button
-              className="h-12 min-h-12 flex-1"
-              size="lg"
-              variant="primary-gradient"
-              onClick={onAddToCart}
-            >
-              Add to Cart
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="icon"
-              className="size-12 min-h-12 min-w-12"
-              aria-label={`Save ${product.name} to wishlist`}
-              onClick={onWishlist}
-            >
-              <Heart className="size-4" />
-            </Button>
-          </div>
+          <Button
+            className="h-12 min-h-12 flex-1 rounded-2xl"
+            size="lg"
+            variant="primary-gradient"
+            loading={adding}
+            onClick={onAddToCart}
+          >
+            <ShoppingCart className="size-4" aria-hidden="true" />
+            Add to Cart
+          </Button>
         ) : (
-          <Button className="h-12 min-h-12 w-full" size="lg" variant="secondary" onClick={onNotify}>
+          <Button className="h-12 min-h-12 flex-1 rounded-2xl" size="lg" variant="secondary" onClick={onNotify}>
             Notify Me
           </Button>
         )}
-        {inStock ? (
-          <Button className="h-12 min-h-12 w-full" size="lg" variant="outline" onClick={onBuyNow}>
-            Buy Now
-          </Button>
-        ) : (
-          <Button className="h-12 min-h-12 w-full" size="lg" variant="outline" disabled>
-            Buy Now
-          </Button>
-        )}
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          className="size-12 min-h-12 min-w-12 rounded-2xl"
+          aria-label={`Save ${product.name} to wishlist`}
+          onClick={onWishlist}
+        >
+          <Heart className="size-4" />
+        </Button>
       </div>
-
-      <TrustIndicators items={detail.trustItems} />
     </div>
   );
 }

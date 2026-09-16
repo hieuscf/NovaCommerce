@@ -10,7 +10,7 @@ export interface ProductImageViewModel {
   readonly alt: string;
 }
 
-export type ProductVariantControl = 'swatch' | 'button';
+export type ProductVariantControl = 'swatch' | 'button' | 'image';
 
 export interface ProductVariantOptionViewModel {
   readonly id: string;
@@ -19,6 +19,7 @@ export interface ProductVariantOptionViewModel {
   readonly available: boolean;
   readonly swatch?: string;
   readonly imageId?: string;
+  readonly thumbnailUrl?: string;
 }
 
 export interface ProductVariantGroupViewModel {
@@ -57,19 +58,58 @@ export interface ProductRatingDistribution {
   readonly 5: number;
 }
 
+export type ProductHighlightIcon =
+  | 'chip'
+  | 'memory'
+  | 'display'
+  | 'battery'
+  | 'camera'
+  | 'audio'
+  | 'storage'
+  | 'weight';
+
+export interface ProductHighlightSpecViewModel {
+  readonly id: string;
+  readonly label: string;
+  readonly hint: string;
+  readonly icon: ProductHighlightIcon;
+}
+
+export interface ProductSellerViewModel {
+  readonly name: string;
+  readonly official: boolean;
+  readonly rating: number;
+  readonly reviewLabel: string;
+  readonly href: string;
+  readonly badges: readonly string[];
+}
+
+export interface ProductLifestyleViewModel {
+  readonly url: string;
+  readonly alt: string;
+}
+
+export interface ProductShippingViewModel {
+  readonly heading: string;
+  readonly paragraphs: readonly string[];
+}
+
 export interface ProductTrustItemViewModel {
   readonly id: string;
   readonly label: string;
-  readonly icon: 'shipping' | 'secure' | 'returns';
+  readonly description: string;
+  readonly icon: 'shipping' | 'secure' | 'returns' | 'support';
 }
 
 export interface ProductDetailViewModel {
   readonly product: ProductViewModel;
   readonly shortDescription: string;
   readonly description: string;
+  readonly descriptionTitle: string;
   readonly images: readonly ProductImageViewModel[];
   readonly variants: readonly ProductVariantGroupViewModel[];
   readonly availability: ProductAvailability;
+  readonly highlightSpecs: readonly ProductHighlightSpecViewModel[];
   readonly specifications: readonly ProductSpecViewModel[];
   readonly features: readonly ProductFeatureViewModel[];
   readonly reviews: readonly ProductReviewViewModel[];
@@ -77,13 +117,34 @@ export interface ProductDetailViewModel {
   readonly crumbs: readonly ShopCrumb[];
   readonly related: readonly ProductViewModel[];
   readonly trustItems: readonly ProductTrustItemViewModel[];
+  readonly seller: ProductSellerViewModel;
+  readonly lifestyleImage?: ProductLifestyleViewModel;
+  readonly shippingReturns: ProductShippingViewModel;
 }
 
 export const DEFAULT_TRUST_ITEMS: readonly ProductTrustItemViewModel[] = [
-  { id: 'shipping', label: 'Free shipping', icon: 'shipping' },
-  { id: 'secure', label: 'Secure payment', icon: 'secure' },
-  { id: 'returns', label: 'Easy returns', icon: 'returns' },
+  { id: 'shipping', label: 'Free Shipping', description: 'On orders over $50', icon: 'shipping' },
+  { id: 'secure', label: 'Secure Payment', description: '100% protected', icon: 'secure' },
+  { id: 'returns', label: 'Easy Returns', description: '30-day return policy', icon: 'returns' },
+  { id: 'support', label: '24/7 Support', description: "We're here to help", icon: 'support' },
 ];
+
+export const DEFAULT_PRODUCT_SELLER: ProductSellerViewModel = {
+  name: 'NovaStore',
+  official: true,
+  rating: 4.8,
+  reviewLabel: '12.5k+ reviews',
+  href: '/shop',
+  badges: ['100% Authentic Products', 'Fast & Reliable Shipping'],
+};
+
+export const DEFAULT_SHIPPING_RETURNS: ProductShippingViewModel = {
+  heading: 'Shipping & Returns',
+  paragraphs: [
+    'Free shipping on qualifying orders. Delivery estimates appear at checkout once a shipping address is available.',
+    'Most items can be returned within 30 days in original condition. Return labels and eligibility stay with Order and Fulfillment when those APIs are connected.',
+  ],
+};
 
 export function getProductBreadcrumbs(product: ProductViewModel): ShopCrumb[] {
   const crumbs: ShopCrumb[] = [{ href: '/', label: 'Home' }];

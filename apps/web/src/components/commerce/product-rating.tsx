@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Star } from 'lucide-react';
-import { formatReviewCount } from '@/lib/view-models/product';
+import { formatExactReviewCount, formatReviewCount } from '@/lib/view-models/product';
 import { cn } from '@/lib/utils';
 
 export interface ProductRatingProps {
@@ -9,6 +9,7 @@ export interface ProductRatingProps {
   href?: string;
   size?: 'sm' | 'md';
   showScale?: boolean;
+  countFormat?: 'compact' | 'exact';
   className?: string;
 }
 
@@ -33,21 +34,22 @@ export function ProductRating({
   href,
   size = 'md',
   showScale = false,
+  countFormat = 'compact',
   className,
 }: ProductRatingProps) {
   const compact = size === 'sm';
-  const label = `${rating.toFixed(1)} out of 5, ${formatReviewCount(reviewCount)} reviews`;
+  const countLabel =
+    countFormat === 'exact' ? formatExactReviewCount(reviewCount) : formatReviewCount(reviewCount);
+  const label = `${rating.toFixed(1)} out of 5, ${countLabel} reviews`;
   const content = (
     <>
       <Stars rating={rating} iconClass={compact ? 'size-3' : 'size-3.5'} />
       <span className={cn('font-semibold text-foreground', compact ? 'text-[11px]' : 'text-sm')}>
         {rating.toFixed(1)}
       </span>
-      {showScale ? (
-        <span className="text-muted-foreground">/ 5</span>
-      ) : null}
+      {showScale ? <span className="text-muted-foreground">/ 5</span> : null}
       <span className={cn('text-muted-foreground', compact ? 'text-[11px]' : 'text-sm')}>
-        {formatReviewCount(reviewCount)} reviews
+        ({countLabel} reviews)
       </span>
     </>
   );

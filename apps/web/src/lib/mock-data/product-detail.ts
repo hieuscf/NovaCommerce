@@ -1,8 +1,12 @@
 import type {
   ProductFeatureViewModel,
+  ProductHighlightSpecViewModel,
   ProductImageViewModel,
+  ProductLifestyleViewModel,
   ProductRatingDistribution,
   ProductReviewViewModel,
+  ProductSellerViewModel,
+  ProductShippingViewModel,
   ProductSpecViewModel,
   ProductVariantGroupViewModel,
 } from '@/lib/view-models/product-detail';
@@ -14,12 +18,18 @@ import type {
 export interface ProductDetailExtras {
   readonly shortDescription: string;
   readonly description: string;
+  readonly descriptionTitle?: string;
   readonly images: readonly ProductImageViewModel[];
   readonly variants?: readonly ProductVariantGroupViewModel[];
+  readonly highlightSpecs?: readonly ProductHighlightSpecViewModel[];
   readonly specifications: readonly ProductSpecViewModel[];
   readonly features: readonly ProductFeatureViewModel[];
   readonly reviews: readonly ProductReviewViewModel[];
   readonly ratingDistribution: ProductRatingDistribution;
+  readonly relatedSlugs?: readonly string[];
+  readonly lifestyleImage?: ProductLifestyleViewModel;
+  readonly seller?: ProductSellerViewModel;
+  readonly shippingReturns?: ProductShippingViewModel;
 }
 
 const IPHONE_IMAGES: readonly ProductImageViewModel[] = [
@@ -50,7 +60,175 @@ const IPHONE_IMAGES: readonly ProductImageViewModel[] = [
   },
 ];
 
+const MACBOOK_IMAGES: readonly ProductImageViewModel[] = [
+  {
+    id: 'mba-front',
+    url: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=1200&h=1200&fit=crop',
+    alt: 'MacBook Air M2 13" — Space Gray, open',
+  },
+  {
+    id: 'mba-angle',
+    url: 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=1200&h=1200&fit=crop',
+    alt: 'MacBook Air M2 13" — three-quarter view',
+  },
+  {
+    id: 'mba-silver',
+    url: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=1200&h=1200&fit=crop',
+    alt: 'MacBook Air M2 13" — Silver',
+  },
+  {
+    id: 'mba-keys',
+    url: 'https://images.unsplash.com/photo-1511385348-a52b4a160dc2?w=1200&h=1200&fit=crop',
+    alt: 'MacBook Air M2 13" — keyboard',
+  },
+  {
+    id: 'mba-desk',
+    url: 'https://images.unsplash.com/photo-1484788984921-03950022c9ef?w=1200&h=1200&fit=crop',
+    alt: 'MacBook Air M2 13" — on a desk',
+  },
+  {
+    id: 'mba-side',
+    url: 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=1200&h=1200&fit=crop',
+    alt: 'MacBook Air M2 13" — side profile',
+  },
+  {
+    id: 'mba-life',
+    url: 'https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?w=1200&h=1200&fit=crop',
+    alt: 'MacBook Air M2 13" — lifestyle',
+  },
+];
+
 export const productDetailExtras: Record<string, ProductDetailExtras> = {
+  'macbook-air-m2': {
+    shortDescription:
+      'The all-new MacBook Air with M2 chip delivers incredible performance, all-day battery life, and a stunning 13.6-inch Liquid Retina display.',
+    descriptionTitle: 'Power meets portability',
+    description:
+      'The MacBook Air M2 is designed for those who want incredible performance in a lightweight, ultra-portable package. With the powerful M2 chip, stunning Liquid Retina display, and all-day battery life, it is perfect for work, creativity, and entertainment.',
+    images: MACBOOK_IMAGES,
+    variants: [
+      {
+        id: 'color',
+        name: 'Color',
+        type: 'image',
+        options: [
+          {
+            id: 'space-gray',
+            label: 'Space Gray',
+            value: 'space-gray',
+            available: true,
+            thumbnailUrl: MACBOOK_IMAGES[0].url,
+            imageId: 'mba-front',
+          },
+          {
+            id: 'silver',
+            label: 'Silver',
+            value: 'silver',
+            available: true,
+            thumbnailUrl: MACBOOK_IMAGES[2].url,
+            imageId: 'mba-silver',
+          },
+          {
+            id: 'starlight',
+            label: 'Starlight',
+            value: 'starlight',
+            available: true,
+            thumbnailUrl: MACBOOK_IMAGES[1].url,
+            imageId: 'mba-angle',
+          },
+        ],
+      },
+    ],
+    highlightSpecs: [
+      { id: 'chip', label: 'M2 Chip', hint: '8-core CPU', icon: 'chip' },
+      { id: 'memory', label: '8GB RAM', hint: '256GB SSD', icon: 'memory' },
+      { id: 'display', label: '13.6" Display', hint: 'Liquid Retina', icon: 'display' },
+    ],
+    specifications: [
+      { name: 'Brand', value: 'Apple' },
+      { name: 'Model', value: 'MacBook Air M2 13"' },
+      { name: 'Chip', value: 'Apple M2 (8-core CPU, 10-core GPU)' },
+      { name: 'Memory', value: '8GB unified memory' },
+      { name: 'Storage', value: '256GB SSD' },
+      { name: 'Display', value: '13.6-inch Liquid Retina' },
+      { name: 'Battery', value: 'Up to 18 hours' },
+      { name: 'Operating System', value: 'macOS Ventura' },
+      { name: 'Weight', value: '1.24 kg' },
+    ],
+    features: [
+      {
+        title: 'M2 Chip',
+        description: 'Next-generation performance',
+      },
+      {
+        title: 'Liquid Retina Display',
+        description: 'Vivid colors, incredible detail',
+      },
+      {
+        title: 'All-Day Battery',
+        description: 'Up to 18 hours',
+      },
+      {
+        title: 'Apple M2 chip with 8-core CPU & 10-core GPU',
+        description: 'Fast everyday performance in a fanless design.',
+      },
+      {
+        title: '13.6-inch Liquid Retina display with True Tone',
+        description: 'A bright, accurate panel for work and entertainment.',
+      },
+      {
+        title: 'Up to 18 hours battery life',
+        description: 'A full day of writing, calls, and streaming.',
+      },
+      {
+        title: 'Fanless design for silent operation',
+        description: 'Stays quiet on desks, flights, and library tables.',
+      },
+      {
+        title: 'macOS Ventura',
+        description: 'Continuity, Stage Manager, and familiar Mac apps.',
+      },
+    ],
+    lifestyleImage: {
+      url: MACBOOK_IMAGES[4].url,
+      alt: 'MacBook Air M2 on a desk with a plant',
+    },
+    relatedSlugs: ['dell-xps-15', 'airpods-pro-2', 'apple-watch-series-10', 'nike-air-force-1'],
+    reviews: [
+      {
+        id: 'mba-r1',
+        author: 'Sofia M.',
+        rating: 5,
+        title: 'Light enough to take everywhere',
+        content:
+          'The M2 Air replaced my old 13-inch without a second thought. Screen is sharp, fans never spin, and the battery covers a full workday.',
+        dateLabel: '3 days ago',
+        verified: true,
+        helpfulCount: 24,
+      },
+      {
+        id: 'mba-r2',
+        author: 'Daniel K.',
+        rating: 5,
+        title: 'Silent and fast',
+        content: 'Video calls and Lightroom stay smooth. Space Gray looks exactly like the photos.',
+        dateLabel: '1 week ago',
+        verified: true,
+        helpfulCount: 11,
+      },
+      {
+        id: 'mba-r3',
+        author: 'Priya S.',
+        rating: 4,
+        title: 'Great screen, 256GB fills up',
+        content: 'Display and keyboard are excellent. I wish I had stepped up storage, but performance is not the bottleneck.',
+        dateLabel: '2 weeks ago',
+        verified: true,
+        helpfulCount: 8,
+      },
+    ],
+    ratingDistribution: { 5: 892, 4: 248, 3: 62, 2: 24, 1: 16 },
+  },
   'iphone-17-pro': {
     shortDescription:
       'Experience powerful performance, advanced photography, and an elegant design built for everyday use.',
