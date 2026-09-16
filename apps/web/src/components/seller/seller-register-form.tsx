@@ -33,6 +33,7 @@ import {
 import type { SellerPageViewModel, SellerRegisterStepId } from '@/lib/view-models/seller';
 import { SellerFlag } from './seller-flag';
 import { SellerImageDropzone } from './seller-image-dropzone';
+import { SellerRegisterCompleteStep } from './seller-register-complete-step';
 import { SellerRegisterStepper } from './seller-register-stepper';
 import { SellerRegisterTermsStep } from './seller-register-terms-step';
 import { SellerRegisterVerificationStep } from './seller-register-verification-step';
@@ -67,9 +68,11 @@ function SectionTitle({ children }: { children: string }) {
 export function SellerRegisterForm({
   page,
   initialStep = 'business',
+  onStepChange,
 }: {
   page: SellerPageViewModel;
   initialStep?: SellerRegisterStepId;
+  onStepChange?: (step: SellerRegisterStepId) => void;
 }) {
   const [step, setStep] = useState<SellerRegisterStepId>(initialStep);
   const formTopRef = useRef<HTMLDivElement>(null);
@@ -124,6 +127,7 @@ export function SellerRegisterForm({
 
   async function goToStep(next: SellerRegisterStepId) {
     setStep(next);
+    onStepChange?.(next);
     focusFormTop();
   }
 
@@ -177,11 +181,7 @@ export function SellerRegisterForm({
                 description:
                   'Please read and agree to the following terms and conditions to complete your registration as a NovaCommerce seller.',
               }
-            : {
-                title: 'Application received',
-                description:
-                  'Thanks for applying. Our team will review your details and email you when your seller profile is ready.',
-              };
+            : null;
 
   return (
     <div
@@ -195,8 +195,12 @@ export function SellerRegisterForm({
         }}
       />
 
-      <h2 className="mt-8 text-[28px] font-extrabold tracking-tight text-ink">{copy.title}</h2>
-      <p className="mt-2 max-w-[520px] text-[14px] leading-relaxed text-copy">{copy.description}</p>
+      {copy ? (
+        <>
+          <h2 className="mt-8 text-[28px] font-extrabold tracking-tight text-ink">{copy.title}</h2>
+          <p className="mt-2 max-w-[520px] text-[14px] leading-relaxed text-copy">{copy.description}</p>
+        </>
+      ) : null}
 
       {step === 'business' ? (
         <form
@@ -958,25 +962,7 @@ export function SellerRegisterForm({
       ) : null}
 
       {step === 'complete' ? (
-        <div className="mt-8 space-y-6">
-          <Alert variant="success">
-            <Shield aria-hidden="true" />
-            <AlertContent>
-              <AlertTitle>We have your application</AlertTitle>
-              <AlertDescription>
-                We will email the business address you provided when the review is complete.
-              </AlertDescription>
-            </AlertContent>
-          </Alert>
-          <div className="flex flex-wrap gap-3">
-            <Button asChild className="rounded-full px-7">
-              <Link href="/shop">Start shopping</Link>
-            </Button>
-            <Button asChild variant="secondary" className="rounded-full">
-              <Link href="/">Back to home</Link>
-            </Button>
-          </div>
-        </div>
+        <SellerRegisterCompleteStep email={form.getValues('businessEmail')} />
       ) : null}
     </div>
   );

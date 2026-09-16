@@ -1,7 +1,7 @@
-import { Settings2, Shield, Users } from 'lucide-react';
+import { Mail, Settings2, Shield, ShieldCheck, Store, Users } from 'lucide-react';
 import { SellerShopArt } from './seller-shop-art';
 
-const BENEFITS = [
+const ONBOARDING_BENEFITS = [
   {
     icon: Users,
     title: 'Reach More Customers',
@@ -19,29 +19,70 @@ const BENEFITS = [
   },
 ] as const;
 
-export function SellerRegisterAside() {
+const COMPLETE_BENEFITS = [
+  {
+    icon: ShieldCheck,
+    title: 'Fast Verification',
+    note: "We'll review your information within 1-3 business days.",
+  },
+  {
+    icon: Mail,
+    title: 'Email Notification',
+    note: "You'll receive an update via email once approved.",
+  },
+  {
+    icon: Store,
+    title: 'Start Selling',
+    note: 'After approval, you can set up your store and start listing products.',
+  },
+] as const;
+
+export function SellerRegisterAside({
+  variant = 'onboarding',
+}: {
+  variant?: 'onboarding' | 'complete';
+}) {
+  const isComplete = variant === 'complete';
+  const benefits = isComplete ? COMPLETE_BENEFITS : ONBOARDING_BENEFITS;
+
   return (
     <aside className="flex flex-col lg:max-w-[420px] lg:pt-4">
       <p className="text-[13px] font-semibold tracking-wide text-primary">Seller Center</p>
-      <h1 className="mt-3 text-[clamp(1.85rem,3.4vw,2.75rem)] font-extrabold leading-[1.12] tracking-tight text-ink">
-        Start Your Business
-        <br />
-        on NovaCommerce
-      </h1>
-      <p className="mt-4 max-w-[360px] text-[15px] leading-relaxed text-copy">
-        Join thousands of successful sellers and reach millions of customers worldwide. It&apos;s
-        easy, fast and free to get started.
-      </p>
+      {isComplete ? (
+        <>
+          <h1 className="mt-3 text-[clamp(1.85rem,3.4vw,2.75rem)] font-extrabold leading-[1.12] tracking-tight text-ink">
+            Registration
+            <br />
+            Completed!
+          </h1>
+          <p className="mt-4 max-w-[360px] text-[15px] leading-relaxed text-copy">
+            Your store registration has been successfully submitted. We will review your information
+            and get back to you shortly via email or within the Seller Center.
+          </p>
+        </>
+      ) : (
+        <>
+          <h1 className="mt-3 text-[clamp(1.85rem,3.4vw,2.75rem)] font-extrabold leading-[1.12] tracking-tight text-ink">
+            Start Your Business
+            <br />
+            on NovaCommerce
+          </h1>
+          <p className="mt-4 max-w-[360px] text-[15px] leading-relaxed text-copy">
+            Join thousands of successful sellers and reach millions of customers worldwide. It&apos;s
+            easy, fast and free to get started.
+          </p>
+        </>
+      )}
 
       <ul className="mt-8 space-y-4">
-        {BENEFITS.map((benefit) => (
-          <li key={benefit.title} className="flex items-center gap-3.5">
+        {benefits.map((benefit) => (
+          <li key={benefit.title} className="flex items-start gap-3.5">
             <span className="grid size-11 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
               <benefit.icon className="size-5" aria-hidden="true" />
             </span>
             <div className="min-w-0 leading-tight">
               <p className="text-[15px] font-bold text-ink">{benefit.title}</p>
-              <p className="mt-0.5 text-[13px] text-muted-foreground">{benefit.note}</p>
+              <p className="mt-0.5 text-[13px] leading-snug text-muted-foreground">{benefit.note}</p>
             </div>
           </li>
         ))}

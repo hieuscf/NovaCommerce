@@ -234,7 +234,31 @@ describe('SellerRegisterForm terms', () => {
     await user.click(screen.getByLabelText(/terms and conditions and privacy policy/i));
     await user.click(screen.getByRole('button', { name: 'Complete Registration' }));
 
-    expect(await screen.findByRole('heading', { name: 'Application received' })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: 'Your Registration is Complete!' }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Waiting for Approval')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'What happens next?' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Back to Home' })).toHaveAttribute('href', '/');
+    expect(screen.getByRole('link', { name: 'Go to Seller Center' })).toHaveAttribute(
+      'href',
+      '/seller',
+    );
+  });
+});
+
+describe('SellerRegisterForm complete', () => {
+  it('renders the Alloy completion summary', () => {
+    render(<SellerRegisterForm page={getSellerPage()} initialStep="complete" />);
+
+    expect(
+      screen.getByRole('heading', { name: 'Your Registration is Complete!' }),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/youremail@example.com/i)).toBeInTheDocument();
+    expect(screen.getByText('Review Information')).toBeInTheDocument();
+    expect(screen.getByText('Account Approval')).toBeInTheDocument();
+    expect(screen.getByText('Set Up Store')).toBeInTheDocument();
+    expect(screen.getByText('Start Selling')).toBeInTheDocument();
   });
 });
 
