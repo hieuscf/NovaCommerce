@@ -7,5 +7,6 @@ export type {
   SearchIndexDocumentInput,
   SearchQueryInput,
   SearchResult,
+  SearchSortClause,
   SearchUpdateDocumentInput,
 } from './search-client';

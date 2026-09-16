@@ -24,10 +24,39 @@ describe('validateAppConfig', () => {
     expect(config.database.url).toContain('postgres:5432');
     expect(config.redis.url).toContain('redis:6379');
     expect(config.opensearch.url).toBe('http://opensearch:9200');
+    expect(config.opensearch.productIndex).toBeUndefined();
+    expect(config.search.cacheEnabled).toBe(true);
+    expect(config.search.cacheTtlSeconds).toBe(60);
     expect(config.minio.endpoint).toBe('minio');
     expect(config.minio.port).toBe(9000);
     expect(config.minio.bucket).toBe('novacommerce');
     expect(config.minio.useSsl).toBe(false);
+  });
+
+  it('reads optional OpenSearch product index name', () => {
+    const config = validateAppConfig({
+      ...BASE_ENV,
+      OPENSEARCH_PRODUCT_INDEX: 'novacommerce-products',
+    });
+
+    expect(config.opensearch.productIndex).toBe('novacommerce-products');
+  });
+
+  it('reads optional Search cache settings', () => {
+    const config = validateAppConfig({
+      ...BASE_ENV,
+      SEARCH_CACHE_ENABLED: 'false',
+      SEARCH_CACHE_TTL_SECONDS: '30',
+    });
+
+    expect(config.search.cacheEnabled).toBe(false);
+    expect(config.search.cacheTtlSeconds).toBe(30);
+  });
+
+  it('throws for invalid Search cache TTL', () => {
+    expect(() => validateAppConfig({ ...BASE_ENV, SEARCH_CACHE_TTL_SECONDS: '0' })).toThrow(
+      'Invalid environment variable: SEARCH_CACHE_TTL_SECONDS',
+    );
   });
 
   it('throws when required variable is missing', () => {

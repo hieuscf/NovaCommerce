@@ -13,6 +13,11 @@ export interface AppConfig {
     readonly url: string;
     readonly username?: string;
     readonly password?: string;
+    readonly productIndex?: string;
+  };
+  readonly search: {
+    readonly cacheEnabled: boolean;
+    readonly cacheTtlSeconds: number;
   };
   readonly minio: {
     readonly endpoint: string;
@@ -60,8 +65,8 @@ function parsePort(value: string, key: string): number {
   return port;
 }
 
-function parseBoolean(value: string | undefined, defaultValue: boolean): boolean {
-  if (value === undefined) {
+function parseBooleanFlag(value: string | undefined, key: string, defaultValue: boolean): boolean {
+  if (value === undefined || value.trim() === '') {
     return defaultValue;
   }
 
@@ -75,7 +80,20 @@ function parseBoolean(value: string | undefined, defaultValue: boolean): boolean
     return false;
   }
 
-  throw new ConfigurationError('Invalid environment variable: MINIO_USE_SSL');
+  throw new ConfigurationError(`Invalid environment variable: ${key}`);
+}
+
+function parsePositiveInteger(value: string | undefined, key: string, defaultValue: number): number {
+  if (value === undefined || value.trim() === '') {
+    return defaultValue;
+  }
+
+  const parsed = Number(value);
+  if (!Number.isInteger(parsed) || parsed < 1) {
+    throw new ConfigurationError(`Invalid environment variable: ${key}`);
+  }
+
+  return parsed;
 }
 
 function parseUrl(value: string, key: string): URL {
@@ -164,6 +182,15 @@ export function validateAppConfig(env: NodeJS.ProcessEnv = process.env): AppConf
       url: opensearchUrl,
       username: readOptionalString(env, 'OPENSEARCH_USERNAME'),
       password: readOptionalString(env, 'OPENSEARCH_PASSWORD'),
+      productIndex: readOptionalString(env, 'OPENSEARCH_PRODUCT_INDEX'),
+    },
+    search: {
+      cacheEnabled: parseBooleanFlag(readOptionalString(env, 'SEARCH_CACHE_ENABLED'), 'SEARCH_CACHE_ENABLED', true),
+      cacheTtlSeconds: parsePositiveInteger(
+        readOptionalString(env, 'SEARCH_CACHE_TTL_SECONDS'),
+        'SEARCH_CACHE_TTL_SECONDS',
+        60,
+      ),
     },
     minio: {
       endpoint: minioEndpoint.endpoint,
@@ -171,7 +198,7 @@ export function validateAppConfig(env: NodeJS.ProcessEnv = process.env): AppConf
       accessKey: readRequiredString(env, 'MINIO_ACCESS_KEY'),
       secretKey: readRequiredString(env, 'MINIO_SECRET_KEY'),
       bucket: readOptionalString(env, 'MINIO_BUCKET') ?? 'novacommerce',
-      useSsl: parseBoolean(readOptionalString(env, 'MINIO_USE_SSL'), false),
+      useSsl: parseBooleanFlag(readOptionalString(env, 'MINIO_USE_SSL'), 'MINIO_USE_SSL', false),
     },
   };
 }

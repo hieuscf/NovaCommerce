@@ -18,6 +18,8 @@ export type {
   StockReservedV1Payload,
   PaymentSucceededV1,
   PaymentSucceededV1Payload,
+  ProductCreatedV1,
+  ProductCreatedV1Payload,
   ProductUpdatedV1,
   ProductUpdatedV1Payload,
   CartItemAddedV1,
@@ -67,6 +69,7 @@ export type {
   SearchIndexDocumentInput,
   SearchQueryInput,
   SearchResult,
+  SearchSortClause,
   SearchUpdateDocumentInput,
 } from './search';
 export type {

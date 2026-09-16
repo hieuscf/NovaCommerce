@@ -13,6 +13,7 @@ const mockClient = {
   indices: {
     create: vi.fn(async () => ({ body: {} })),
     delete: vi.fn(async () => ({ body: {} })),
+    exists: vi.fn(async () => ({ body: true, statusCode: 200 })),
   },
   index: vi.fn(async () => ({ body: {} })),
   update: vi.fn(async () => ({ body: {} })),
@@ -51,7 +52,12 @@ describe('OpenSearchClientService', () => {
   it('indexes, updates, deletes, and searches documents', async () => {
     const service = new OpenSearchClientService({ url: 'http://localhost:9200' });
 
-    await service.createIndex('products');
+    await service.createIndex(
+      'products',
+      { properties: { name: { type: 'text' } } },
+      { analysis: { normalizer: { lowercase_normalizer: { type: 'custom', filter: ['lowercase'] } } } },
+    );
+    await expect(service.indexExists('products')).resolves.toBe(true);
     await service.indexDocument({ index: 'products', id: '1', document: { name: 'A' } });
     await service.updateDocument({ index: 'products', id: '1', document: { name: 'B' } });
     await service.deleteDocument({ index: 'products', id: '1' });
@@ -59,8 +65,32 @@ describe('OpenSearchClientService', () => {
     const result = await service.search({
       index: 'products',
       query: { match_all: {} },
+      sort: [{ price: { order: 'asc' } }, { id: { order: 'asc' } }],
+      from: 0,
+      size: 20,
     });
 
+    expect(mockClient.search).toHaveBeenCalledWith({
+      index: 'products',
+      from: 0,
+      size: 20,
+      body: {
+        query: { match_all: {} },
+        sort: [{ price: { order: 'asc' } }, { id: { order: 'asc' } }],
+      },
+    });
+
+    expect(mockClient.indices.create).toHaveBeenCalledWith({
+      index: 'products',
+      body: {
+        settings: {
+          analysis: {
+            normalizer: { lowercase_normalizer: { type: 'custom', filter: ['lowercase'] } },
+          },
+        },
+        mappings: { properties: { name: { type: 'text' } } },
+      },
+    });
     expect(result.total).toBe(1);
     expect(result.hits[0]?.source.name).toBe('Product');
   });

@@ -72,11 +72,41 @@ export class OpenSearchClientService implements ISearchClient {
     }
   }
 
-  async createIndex(index: string, mappings?: Record<string, unknown>): Promise<void> {
+  async indexExists(index: string): Promise<boolean> {
     try {
+      const response = await this.client.indices.exists({ index });
+
+      if (typeof response.body === 'boolean') {
+        return response.body;
+      }
+
+      return response.statusCode === 200;
+    } catch (error) {
+      if (this.isNotFound(error)) {
+        return false;
+      }
+
+      throw this.wrapOperationError('OpenSearch index exists check failed', error);
+    }
+  }
+
+  async createIndex(
+    index: string,
+    mappings?: Record<string, unknown>,
+    settings?: Record<string, unknown>,
+  ): Promise<void> {
+    try {
+      const body =
+        mappings || settings
+          ? {
+              ...(settings ? { settings } : {}),
+              ...(mappings ? { mappings } : {}),
+            }
+          : undefined;
+
       await this.client.indices.create({
         index,
-        body: mappings ? { mappings } : undefined,
+        body,
       });
     } catch (error) {
       throw this.wrapOperationError('OpenSearch create index failed', error);
@@ -139,6 +169,7 @@ export class OpenSearchClientService implements ISearchClient {
         size: input.size,
         body: {
           query: input.query,
+          ...(input.sort && input.sort.length > 0 ? { sort: [...input.sort] } : {}),
         },
       });
 
@@ -175,6 +206,20 @@ export class OpenSearchClientService implements ISearchClient {
     }
 
     return 'unknown';
+  }
+
+  private isNotFound(error: unknown): boolean {
+    if (typeof error !== 'object' || error === null) {
+      return false;
+    }
+
+    const statusCode = (error as { statusCode?: unknown }).statusCode;
+    if (statusCode === 404) {
+      return true;
+    }
+
+    const meta = (error as { meta?: { statusCode?: unknown } }).meta;
+    return meta?.statusCode === 404;
   }
 
   private wrapOperationError(message: string, error: unknown): InfrastructureError {

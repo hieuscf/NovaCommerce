@@ -22,11 +22,14 @@ export interface SearchDeleteDocumentInput {
   readonly id: string;
 }
 
+export type SearchSortClause = string | Record<string, unknown>;
+
 export interface SearchQueryInput {
   readonly index: string;
   readonly query: Record<string, unknown>;
   readonly from?: number;
   readonly size?: number;
+  readonly sort?: readonly SearchSortClause[];
 }
 
 export interface SearchHit {
@@ -42,7 +45,12 @@ export interface SearchResult {
 
 export interface ISearchClient {
   health(): Promise<SearchHealthResult>;
-  createIndex(index: string, mappings?: Record<string, unknown>): Promise<void>;
+  indexExists(index: string): Promise<boolean>;
+  createIndex(
+    index: string,
+    mappings?: Record<string, unknown>,
+    settings?: Record<string, unknown>,
+  ): Promise<void>;
   deleteIndex(index: string): Promise<void>;
   indexDocument(input: SearchIndexDocumentInput): Promise<void>;
   updateDocument(input: SearchUpdateDocumentInput): Promise<void>;
