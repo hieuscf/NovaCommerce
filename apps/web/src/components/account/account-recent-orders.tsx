@@ -8,8 +8,7 @@ import { AccountCard } from './account-card';
 import { AccountSectionHeading } from './account-section-heading';
 
 /**
- * Orders list on `/account` stays a gateway until the web Order adapter is wired.
- * Deep browsing happens on `/orders`.
+ * Overview rail points shoppers to `/orders`, which loads live Gateway history.
  */
 export function AccountRecentOrders() {
   return (
@@ -21,7 +20,7 @@ export function AccountRecentOrders() {
         <EmptyState
           icon={<Package className="size-6" />}
           title="Orders live on My Orders"
-          description="Open the orders page to track purchases. Live order history will appear here when the Order API is connected on the storefront."
+          description="Open My Orders to track purchases from your live order history."
           action={
             <Button asChild variant="secondary">
               <Link href="/orders">Go to orders</Link>

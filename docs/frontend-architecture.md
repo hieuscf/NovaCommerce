@@ -123,7 +123,7 @@ apps/web/src/
 │   ├── catalog/         listing + PDP fixture selection until Catalog Gateway exists
 │   ├── cart/            cart page fixture selection until Cart Gateway exists
 │   ├── checkout/        checkout page fixture selection until Checkout Gateway exists
-│   ├── orders/          order list/detail/confirmation fixtures until Order Gateway exists
+│   ├── orders/          order list via Gateway `orderClient`; detail/confirmation fixtures until detail adapter exists
 │   ├── user/            User Gateway adapter (`userClient`) for account profile/addresses/preferences
 │   ├── view-models/     UI contracts (no backend entities)
 │   ├── mock-data/       presentation fixtures until Gateway adapters exist
@@ -174,7 +174,7 @@ Both apps use the **Next.js 15 App Router**.
 | `/products/[slug]` | `(store)` | Product detail. Gallery, variants, reviews, and related products use presentation fixtures until the Catalog Gateway is wired. |
 | `/cart` | `(store)` | Shopping cart. Line items, quantity, remove, summary, and recommendations use presentation fixtures until `GET /api/v1/users/me/cart` is wired. Checkout and PayPal buttons navigate to `/checkout` and do not invent Payment APIs. |
 | `/checkout` | `(store)` | Protected Alloy checkout (customer + shipping, then Payment Gateway, then review). Presentation fixtures until Cart / User / Checkout Gateway adapters are wired. Payment tiles are presentation methods (`card`, `paypal`, `qr_pay`, `google_pay`) and map to Gateway `paymentProvider` (`vnpay`, `paypal`, `momo`) when checkout is wired. Card/OTP fields stay in the browser and are never posted. Place order navigates to `/orders/confirmed` as a preview success state — it does not call `POST /users/me/checkout`. |
-| `/orders` | `(store)` | Protected customer order list (account sidebar + status filters + pagination). Query: `status` (`all` default, plus `processing`, `shipped`, `delivered`, `cancelled`), `page`. Presentation fixtures until Order Gateway adapters are wired. `/account?section=orders` redirects here. |
+| `/orders` | `(store)` | Protected customer order list (account sidebar + status filters + pagination). Query: `status` (`all` default, plus `processing`, `shipped`, `delivered`, `cancelled`), `page`. Loads live history from Gateway `GET /users/me/orders` via `orderClient` (client-side after session restore). Alloy filters map to domain statuses (`processing`→`pending`, `shipped`→`confirmed`, `delivered`→`completed`, `cancelled`→`cancelled`). `/account?section=orders` uses the same container. |
 | `/orders/confirmed` | `(store)` | Protected Alloy order confirmation. Shown after checkout preview; does not invent Payment or Order APIs. |
 | `/orders/[orderNumber]` | `(store)` | Protected order detail (timeline, items, shipping, payment, totals). Unknown numbers use `not-found`. |
 | `/login` `/register` `/forgot-password` `/reset-password` `/verify-email` | `(auth)` | Authentication |

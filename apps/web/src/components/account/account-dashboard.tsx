@@ -5,9 +5,8 @@ import { ChevronRight } from 'lucide-react';
 import { Button } from '@novacommerce/ui/components/button';
 import { Container } from '@novacommerce/ui/components/container';
 import { ErrorState } from '@novacommerce/ui/components/error-state';
-import { OrderListPage } from '@/components/commerce/orders/order-list-page';
+import { OrderListContainer } from '@/components/commerce/orders/order-list-container';
 import { AccountProvider, useAccount } from '@/features/account/account-context';
-import { getOrderListPage } from '@/lib/orders/get-order-list';
 import { ACCOUNT_SECTION_LABELS, type AccountSection } from '@/lib/view-models/account';
 import {
   AccountAddresses,
@@ -133,8 +132,7 @@ function AccountDashboardBody({ section }: { section: AccountSection }) {
 
 export function AccountDashboard({ section }: { section: AccountSection }) {
   if (section === 'orders') {
-    const query = { status: 'all' as const, page: 1 };
-    return <OrderListPage list={getOrderListPage(query)} query={query} />;
+    return <OrderListContainer query={{ status: 'all', page: 1 }} />;
   }
 
   return (

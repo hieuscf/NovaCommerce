@@ -7,18 +7,13 @@ import {
   normalizeOrderNumber,
   type OrderDetailViewModel,
   type OrderItemViewModel,
-  type OrderListItemViewModel,
   type OrderListPageViewModel,
   type OrderSummaryViewModel,
 } from '@/lib/view-models/order';
 import type { ProductViewModel } from '@/lib/view-models/product';
 import type { OrdersQuery } from '@/lib/url/orders-query';
-
-const LIST_CRUMBS = [
-  { href: '/', label: 'Home' },
-  { href: '/account', label: 'My Account' },
-  { href: '/orders', label: 'My Orders', current: true },
-] as const;
+import { orderClient } from './client';
+import { mapOrderListToPageViewModel, toApiOrderStatus } from './mappers';
 
 function productsById(): Map<string, ProductViewModel> {
   return new Map(catalogProducts.map((product) => [product.id, product]));
@@ -81,48 +76,17 @@ function summarize(fixture: OrderFixture, items: readonly OrderItemViewModel[]):
   };
 }
 
-function toListItem(fixture: OrderFixture): OrderListItemViewModel | undefined {
-  const items = resolveItems(fixture);
-  if (items.length === 0) {
-    return undefined;
-  }
-
-  const summary = summarize(fixture, items);
-  return {
-    orderNumber: fixture.orderNumber,
-    placedAtLabel: fixture.placedAtLabel.split('•')[0]?.trim() ?? fixture.placedAtLabel,
-    itemCount: summary.itemCount,
-    total: summary.total,
-    currency: summary.currency,
-    status: fixture.status,
-    thumbnails: items.map((item) => ({ src: item.imageUrl, alt: item.name })),
-  };
-}
-
 /**
- * Presentation lookup for the customer order list. Replace with an Order
- * Gateway adapter later. Missing catalog products are skipped. Unexpected
- * failures must throw so `orders/error.tsx` can render the order error state.
+ * Loads the customer order list from Gateway `GET /users/me/orders`.
+ * Unexpected failures must throw so the orders error UI can recover.
  */
-export function getOrderListPage(query: OrdersQuery): OrderListPageViewModel {
-  const items = orderFixtures.flatMap((fixture) => {
-    const item = toListItem(fixture);
-    return item ? [item] : [];
+export async function getOrderListPage(query: OrdersQuery): Promise<OrderListPageViewModel> {
+  const dto = await orderClient.getOrderHistory({
+    page: query.page,
+    pageSize: ORDER_PAGE_SIZE,
+    status: toApiOrderStatus(query.status),
   });
-  const filtered =
-    query.status === 'all' ? items : items.filter((item) => item.status === query.status);
-  const totalPages = Math.max(1, Math.ceil(filtered.length / ORDER_PAGE_SIZE) || 1);
-  const page = Math.min(query.page, totalPages);
-  const start = (page - 1) * ORDER_PAGE_SIZE;
-
-  return {
-    crumbs: LIST_CRUMBS,
-    status: query.status,
-    page,
-    totalPages: filtered.length === 0 ? 1 : totalPages,
-    total: filtered.length,
-    items: filtered.slice(start, start + ORDER_PAGE_SIZE),
-  };
+  return mapOrderListToPageViewModel(dto, query);
 }
 
 export function getOrderFixture(orderNumber: string): OrderFixture | undefined {

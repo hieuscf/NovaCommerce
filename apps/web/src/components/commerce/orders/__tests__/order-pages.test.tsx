@@ -5,18 +5,46 @@ import { OrderDetailPage } from '../order-detail-page';
 import { OrderConfirmedPage } from '../order-confirmed-page';
 import { OrderErrorState, OrderLoadingState } from '../order-states';
 import { Button } from '@novacommerce/ui/components/button';
-import { getOrderListPage } from '@/lib/orders/get-order-list';
 import { getOrderDetail } from '@/lib/orders/get-order-detail';
 import { getOrderConfirmed } from '@/lib/orders/get-order-confirmed';
+import type { OrderListPageViewModel } from '@/lib/view-models/order';
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
 }));
 
+const sampleList: OrderListPageViewModel = {
+  crumbs: [
+    { href: '/', label: 'Home' },
+    { href: '/account', label: 'My Account' },
+    { href: '/orders', label: 'My Orders', current: true },
+  ],
+  status: 'all',
+  page: 1,
+  totalPages: 2,
+  total: 6,
+  items: [
+    {
+      orderNumber: 'NC2026001',
+      placedAtLabel: 'Sep 12, 2026',
+      itemCount: 3,
+      total: 1843.56,
+      currency: 'USD',
+      status: 'shipped',
+      thumbnails: [
+        {
+          src: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=200&h=200&fit=crop',
+          alt: 'MacBook Air M2 13"',
+        },
+      ],
+    },
+  ],
+};
+
 describe('OrderListPage', () => {
-  it('renders the Alloy order list from fixtures', () => {
+  it('renders the Alloy order list from the list view-model', () => {
     const query = { status: 'all' as const, page: 1 };
-    render(<OrderListPage list={getOrderListPage(query)} query={query} />);
+    render(<OrderListPage list={sampleList} query={query} />);
 
     expect(screen.getByRole('heading', { name: 'My Orders' })).toBeInTheDocument();
     expect(screen.getByText('#NC2026001')).toBeInTheDocument();

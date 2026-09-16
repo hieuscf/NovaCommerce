@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
-import { OrderListPage } from '@/components/commerce/orders/order-list-page';
-import { getOrderListPage } from '@/lib/orders/get-order-list';
+import { OrderListContainer } from '@/components/commerce/orders/order-list-container';
 import { parseOrdersQuery } from '@/lib/url/orders-query';
 
 export const metadata: Metadata = {
@@ -15,7 +14,6 @@ interface OrdersPageProps {
 
 export default async function OrdersPage({ searchParams }: OrdersPageProps) {
   const query = parseOrdersQuery(await searchParams);
-  const list = getOrderListPage(query);
 
-  return <OrderListPage list={list} query={query} />;
+  return <OrderListContainer query={query} />;
 }
