@@ -200,7 +200,8 @@ Reserved (do not create empty pages): `/categories`, `/search`, `/account/*`. Ac
 | Route | Group | Purpose |
 |-------|-------|---------|
 | `/` | `(console)` | Alloy operations dashboard — KPI cards, sales/order charts, recent orders, top products, category mix, quick actions. Presentation fixtures until reporting Gateway adapters exist. |
-| `/products` | `(console)` | Alloy Product Management — KPI cards, search/category/brand/status filters (`q`, `category`, `brand`, `status`, `page` in URL), products table, pagination. Presentation fixtures until a Catalog admin Gateway adapter exists. |
+| `/products` | `(console)` | Alloy Product Management — KPI cards, search/category/brand/status filters (`q`, `category`, `brand`, `status`, `page` in URL), products table with eye action → detail, pagination. Presentation fixtures until a Catalog admin Gateway adapter exists. |
+| `/products/[id]` | `(console)` | Alloy product detail — view/edit catalog fields, change status, lock product (esp. on policy violation), report history, related products. Unknown ids use `not-found`. Fixtures only. |
 | `/accounts` | `(console)` | Alloy Account Management — KPI cards, search/role/status filters (`q`, `role`, `status`, `page` in URL), accounts table, pagination. Presentation fixtures until an admin-users Gateway adapter exists. |
 | `/sellers` | `(console)` | Alloy Seller Management — five KPI cards, search/status/verification/sort filters (`q`, `status`, `verified`, `sort`, `page` in URL), sellers table, pagination. Presentation fixtures until Seller Gateway exists (Seller module deferred). |
 | `/sellers/approvals` | `(console)` | Alloy Seller Verification & Approval list — pending KPIs, filters, applications table. Click seller / View opens the review page. |

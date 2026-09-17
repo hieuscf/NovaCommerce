@@ -117,7 +117,10 @@ function isChildActive(
   }
 
   if (pathOnly === '/products') {
-    return pathname === '/products';
+    if (pathname === '/products') return true;
+    const segment = pathname.split('/')[2];
+    const reserved = new Set(['categories', 'brands', 'attributes', 'reviews']);
+    return Boolean(segment) && !reserved.has(segment);
   }
 
   return pathname === pathOnly || pathname.startsWith(`${pathOnly}/`);

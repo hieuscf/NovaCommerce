@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { CheckCircle2, MoreHorizontal, XCircle } from 'lucide-react';
+import Link from 'next/link';
+import { CheckCircle2, Eye, MoreHorizontal, ShieldAlert, XCircle } from 'lucide-react';
 import { Badge } from '@novacommerce/ui/components/badge';
 import { Button } from '@novacommerce/ui/components/button';
 import { Checkbox } from '@novacommerce/ui/components/checkbox';
@@ -25,6 +26,13 @@ function StatusBadge({ status }: { status: ProductStatus }) {
     return (
       <Badge variant="success" className="gap-1 rounded-full">
         <CheckCircle2 className="size-3" aria-hidden="true" />
+        {productStatusLabel[status]}
+      </Badge>
+    );
+  }
+  if (status === 'draft') {
+    return (
+      <Badge variant="secondary" className="rounded-full">
         {productStatusLabel[status]}
       </Badge>
     );
@@ -91,7 +99,7 @@ export function ProductsTable({ products }: { products: AdminProduct[] }) {
           <TableHead>Stock</TableHead>
           <TableHead>Status</TableHead>
           <TableHead>Created At</TableHead>
-          <TableHead className="w-14 text-right">Actions</TableHead>
+          <TableHead className="w-24 text-right">Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -109,11 +117,16 @@ export function ProductsTable({ products }: { products: AdminProduct[] }) {
               <TableCell>
                 <div className="flex min-w-0 items-center gap-3">
                   <span
-                    className="flex size-10 shrink-0 items-center justify-center rounded-xl text-xs font-bold text-white shadow-sm"
+                    className="relative flex size-10 shrink-0 items-center justify-center rounded-xl text-xs font-bold text-white shadow-sm"
                     style={{ backgroundColor: product.accent }}
                     aria-hidden="true"
                   >
                     {product.initials}
+                    {product.hasViolation ? (
+                      <span className="absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full bg-destructive text-white">
+                        <ShieldAlert className="size-2.5" />
+                      </span>
+                    ) : null}
                   </span>
                   <div className="min-w-0">
                     <p className="truncate text-sm font-semibold text-foreground">
@@ -147,14 +160,24 @@ export function ProductsTable({ products }: { products: AdminProduct[] }) {
                 {product.createdAt}
               </TableCell>
               <TableCell className="text-right">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon-sm"
-                  aria-label={`Actions for ${product.name}`}
-                >
-                  <MoreHorizontal className="size-4" />
-                </Button>
+                <div className="inline-flex items-center justify-end gap-0.5">
+                  <Button asChild type="button" variant="ghost" size="icon-sm">
+                    <Link
+                      href={`/products/${product.id}`}
+                      aria-label={`View details for ${product.name}`}
+                    >
+                      <Eye className="size-4" />
+                    </Link>
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-sm"
+                    aria-label={`More actions for ${product.name}`}
+                  >
+                    <MoreHorizontal className="size-4" />
+                  </Button>
+                </div>
               </TableCell>
             </TableRow>
           );
