@@ -140,15 +140,22 @@ apps/web/src/
 ```text
 apps/admin/src/
 ├── app/
-│   ├── (console)/       dashboard + admin shell
+│   ├── (console)/       dashboard, accounts, sellers + admin shell
 │   ├── error.tsx
 │   ├── global-error.tsx
 │   └── not-found.tsx
-├── components/layout/
+├── components/
+│   ├── accounts/        Account Management (KPI, filters, table, pagination)
+│   ├── sellers/         Seller Management + Verification & Approval drawer
+│   ├── dashboard/       Alloy dashboard widgets (KPI, charts, tables, actions)
+│   ├── layout/          AdminShell, sidebar, topbar
+│   └── providers/
 ├── features/auth/
 └── lib/
     ├── api/
     ├── auth/
+    ├── mock-data/       presentation fixtures until reporting Gateway adapters exist
+    ├── url/             shareable query parsers (accounts/sellers/approvals)
     └── env.ts
 ```
 
@@ -191,9 +198,15 @@ Reserved (do not create empty pages): `/categories`, `/search`, `/account/*`. Ac
 
 | Route | Group | Purpose |
 |-------|-------|---------|
-| `/` | `(console)` | Dashboard |
+| `/` | `(console)` | Alloy operations dashboard — KPI cards, sales/order charts, recent orders, top products, category mix, quick actions. Presentation fixtures until reporting Gateway adapters exist. |
+| `/accounts` | `(console)` | Alloy Account Management — KPI cards, search/role/status filters (`q`, `role`, `status`, `page` in URL), accounts table, pagination. Presentation fixtures until an admin-users Gateway adapter exists. |
+| `/sellers` | `(console)` | Alloy Seller Management — five KPI cards, search/status/verification/sort filters (`q`, `status`, `verified`, `sort`, `page` in URL), sellers table, pagination. Presentation fixtures until Seller Gateway exists (Seller module deferred). |
+| `/sellers/approvals` | `(console)` | Alloy Seller Verification & Approval list — pending KPIs, filters, applications table. Click seller / View opens the review page. |
+| `/sellers/approvals/[id]` | `(console)` | Full seller application review — all web onboarding sections (business, shop, verification docs, terms), activity timeline, admin checklist (required before Approve), notes, Approve / Reject. Fixtures only. |
 
-Reserved: `/catalog`, `/inventory`, `/orders`, `/customers`, `/promotions`, `/settings`, `/login`.
+Reserved (nav targets; do not create empty pages): `/products`, `/catalog`, `/inventory`, `/orders`, `/accounts/roles`, `/promotions`, `/analytics`, `/content`, `/settings`, `/login`.
+
+URL filter examples: `/accounts?role=customer`, `/accounts?status=blocked&page=2`, `/accounts?q=sarah`, `/sellers?status=pending`, `/sellers?verified=unverified&sort=sales_desc`, `/sellers/approvals?id=app_001`
 
 ### URL state
 

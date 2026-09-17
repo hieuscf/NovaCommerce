@@ -35,31 +35,44 @@ export function NovaCommerceLogo({
       aria-label={withWordmark ? undefined : 'NovaCommerce logo'}
     >
       <span
-        className="relative grid shrink-0 place-items-center rounded-[9px] font-bold text-white"
+        className="shrink-0 rounded-[9px] font-bold text-white"
         style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
           width: size,
           height: size,
           background: MARK_BACKGROUND,
           boxShadow: MARK_SHADOW,
-          fontSize: size * 0.6,
+          fontSize: Math.round(size * 0.55),
           lineHeight: 1,
+          letterSpacing: '-0.02em',
         }}
         aria-hidden="true"
       >
         N
       </span>
       {withWordmark ? (
-        <span className="leading-tight">
+        <span className="flex min-w-0 flex-col justify-center leading-tight">
           <span
             className={cn(
-              'block text-[17px] font-bold tracking-tight',
+              'text-[17px] font-bold tracking-tight',
               tone === 'inverse' ? 'text-white' : 'text-foreground',
               wordmarkClassName,
             )}
           >
             NovaCommerce
           </span>
-          {subLabel ? <span className="block text-[11px] text-slate-500">{subLabel}</span> : null}
+          {subLabel ? (
+            <span
+              className={cn(
+                'text-[11px] font-medium',
+                tone === 'inverse' ? 'text-white/60' : 'text-slate-500',
+              )}
+            >
+              {subLabel}
+            </span>
+          ) : null}
         </span>
       ) : null}
     </span>
