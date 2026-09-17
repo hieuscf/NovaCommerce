@@ -35,7 +35,19 @@ export interface AdminNavItem {
 
 export const adminNavItems: AdminNavItem[] = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/products', label: 'Products', icon: Package, expandable: true },
+  {
+    href: '/products',
+    label: 'Products',
+    icon: Package,
+    expandable: true,
+    children: [
+      { href: '/products', label: 'All Products' },
+      { href: '/products/categories', label: 'Categories' },
+      { href: '/products/brands', label: 'Brands' },
+      { href: '/products/attributes', label: 'Attributes' },
+      { href: '/products/reviews', label: 'Reviews' },
+    ],
+  },
   { href: '/orders', label: 'Orders', icon: ShoppingCart, expandable: true },
   {
     href: '/accounts',
@@ -102,6 +114,10 @@ function isChildActive(
       !searchParams.get('status') &&
       !pathname.startsWith('/sellers/')
     );
+  }
+
+  if (pathOnly === '/products') {
+    return pathname === '/products';
   }
 
   return pathname === pathOnly || pathname.startsWith(`${pathOnly}/`);
