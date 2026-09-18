@@ -178,7 +178,7 @@ export const sellerFeatureCards: SellerFeatureCard[] = [
 export interface SellerNavChild {
   href: string;
   label: string;
-  section?: 'home' | 'products';
+  section?: 'home' | 'products' | 'orders';
 }
 
 export interface SellerNavItem {
@@ -186,7 +186,7 @@ export interface SellerNavItem {
   label: string;
   icon: 'home' | 'products' | 'orders' | 'customers' | 'promotions' | 'finance' | 'reports' | 'settings';
   expandable?: boolean;
-  section?: 'home' | 'products';
+  section?: 'home' | 'products' | 'orders';
   children?: readonly SellerNavChild[];
 }
 
@@ -224,10 +224,38 @@ export const sellerNavItems: readonly SellerNavItem[] = [
     ],
   },
   {
-    href: '/seller?demo=registered#orders',
+    href: '/seller?demo=registered&section=orders',
     label: 'Đơn hàng',
     icon: 'orders',
     expandable: true,
+    section: 'orders',
+    children: [
+      {
+        href: '/seller?demo=registered&section=orders',
+        label: 'Tất cả đơn hàng',
+        section: 'orders',
+      },
+      {
+        href: '/seller?demo=registered&section=orders&tab=pending_confirm',
+        label: 'Đơn chờ xử lý',
+        section: 'orders',
+      },
+      {
+        href: '/seller?demo=registered&section=orders&tab=delivered',
+        label: 'Đơn đã giao',
+        section: 'orders',
+      },
+      {
+        href: '/seller?demo=registered&section=orders&tab=cancelled',
+        label: 'Đơn hủy / Thất bại',
+        section: 'orders',
+      },
+      {
+        href: '/seller?demo=registered&section=orders&tab=return_refund',
+        label: 'Đơn trả hàng / Hoàn tiền',
+        section: 'orders',
+      },
+    ],
   },
   {
     href: '/seller?demo=registered#customers',

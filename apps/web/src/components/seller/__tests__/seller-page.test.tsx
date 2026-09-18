@@ -103,6 +103,24 @@ describe('SellerPage', () => {
     expect(screen.getAllByRole('link', { name: /Thêm sản phẩm mới/i }).length).toBeGreaterThan(0);
     expect(screen.queryByRole('heading', { name: /Xin chào, HappyShop/i })).not.toBeInTheDocument();
   });
+
+  it('renders the registered orders management section', () => {
+    render(
+      <SellerPage
+        page={getSellerPage('registered')}
+        section="orders"
+        ordersQuery={{ tab: 'all', status: 'all', range: 'all', page: 1 }}
+      />,
+    );
+
+    expect(screen.getByRole('heading', { name: 'Đơn hàng' })).toBeInTheDocument();
+    expect(screen.getByText('Tổng đơn hàng')).toBeInTheDocument();
+    expect(screen.getAllByText('Chờ xác nhận').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('#NC152636').length).toBeGreaterThan(0);
+    expect(screen.getByText('Chi tiết đơn hàng')).toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: /Xác nhận đơn/i }).length).toBeGreaterThan(0);
+    expect(screen.queryByRole('heading', { name: /Xin chào, HappyShop/i })).not.toBeInTheDocument();
+  });
 });
 
 describe('SellerRegisterForm shop details', () => {

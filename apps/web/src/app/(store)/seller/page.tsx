@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { SellerPage } from '@/components/seller/seller-page';
 import { getSellerPage, getSellerPageStatus } from '@/lib/seller/get-seller-page';
 import {
+  parseSellerOrdersQuery,
   parseSellerProductsQuery,
   parseSellerWorkspaceSection,
 } from '@/lib/url/seller-workspace-query';
@@ -21,7 +22,13 @@ export default async function SellerRoutePage({ searchParams }: SellerRouteProps
   const status = getSellerPageStatus(params);
   const section = parseSellerWorkspaceSection(params);
   const productsQuery = parseSellerProductsQuery(params);
+  const ordersQuery = parseSellerOrdersQuery(params);
   return (
-    <SellerPage page={getSellerPage(status)} section={section} productsQuery={productsQuery} />
+    <SellerPage
+      page={getSellerPage(status)}
+      section={section}
+      productsQuery={productsQuery}
+      ordersQuery={ordersQuery}
+    />
   );
 }

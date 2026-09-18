@@ -24,9 +24,11 @@ export function SellerDashboardTopbar({
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const searchPlaceholder =
-    section === 'products'
-      ? 'Tìm kiếm sản phẩm, đơn hàng, khách hàng...'
-      : 'Tìm kiếm đơn hàng, sản phẩm, khách hàng...';
+    section === 'orders'
+      ? 'Tìm kiếm đơn hàng, khách hàng, mã vận đơn...'
+      : section === 'products'
+        ? 'Tìm kiếm sản phẩm, đơn hàng, khách hàng...'
+        : 'Tìm kiếm đơn hàng, sản phẩm, khách hàng...';
 
   return (
     <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-3 border-b border-border/80 bg-white/95 px-4 backdrop-blur-md lg:px-6">

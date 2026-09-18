@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import {
   BarChart3,
@@ -40,7 +41,17 @@ export function SellerDashboardSidebar({
   section?: SellerWorkspaceSection;
   onNavigate?: () => void;
 }) {
+  const searchParams = useSearchParams();
+  const currentTab = searchParams.get('tab');
   const [openProducts, setOpenProducts] = useState(section === 'products');
+  const [openOrders, setOpenOrders] = useState(section === 'orders');
+
+  function isChildActive(href: string, childSection?: SellerWorkspaceSection) {
+    if (childSection !== section || href.includes('#')) return false;
+    const tabInHref = new URL(href, 'https://novacommerce.local').searchParams.get('tab');
+    if (!tabInHref) return !currentTab;
+    return currentTab === tabInHref;
+  }
 
   return (
     <aside className="flex h-full w-[260px] shrink-0 flex-col border-r border-border/80 bg-white">
@@ -48,7 +59,12 @@ export function SellerDashboardSidebar({
         {sellerNavItems.map((item) => {
           const Icon = navIcons[item.icon];
           const active = item.section === section;
-          const expanded = item.icon === 'products' ? openProducts || active : false;
+          const expanded =
+            item.icon === 'products'
+              ? openProducts || active
+              : item.icon === 'orders'
+                ? openOrders || active
+                : false;
 
           if (item.children?.length) {
             return (
@@ -57,6 +73,7 @@ export function SellerDashboardSidebar({
                   type="button"
                   onClick={() => {
                     if (item.icon === 'products') setOpenProducts((prev) => !prev);
+                    if (item.icon === 'orders') setOpenOrders((prev) => !prev);
                   }}
                   className={cn(
                     'group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors',
@@ -79,8 +96,7 @@ export function SellerDashboardSidebar({
                 {expanded ? (
                   <ul className="ml-4 space-y-0.5 border-l border-slate-200 py-1 pl-3">
                     {item.children.map((child) => {
-                      const childActive =
-                        child.section === section && !child.href.includes('#');
+                      const childActive = isChildActive(child.href, child.section);
                       return (
                         <li key={child.href}>
                           <Link
