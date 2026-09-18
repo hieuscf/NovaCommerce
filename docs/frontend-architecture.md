@@ -106,7 +106,7 @@ apps/web/src/
 │   ├── account/         Alloy account dashboard (User Gateway profile/addresses/preferences)
 │   ├── auth/            auth-specific UI (not primitives)
 │   ├── commerce/        product cards, listing (PLP), product detail (PDP), cart, checkout, orders, merchandising
-│   ├── seller/          Alloy seller onboarding + registered dashboard/products/orders fixtures (Seller Gateway pending)
+│   ├── seller/          Alloy seller onboarding + registered dashboard/products/orders/finance/promotions/chat fixtures (Seller Gateway pending)
 │   ├── feedback/        API / page loading wrappers
 │   ├── layout/
 │   ├── marketing/
@@ -192,7 +192,7 @@ Both apps use the **Next.js 15 App Router**.
 | `/login` `/register` `/forgot-password` `/reset-password` `/verify-email` | `(auth)` | Authentication |
 | `/unauthorized` | `(store)` | 403 access-restricted |
 | `/account` | `(store)` | Protected Alloy dashboard. Profile, addresses, and notification preferences load from Gateway `GET/PATCH /users/me*` via `userClient`. Payment methods load from `GET/POST/DELETE /users/me/payment-methods` (saved cards: brand/last4/expiry only — **never CVV**; CVV re-entered at checkout). Loyalty, wishlist, and recent-order rails stay empty until those APIs are wired. Sections via `?section=`. Orders live on `/orders`. |
-| `/seller` | `(store)` | Public Seller Center. Unregistered visitors complete the Alloy onboarding wizard (business, shop, verification, English terms, completion/waiting-for-approval). Verified sellers see the Alloy seller workspace: home dashboard (`?demo=registered`), product management (`?demo=registered&section=products` with `tab`/`q`/`category`/`page` filters), or order management (`?demo=registered&section=orders` with `tab`/`q`/`status`/`range`/`page` filters + detail rail). Default status is presentation-only `unregistered`. Do not invent Seller APIs until the deferred Seller module has a Gateway adapter. |
+| `/seller` | `(store)` | Public Seller Center. Unregistered visitors complete the Alloy onboarding wizard (business, shop, verification, English terms, completion/waiting-for-approval). Verified sellers see the Alloy seller workspace: home dashboard (`?demo=registered`), product management (`?demo=registered&section=products` with `tab`/`q`/`category`/`page` filters), order management (`?demo=registered&section=orders` with `tab`/`q`/`status`/`range`/`page` filters + detail rail), finance/wallet (`?demo=registered&section=finance` with `tab`/`month` filters), promotions (`?demo=registered&section=promotions` with `tab`/`range` filters), or customer chat (`?demo=registered&section=chat` with `tab`/`inbox`/`q`/`thread` filters + tools rail). Default status is presentation-only `unregistered`. Do not invent Seller APIs until the deferred Seller module has a Gateway adapter. |
 
 Reserved (do not create empty pages): `/categories`, `/search`, `/account/*`. Account sections stay on `/account?section=` except **Orders**, which is `/orders`. Customer `/orders` is not the Admin reserved `/orders` console route.
 

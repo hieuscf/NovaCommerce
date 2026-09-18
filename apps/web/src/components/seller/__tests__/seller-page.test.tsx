@@ -121,6 +121,65 @@ describe('SellerPage', () => {
     expect(screen.getAllByRole('button', { name: /Xác nhận đơn/i }).length).toBeGreaterThan(0);
     expect(screen.queryByRole('heading', { name: /Xin chào, HappyShop/i })).not.toBeInTheDocument();
   });
+
+  it('renders the registered finance wallet section', () => {
+    render(
+      <SellerPage
+        page={getSellerPage('registered')}
+        section="finance"
+        financeQuery={{ tab: 'wallet', month: '2025-04' }}
+      />,
+    );
+
+    expect(
+      screen.getByRole('heading', { name: 'Ví Seller / Số dư tài khoản' }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Số dư khả dụng')).toBeInTheDocument();
+    expect(screen.getByText('12.580.000₫')).toBeInTheDocument();
+    expect(screen.getByText('Tài khoản ngân hàng liên kết')).toBeInTheDocument();
+    expect(screen.getAllByText('Lịch sử rút tiền').length).toBeGreaterThan(0);
+    expect(screen.getByRole('button', { name: /Rút tiền ngay/i })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /Xin chào, HappyShop/i })).not.toBeInTheDocument();
+  });
+
+  it('renders the registered promotions section', () => {
+    render(
+      <SellerPage
+        page={getSellerPage('registered')}
+        section="promotions"
+        promotionsQuery={{ tab: 'all', range: '2025-04' }}
+      />,
+    );
+
+    expect(
+      screen.getByRole('heading', { name: 'Khuyến mãi & Chiến dịch' }),
+    ).toBeInTheDocument();
+    expect(screen.getAllByText('Mã giảm giá').length).toBeGreaterThan(0);
+    expect(screen.getByText('Hiệu quả khuyến mãi')).toBeInTheDocument();
+    expect(screen.getByText('Top chương trình hiệu quả')).toBeInTheDocument();
+    expect(screen.getByText('Mã giảm giá mới nhất')).toBeInTheDocument();
+    expect(screen.getByText('SALE20')).toBeInTheDocument();
+    expect(screen.getAllByRole('link', { name: /Tạo khuyến mãi mới/i }).length).toBeGreaterThan(0);
+    expect(screen.queryByRole('heading', { name: /Xin chào, HappyShop/i })).not.toBeInTheDocument();
+  });
+
+  it('renders the registered chat section', () => {
+    render(
+      <SellerPage
+        page={getSellerPage('registered')}
+        section="chat"
+        chatQuery={{ tab: 'messages', inbox: 'all', thread: 'sc_mai' }}
+      />,
+    );
+
+    expect(screen.getByRole('heading', { name: 'Tin nhắn khách hàng' })).toBeInTheDocument();
+    expect(screen.getAllByText('Nguyễn Thị Mai').length).toBeGreaterThan(0);
+    expect(screen.getByText('Thông tin khách hàng')).toBeInTheDocument();
+    expect(screen.getByText('Voucher nhanh')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Gửi' })).toBeInTheDocument();
+    expect(screen.getByLabelText('Nội dung tin nhắn')).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /Xin chào, HappyShop/i })).not.toBeInTheDocument();
+  });
 });
 
 describe('SellerRegisterForm shop details', () => {

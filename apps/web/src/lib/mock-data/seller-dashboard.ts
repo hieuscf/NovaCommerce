@@ -156,14 +156,14 @@ export const sellerFeatureCards: SellerFeatureCard[] = [
     id: 'promotions',
     title: 'Chương trình khuyến mãi',
     description: 'Tạo mã giảm giá, flash sale',
-    href: '/seller?demo=registered#promotions',
+    href: '/seller?demo=registered&section=promotions',
     tone: 'promotions',
   },
   {
     id: 'revenue',
     title: 'Theo dõi doanh thu',
     description: 'Xem báo cáo chi tiết',
-    href: '/seller?demo=registered#reports',
+    href: '/seller?demo=registered&section=finance',
     tone: 'revenue',
   },
   {
@@ -178,15 +178,24 @@ export const sellerFeatureCards: SellerFeatureCard[] = [
 export interface SellerNavChild {
   href: string;
   label: string;
-  section?: 'home' | 'products' | 'orders';
+  section?: 'home' | 'products' | 'orders' | 'finance' | 'promotions' | 'chat';
 }
 
 export interface SellerNavItem {
   href: string;
   label: string;
-  icon: 'home' | 'products' | 'orders' | 'customers' | 'promotions' | 'finance' | 'reports' | 'settings';
+  icon:
+    | 'home'
+    | 'products'
+    | 'orders'
+    | 'customers'
+    | 'promotions'
+    | 'finance'
+    | 'reports'
+    | 'chat'
+    | 'settings';
   expandable?: boolean;
-  section?: 'home' | 'products' | 'orders';
+  section?: 'home' | 'products' | 'orders' | 'finance' | 'promotions' | 'chat';
   children?: readonly SellerNavChild[];
 }
 
@@ -263,21 +272,102 @@ export const sellerNavItems: readonly SellerNavItem[] = [
     icon: 'customers',
   },
   {
-    href: '/seller?demo=registered#promotions',
+    href: '/seller?demo=registered&section=promotions',
     label: 'Khuyến mãi',
     icon: 'promotions',
+    expandable: true,
+    section: 'promotions',
+    children: [
+      {
+        href: '/seller?demo=registered&section=promotions',
+        label: 'Tất cả chương trình',
+        section: 'promotions',
+      },
+      {
+        href: '/seller?demo=registered&section=promotions&tab=vouchers',
+        label: 'Mã giảm giá',
+        section: 'promotions',
+      },
+      {
+        href: '/seller?demo=registered&section=promotions&tab=flash_sale',
+        label: 'Flash Sale',
+        section: 'promotions',
+      },
+      {
+        href: '/seller?demo=registered&section=promotions&tab=combo',
+        label: 'Combo / Mua kèm',
+        section: 'promotions',
+      },
+      {
+        href: '/seller?demo=registered&section=promotions&tab=campaigns',
+        label: 'Chiến dịch Sàn',
+        section: 'promotions',
+      },
+      {
+        href: '/seller?demo=registered&section=promotions&tab=ads',
+        label: 'Quảng cáo',
+        section: 'promotions',
+      },
+    ],
   },
   {
-    href: '/seller?demo=registered#finance',
+    href: '/seller?demo=registered&section=finance',
     label: 'Tài chính',
     icon: 'finance',
     expandable: true,
+    section: 'finance',
+    children: [
+      {
+        href: '/seller?demo=registered&section=finance&tab=overview',
+        label: 'Tổng quan tài chính',
+        section: 'finance',
+      },
+      {
+        href: '/seller?demo=registered&section=finance',
+        label: 'Ví Seller / Số dư tài khoản',
+        section: 'finance',
+      },
+      {
+        href: '/seller?demo=registered&section=finance&tab=withdrawals',
+        label: 'Lịch sử rút tiền',
+        section: 'finance',
+      },
+      {
+        href: '/seller?demo=registered&section=finance&tab=reports',
+        label: 'Đối soát & Báo cáo',
+        section: 'finance',
+      },
+      {
+        href: '/seller?demo=registered&section=finance&tab=invoices',
+        label: 'Hóa đơn & Thuế',
+        section: 'finance',
+      },
+    ],
   },
   {
     href: '/seller?demo=registered#reports',
     label: 'Báo cáo',
     icon: 'reports',
     expandable: true,
+  },
+  {
+    href: '/seller?demo=registered&section=chat',
+    label: 'Chat',
+    icon: 'chat',
+    expandable: true,
+    section: 'chat',
+    children: [
+      {
+        href: '/seller?demo=registered&section=chat',
+        label: 'Tin nhắn khách hàng',
+        section: 'chat',
+      },
+      {
+        href: '/seller?demo=registered&section=chat&tab=reviews',
+        label: 'Đánh giá & Phản hồi',
+        section: 'chat',
+      },
+    ],
   },
   {
     href: '/seller?demo=registered#settings',

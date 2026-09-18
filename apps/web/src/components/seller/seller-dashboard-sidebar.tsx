@@ -8,6 +8,7 @@ import {
   ChevronDown,
   Headphones,
   Home,
+  MessageCircle,
   MoreHorizontal,
   Package,
   Percent,
@@ -31,6 +32,7 @@ const navIcons = {
   promotions: Percent,
   finance: Wallet,
   reports: BarChart3,
+  chat: MessageCircle,
   settings: Settings,
 } as const;
 
@@ -45,6 +47,9 @@ export function SellerDashboardSidebar({
   const currentTab = searchParams.get('tab');
   const [openProducts, setOpenProducts] = useState(section === 'products');
   const [openOrders, setOpenOrders] = useState(section === 'orders');
+  const [openFinance, setOpenFinance] = useState(section === 'finance');
+  const [openPromotions, setOpenPromotions] = useState(section === 'promotions');
+  const [openChat, setOpenChat] = useState(section === 'chat');
 
   function isChildActive(href: string, childSection?: SellerWorkspaceSection) {
     if (childSection !== section || href.includes('#')) return false;
@@ -64,7 +69,13 @@ export function SellerDashboardSidebar({
               ? openProducts || active
               : item.icon === 'orders'
                 ? openOrders || active
-                : false;
+                : item.icon === 'finance'
+                  ? openFinance || active
+                  : item.icon === 'promotions'
+                    ? openPromotions || active
+                    : item.icon === 'chat'
+                      ? openChat || active
+                      : false;
 
           if (item.children?.length) {
             return (
@@ -74,6 +85,9 @@ export function SellerDashboardSidebar({
                   onClick={() => {
                     if (item.icon === 'products') setOpenProducts((prev) => !prev);
                     if (item.icon === 'orders') setOpenOrders((prev) => !prev);
+                    if (item.icon === 'finance') setOpenFinance((prev) => !prev);
+                    if (item.icon === 'promotions') setOpenPromotions((prev) => !prev);
+                    if (item.icon === 'chat') setOpenChat((prev) => !prev);
                   }}
                   className={cn(
                     'group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors',
