@@ -5,6 +5,10 @@ describe('getSellerPageStatus', () => {
   it('returns unregistered until a Seller Gateway adapter exists', () => {
     expect(getSellerPageStatus()).toBe('unregistered');
   });
+
+  it('allows a presentation-only registered dashboard preview', () => {
+    expect(getSellerPageStatus({ demo: 'registered' })).toBe('registered');
+  });
 });
 
 describe('getSellerPage', () => {

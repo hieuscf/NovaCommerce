@@ -10,14 +10,26 @@ import {
 } from '@/lib/mock-data/seller';
 import type { SellerPageStatus, SellerPageViewModel } from '@/lib/view-models/seller';
 
+export type SellerPageSearchParams = Record<string, string | string[] | undefined>;
+
+function first(value: string | string[] | undefined): string | undefined {
+  if (Array.isArray(value)) return value[0];
+  return value;
+}
+
 /**
- * Seller onboarding status for `/seller`.
+ * Seller onboarding / workspace status for `/seller`.
  *
- * The Seller bounded context is deferred (`docs/domain-model.md`), so this
- * always returns `unregistered` until a Seller Gateway adapter exists.
- * Do not invent Seller APIs from the storefront.
+ * The Seller bounded context is deferred (`docs/domain-model.md`), so the
+ * default remains `unregistered` until a Seller Gateway adapter exists.
+ * `?demo=registered` is a presentation-only preview of the verified seller
+ * dashboard — it does not invent Seller APIs.
  */
-export function getSellerPageStatus(): SellerPageStatus {
+export function getSellerPageStatus(
+  searchParams?: SellerPageSearchParams,
+): SellerPageStatus {
+  const demo = first(searchParams?.demo)?.trim().toLowerCase();
+  if (demo === 'registered') return 'registered';
   return 'unregistered';
 }
 

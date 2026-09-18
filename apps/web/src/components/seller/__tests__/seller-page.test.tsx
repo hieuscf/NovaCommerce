@@ -55,7 +55,7 @@ describe('SellerPage', () => {
     );
     expect(screen.getByRole('button', { name: 'Next Step' })).toBeEnabled();
     expect(screen.getByText('Sarah Johnson')).toBeInTheDocument();
-    expect(screen.queryByRole('heading', { name: 'Your seller workspace' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /Xin chào, HappyShop/i })).not.toBeInTheDocument();
   });
 
   it('keeps the user on business information when required fields are empty', async () => {
@@ -72,7 +72,12 @@ describe('SellerPage', () => {
   it('renders the registered workspace instead of the application form', () => {
     render(<SellerPage page={getSellerPage('registered')} />);
 
-    expect(screen.getByRole('heading', { name: 'Your seller workspace' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /Xin chào, HappyShop/i }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Gian hàng đã xác nhận')).toBeInTheDocument();
+    expect(screen.getByText('Doanh thu 7 ngày gần đây')).toBeInTheDocument();
+    expect(screen.getByRole('navigation', { name: 'Seller navigation' })).toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'Become a Seller' })).not.toBeInTheDocument();
   });
 });
