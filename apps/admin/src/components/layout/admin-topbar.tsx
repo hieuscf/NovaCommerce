@@ -1,7 +1,8 @@
 'use client';
 
-import { Bell, Globe, Menu, Moon, Search, Sun } from 'lucide-react';
+import { Bell, Globe, LogOut, Menu, Moon, Search, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import { useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback } from '@novacommerce/ui/components/avatar';
 import { Button } from '@novacommerce/ui/components/button';
 import { Input } from '@novacommerce/ui/components/input';
@@ -13,9 +14,11 @@ import {
   SheetTrigger,
 } from '@novacommerce/ui/components/sheet';
 import { useEffect, useState, Suspense } from 'react';
+import { signOut } from '@/lib/auth/session';
 import { AdminSidebarPanel } from './admin-sidebar';
 
 export function AdminTopbar() {
+  const router = useRouter();
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -25,6 +28,11 @@ export function AdminTopbar() {
   }, []);
 
   const isDark = mounted && resolvedTheme === 'dark';
+
+  function handleSignOut() {
+    signOut();
+    router.replace('/login');
+  }
 
   return (
     <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-3 border-b border-border bg-surface/95 px-4 backdrop-blur-md lg:px-6">
@@ -96,6 +104,15 @@ export function AdminTopbar() {
             <p className="text-sm font-semibold text-foreground">Admin User</p>
             <p className="text-caption text-muted-foreground">Administrator</p>
           </div>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            aria-label="Sign out"
+            onClick={handleSignOut}
+          >
+            <LogOut className="size-4" strokeWidth={1.75} />
+          </Button>
         </div>
       </div>
     </header>

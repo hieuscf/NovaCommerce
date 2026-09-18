@@ -30,6 +30,10 @@ export class PrismaRoleRepository implements IRoleRepository {
     return rows.map((row) => this.toDomain(row));
   }
 
+  async delete(id: string): Promise<void> {
+    await this.prisma.role.delete({ where: { id } });
+  }
+
   async save(role: Role): Promise<void> {
     await this.prisma.$transaction(async (tx) => {
       await tx.role.upsert({
@@ -42,6 +46,7 @@ export class PrismaRoleRepository implements IRoleRepository {
         update: {
           name: role.getName(),
           description: role.getDescription(),
+          updatedAt: role.updatedAt,
         },
       });
 

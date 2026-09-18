@@ -11,6 +11,14 @@ export interface AdminSession {
   subscribe(listener: SessionListener): () => void;
 }
 
+/** Cached snapshots so useSyncExternalStore sees stable Object.is equality. */
+const UNAUTHENTICATED_SNAPSHOT: AdminSessionSnapshot = Object.freeze({
+  isAuthenticated: false,
+});
+const AUTHENTICATED_SNAPSHOT: AdminSessionSnapshot = Object.freeze({
+  isAuthenticated: true,
+});
+
 /**
  * Admin session is isolated from the customer web session.
  * Tokens stay in memory until the Gateway issues httpOnly cookies.
@@ -31,7 +39,8 @@ function createMemoryAdminSession(): AdminSession {
       accessToken = token;
       notify();
     },
-    getSnapshot: () => ({ isAuthenticated: accessToken !== null }),
+    getSnapshot: () =>
+      accessToken !== null ? AUTHENTICATED_SNAPSHOT : UNAUTHENTICATED_SNAPSHOT,
     subscribe: (listener) => {
       listeners.add(listener);
       return () => {
@@ -45,4 +54,12 @@ export const adminSession = createMemoryAdminSession();
 
 export function getAdminSession(): AdminSessionSnapshot {
   return adminSession.getSnapshot();
+}
+
+export function signIn(accessToken: string): void {
+  adminSession.setAccessToken(accessToken);
+}
+
+export function signOut(): void {
+  adminSession.setAccessToken(null);
 }

@@ -51,6 +51,7 @@ function createIdentityPrismaMock() {
         }
         return null;
       }),
+      findMany: vi.fn().mockResolvedValue([]),
       upsert: vi.fn(async ({ create }: { create: { id: string; email: string } }) => {
         identities.set(create.id, {
           id: create.id,
@@ -62,9 +63,9 @@ function createIdentityPrismaMock() {
       }),
     },
     credential: { upsert: vi.fn() },
-    identityRole: { findMany: vi.fn().mockResolvedValue([]), create: vi.fn(), delete: vi.fn(), deleteMany: vi.fn() },
+    identityRole: { findMany: vi.fn().mockResolvedValue([]), create: vi.fn(), delete: vi.fn(), deleteMany: vi.fn(), groupBy: vi.fn().mockResolvedValue([]) },
     refreshSession: { upsert: vi.fn(), findFirst: vi.fn(), findUnique: vi.fn(), updateMany: vi.fn() },
-    role: { findMany: vi.fn().mockResolvedValue([]), findUnique: vi.fn(), upsert: vi.fn() },
+    role: { findMany: vi.fn().mockResolvedValue([]), findUnique: vi.fn(), upsert: vi.fn(), delete: vi.fn() },
     permission: { findMany: vi.fn().mockResolvedValue([]), findUnique: vi.fn(), upsert: vi.fn(), findFirst: vi.fn() },
     rolePermission: { deleteMany: vi.fn(), createMany: vi.fn() },
     passwordResetToken: {

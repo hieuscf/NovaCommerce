@@ -140,24 +140,28 @@ apps/web/src/
 ```text
 apps/admin/src/
 ├── app/
-│   ├── (console)/       dashboard, products, orders, accounts, sellers + admin shell
+│   ├── (console)/       dashboard, products, orders, accounts, roles, sellers + admin shell
+│   ├── (auth)/          admin login (outside AdminShell)
 │   ├── error.tsx
 │   ├── global-error.tsx
 │   └── not-found.tsx
 ├── components/
+│   ├── auth/            Admin login shell + form
 │   ├── accounts/        Account Management (KPI, filters, table, pagination)
+│   ├── roles/           Roles & Permissions (KPI, filters, table, overview, dialogs)
 │   ├── products/        Product Management (KPI, filters, table, pagination)
 │   ├── orders/          Order Management (KPI, filters, table, pagination)
 │   ├── sellers/         Seller Management + Verification & Approval drawer
 │   ├── dashboard/       Alloy dashboard widgets (KPI, charts, tables, actions)
 │   ├── layout/          AdminShell, sidebar, topbar
 │   └── providers/
-├── features/auth/
+├── features/auth/       useAdminSession, RequireAdminAuth
 └── lib/
     ├── api/
-    ├── auth/
+    ├── auth/            admin session, login client, return-url, route policy
+    ├── identity/        rolesClient + Roles & Permissions view models
     ├── mock-data/       presentation fixtures until reporting Gateway adapters exist
-    ├── url/             shareable query parsers (products/orders/accounts/sellers/approvals)
+    ├── url/             shareable query parsers (products/orders/accounts/roles/sellers/approvals)
     └── env.ts
 ```
 
@@ -205,13 +209,15 @@ Reserved (do not create empty pages): `/categories`, `/search`, `/account/*`. Ac
 | `/products/[id]` | `(console)` | Alloy product detail — view/edit catalog fields, change status, lock product (esp. on policy violation), report history, related products. Unknown ids use `not-found`. Fixtures only. |
 | `/orders` | `(console)` | Alloy Order Management — KPI cards, search/status/payment/date-range filters (`q`, `status`, `payment`, `range`, `page` in URL), orders table, pagination. Presentation fixtures until an Order admin Gateway adapter exists. |
 | `/accounts` | `(console)` | Alloy Account Management — KPI cards, search/role/status filters (`q`, `role`, `status`, `page` in URL), accounts table, pagination. Presentation fixtures until an admin-users Gateway adapter exists. |
+| `/accounts/roles` | `(console)` | Alloy Roles & Permissions **detail** — role cards, Permissions / Users / Description tabs, CRUD matrix, right rail. Live Gateway `GET /roles` (timestamps + `memberCount`) + `GET /permissions` + `GET /roles/:id/users`. Update matrix cells `PATCH /roles/:id/permissions` (`changes: [{ permissionKey, granted }]`). Single grant `POST /roles/:id/permissions`, revoke `DELETE /roles/:id/permissions?key=`. Edit `PATCH /roles/:id`, duplicate `POST /roles/:id/duplicate`, delete `DELETE /roles/:id`. Query: `role`, `tab`, `grant`, `pq`. |
+| `/login` | `(auth)` | Admin operator sign-in — branded shell (not customer Alloy split), form posts Gateway `POST /auth/login` via `adminAuthClient`, stores access token in-memory `adminSession`, redirects to `returnUrl`. Sign-out clears session from the topbar. |
 | `/sellers` | `(console)` | Alloy Seller Management — five KPI cards, search/status/verification/sort filters (`q`, `status`, `verified`, `sort`, `page` in URL), sellers table, pagination. Presentation fixtures until Seller Gateway exists (Seller module deferred). |
 | `/sellers/approvals` | `(console)` | Alloy Seller Verification & Approval list — pending KPIs, filters, applications table. Click seller / View opens the review page. |
 | `/sellers/approvals/[id]` | `(console)` | Full seller application review — all web onboarding sections (business, shop, verification docs, terms), activity timeline, admin checklist (required before Approve), notes, Approve / Reject. Fixtures only. |
 
-Reserved (nav targets; do not create empty pages): `/products/categories`, `/products/brands`, `/products/attributes`, `/products/reviews`, `/orders/[id]`, `/catalog`, `/inventory`, `/accounts/roles`, `/promotions`, `/analytics`, `/content`, `/settings`, `/login`.
+Reserved (nav targets; do not create empty pages): `/products/categories`, `/products/brands`, `/products/attributes`, `/products/reviews`, `/orders/[id]`, `/catalog`, `/inventory`, `/promotions`, `/analytics`, `/content`, `/settings`.
 
-URL filter examples: `/products?category=Electronics`, `/products?brand=Apple&status=active&page=2`, `/products?q=airpods`, `/orders?status=pending`, `/orders?payment=paid&range=last_7_days&page=2`, `/accounts?role=customer`, `/accounts?status=blocked&page=2`, `/accounts?q=sarah`, `/sellers?status=pending`, `/sellers?verified=unverified&sort=sales_desc`, `/sellers/approvals?id=app_001`
+URL filter examples: `/products?category=Electronics`, `/products?brand=Apple&status=active&page=2`, `/products?q=airpods`, `/orders?status=pending`, `/orders?payment=paid&range=last_7_days&page=2`, `/accounts?role=customer`, `/accounts?status=blocked&page=2`, `/accounts?q=sarah`, `/accounts/roles?role=<uuid>`, `/accounts/roles?grant=not_granted&pq=identity`, `/sellers?status=pending`, `/sellers?verified=unverified&sort=sales_desc`, `/sellers/approvals?id=app_001`
 
 ### URL state
 

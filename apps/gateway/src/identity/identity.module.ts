@@ -8,6 +8,10 @@ import { AssignPermissionToRoleHandler } from '../../../../modules/identity/appl
 import { AssignRoleHandler } from '../../../../modules/identity/application/handlers/assign-role.handler';
 import { ChangePasswordHandler } from '../../../../modules/identity/application/handlers/change-password.handler';
 import { CreateRoleHandler } from '../../../../modules/identity/application/handlers/create-role.handler';
+import { DeleteRoleHandler } from '../../../../modules/identity/application/handlers/delete-role.handler';
+import { DuplicateRoleHandler } from '../../../../modules/identity/application/handlers/duplicate-role.handler';
+import { ListRoleMembersHandler } from '../../../../modules/identity/application/handlers/list-role-members.handler';
+import { ListRolesHandler } from '../../../../modules/identity/application/handlers/list-roles.handler';
 import { LoginIdentityHandler } from '../../../../modules/identity/application/handlers/login-identity.handler';
 import { LogoutIdentityHandler } from '../../../../modules/identity/application/handlers/logout-identity.handler';
 import { OAuthLoginHandler } from '../../../../modules/identity/application/handlers/oauth-login.handler';
@@ -15,7 +19,10 @@ import { RefreshTokenHandler } from '../../../../modules/identity/application/ha
 import { RegisterIdentityHandler } from '../../../../modules/identity/application/handlers/register-identity.handler';
 import { RequestPasswordResetHandler } from '../../../../modules/identity/application/handlers/request-password-reset.handler';
 import { ResetPasswordHandler } from '../../../../modules/identity/application/handlers/reset-password.handler';
+import { RevokePermissionFromRoleHandler } from '../../../../modules/identity/application/handlers/revoke-permission-from-role.handler';
 import { RevokeRoleHandler } from '../../../../modules/identity/application/handlers/revoke-role.handler';
+import { UpdateRoleHandler } from '../../../../modules/identity/application/handlers/update-role.handler';
+import { UpdateRolePermissionsHandler } from '../../../../modules/identity/application/handlers/update-role-permissions.handler';
 import { AuthenticationTokenService } from '../../../../modules/identity/application/services/authentication-token.service';
 import { RedisOAuthStateStore } from '../../../../modules/identity/infrastructure/oauth/redis-oauth-state-store';
 import { StubOAuthProvider } from '../../../../modules/identity/infrastructure/oauth/stub-oauth-provider';
@@ -319,11 +326,51 @@ function parseDurationToSeconds(value: string, fallback: number): number {
       ],
     },
     {
+      provide: ListRolesHandler,
+      useFactory: (
+        roleRepository: PrismaRoleRepository,
+        identityRepository: PrismaIdentityRepository,
+      ) => new ListRolesHandler(roleRepository, identityRepository),
+      inject: [IDENTITY_TOKENS.ROLE_REPOSITORY, IDENTITY_TOKENS.IDENTITY_REPOSITORY],
+    },
+    {
+      provide: ListRoleMembersHandler,
+      useFactory: (
+        roleRepository: PrismaRoleRepository,
+        identityRepository: PrismaIdentityRepository,
+      ) => new ListRoleMembersHandler(roleRepository, identityRepository),
+      inject: [IDENTITY_TOKENS.ROLE_REPOSITORY, IDENTITY_TOKENS.IDENTITY_REPOSITORY],
+    },
+    {
       provide: CreateRoleHandler,
       useFactory: (
         roleRepository: PrismaRoleRepository,
         authorizationService: PrismaAuthorizationService,
       ) => new CreateRoleHandler(roleRepository, authorizationService),
+      inject: [IDENTITY_TOKENS.ROLE_REPOSITORY, IDENTITY_TOKENS.AUTHORIZATION_SERVICE],
+    },
+    {
+      provide: UpdateRoleHandler,
+      useFactory: (
+        roleRepository: PrismaRoleRepository,
+        authorizationService: PrismaAuthorizationService,
+      ) => new UpdateRoleHandler(roleRepository, authorizationService),
+      inject: [IDENTITY_TOKENS.ROLE_REPOSITORY, IDENTITY_TOKENS.AUTHORIZATION_SERVICE],
+    },
+    {
+      provide: DeleteRoleHandler,
+      useFactory: (
+        roleRepository: PrismaRoleRepository,
+        authorizationService: PrismaAuthorizationService,
+      ) => new DeleteRoleHandler(roleRepository, authorizationService),
+      inject: [IDENTITY_TOKENS.ROLE_REPOSITORY, IDENTITY_TOKENS.AUTHORIZATION_SERVICE],
+    },
+    {
+      provide: DuplicateRoleHandler,
+      useFactory: (
+        roleRepository: PrismaRoleRepository,
+        authorizationService: PrismaAuthorizationService,
+      ) => new DuplicateRoleHandler(roleRepository, authorizationService),
       inject: [IDENTITY_TOKENS.ROLE_REPOSITORY, IDENTITY_TOKENS.AUTHORIZATION_SERVICE],
     },
     {
@@ -377,6 +424,51 @@ function parseDurationToSeconds(value: string, fallback: number): number {
         auditLogger: PrismaAuditLogger,
       ) =>
         new AssignPermissionToRoleHandler(
+          roleRepository,
+          permissionRepository,
+          authorizationService,
+          auditLogger,
+        ),
+      inject: [
+        IDENTITY_TOKENS.ROLE_REPOSITORY,
+        IDENTITY_TOKENS.PERMISSION_REPOSITORY,
+        IDENTITY_TOKENS.AUTHORIZATION_SERVICE,
+        IDENTITY_TOKENS.AUDIT_LOGGER,
+      ],
+    },
+    {
+      provide: UpdateRolePermissionsHandler,
+      useFactory: (
+        roleRepository: PrismaRoleRepository,
+        permissionRepository: PrismaPermissionRepository,
+        identityRepository: PrismaIdentityRepository,
+        authorizationService: PrismaAuthorizationService,
+        auditLogger: PrismaAuditLogger,
+      ) =>
+        new UpdateRolePermissionsHandler(
+          roleRepository,
+          permissionRepository,
+          identityRepository,
+          authorizationService,
+          auditLogger,
+        ),
+      inject: [
+        IDENTITY_TOKENS.ROLE_REPOSITORY,
+        IDENTITY_TOKENS.PERMISSION_REPOSITORY,
+        IDENTITY_TOKENS.IDENTITY_REPOSITORY,
+        IDENTITY_TOKENS.AUTHORIZATION_SERVICE,
+        IDENTITY_TOKENS.AUDIT_LOGGER,
+      ],
+    },
+    {
+      provide: RevokePermissionFromRoleHandler,
+      useFactory: (
+        roleRepository: PrismaRoleRepository,
+        permissionRepository: PrismaPermissionRepository,
+        authorizationService: PrismaAuthorizationService,
+        auditLogger: PrismaAuditLogger,
+      ) =>
+        new RevokePermissionFromRoleHandler(
           roleRepository,
           permissionRepository,
           authorizationService,

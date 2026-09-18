@@ -30,6 +30,19 @@ Identity → IdentityRole → Role → RolePermission → Permission
 JWT carries roles + permissions; PermissionsGuard enforces at gateway
 ```
 
+Foundation roles (seeded in `packages/database/prisma/seed/seed_rbac.sql`):
+
+| Role | Type | Scope |
+|------|------|--------|
+| `super_admin` | System | All catalog permissions |
+| `admin` | System | Platform operations (all except deleting accounts/roles) |
+| `customer_support` | Custom | Orders, returns, customer profiles |
+| `inventory_manager` | Custom | Stock, warehouse, shipping |
+| `marketing_manager` | Custom | Promotions, CMS, notifications |
+| `analyst` | Custom | Read-only analytics and reports |
+
+Permission keys follow `resource:action` (`identity:role:create`) or `resource:feature:action` (`catalog:product:view`). Regenerate the SQL catalog with `node packages/database/prisma/seed/rbac-catalog.mjs`.
+
 ## API Endpoints (Gateway)
 
 | Method | Path |
@@ -42,7 +55,18 @@ JWT carries roles + permissions; PermissionsGuard enforces at gateway
 | POST | `/api/v1/auth/forgot-password` |
 | POST | `/api/v1/auth/reset-password` |
 | POST | `/api/v1/auth/oauth/callback` |
-| GET/POST | `/api/v1/roles`, `/api/v1/permissions`, role assignment routes |
+| GET | `/api/v1/roles` |
+| GET | `/api/v1/roles/:roleId/users` |
+| POST | `/api/v1/roles` |
+| PATCH | `/api/v1/roles/:roleId` |
+| DELETE | `/api/v1/roles/:roleId` |
+| POST | `/api/v1/roles/:roleId/duplicate` |
+| GET | `/api/v1/permissions` |
+| POST | `/api/v1/roles/:roleId/permissions` |
+| PATCH | `/api/v1/roles/:roleId/permissions` |
+| DELETE | `/api/v1/roles/:roleId/permissions?key=` |
+| POST | `/api/v1/users/:identityId/roles` |
+| DELETE | `/api/v1/users/:identityId/roles/:roleId` |
 
 NestJS controllers live in `apps/gateway/src/identity/`; domain/application/infrastructure remain in this module.
 

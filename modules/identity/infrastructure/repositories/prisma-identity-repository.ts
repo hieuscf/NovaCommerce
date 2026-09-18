@@ -5,7 +5,10 @@ import { Identity } from '../../domain/aggregates/identity';
 import { Credential } from '../../domain/entities/credential';
 import { ExternalIdentity } from '../../domain/entities/external-identity';
 import { RefreshSession } from '../../domain/entities/refresh-session';
-import type { IIdentityRepository } from '../../domain/repositories/i-identity-repository';
+import type {
+  IIdentityRepository,
+  IdentityRoleMemberRecord,
+} from '../../domain/repositories/i-identity-repository';
 import { AccountStatus } from '../../domain/value-objects/account-status';
 import { EmailAddress } from '../../domain/value-objects/email-address';
 import { IdentityId } from '../../domain/value-objects/identity-id';
@@ -30,6 +33,35 @@ export class PrismaIdentityRepository implements IIdentityRepository {
       include: this.defaultInclude(),
     });
     return row ? this.toDomain(row) : null;
+  }
+
+  async findMembersByRoleId(roleId: string): Promise<readonly IdentityRoleMemberRecord[]> {
+    const rows = await this.prisma.identity.findMany({
+      where: { roles: { some: { roleId } } },
+      orderBy: { email: 'asc' },
+      select: { id: true, email: true, status: true, createdAt: true },
+    });
+
+    return rows.map((row) => ({
+      id: row.id,
+      email: row.email,
+      status: row.status,
+      createdAt: row.createdAt,
+    }));
+  }
+
+  async countMembersByRoleIds(roleIds: readonly string[]): Promise<ReadonlyMap<string, number>> {
+    if (roleIds.length === 0) {
+      return new Map();
+    }
+
+    const rows = await this.prisma.identityRole.groupBy({
+      by: ['roleId'],
+      where: { roleId: { in: [...roleIds] } },
+      _count: { identityId: true },
+    });
+
+    return new Map(rows.map((row) => [row.roleId, row._count.identityId]));
   }
 
   async save(identity: Identity): Promise<void> {
