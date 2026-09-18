@@ -9,14 +9,25 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@novacommerce/ui/components/pagination';
-import { ACCOUNT_PAGE_SIZE, ACCOUNT_TOTAL_COUNT, ACCOUNT_TOTAL_PAGES } from '@/lib/mock-data/accounts';
 import { accountsHref, type AccountsQuery } from '@/lib/url/accounts-query';
 
-export function AccountsPagination({ query }: { query: AccountsQuery }) {
-  const page = Math.min(query.page, ACCOUNT_TOTAL_PAGES);
-  const start = (page - 1) * ACCOUNT_PAGE_SIZE + 1;
-  const end = Math.min(page * ACCOUNT_PAGE_SIZE, ACCOUNT_TOTAL_COUNT);
-  const items = getPaginationRange({ page, totalPages: ACCOUNT_TOTAL_PAGES, siblingCount: 2 });
+export function AccountsPagination({
+  query,
+  page,
+  pageSize,
+  total,
+  totalPages,
+}: {
+  query: AccountsQuery;
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+}) {
+  const safePage = Math.min(page, Math.max(1, totalPages));
+  const start = total === 0 ? 0 : (safePage - 1) * pageSize + 1;
+  const end = Math.min(safePage * pageSize, total);
+  const items = getPaginationRange({ page: safePage, totalPages: Math.max(1, totalPages), siblingCount: 2 });
 
   return (
     <div className="flex flex-col gap-3 border-t border-border px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
@@ -25,7 +36,7 @@ export function AccountsPagination({ query }: { query: AccountsQuery }) {
         <span className="font-medium text-foreground">
           {start}-{end}
         </span>{' '}
-        of <span className="font-medium text-foreground">{ACCOUNT_TOTAL_COUNT.toLocaleString()}</span>{' '}
+        of <span className="font-medium text-foreground">{total.toLocaleString()}</span>{' '}
         accounts
       </p>
 
@@ -33,8 +44,8 @@ export function AccountsPagination({ query }: { query: AccountsQuery }) {
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious
-              href={accountsHref({ ...query, page: Math.max(1, page - 1) })}
-              disabled={page <= 1}
+              href={accountsHref({ ...query, page: Math.max(1, safePage - 1) })}
+              disabled={safePage <= 1}
               label="Previous"
             />
           </PaginationItem>
@@ -46,7 +57,7 @@ export function AccountsPagination({ query }: { query: AccountsQuery }) {
               </PaginationItem>
             ) : (
               <PaginationItem key={item}>
-                <PaginationLink asChild isActive={item === page}>
+                <PaginationLink asChild isActive={item === safePage}>
                   <Link href={accountsHref({ ...query, page: item })}>{item}</Link>
                 </PaginationLink>
               </PaginationItem>
@@ -55,8 +66,8 @@ export function AccountsPagination({ query }: { query: AccountsQuery }) {
 
           <PaginationItem>
             <PaginationNext
-              href={accountsHref({ ...query, page: Math.min(ACCOUNT_TOTAL_PAGES, page + 1) })}
-              disabled={page >= ACCOUNT_TOTAL_PAGES}
+              href={accountsHref({ ...query, page: Math.min(Math.max(1, totalPages), safePage + 1) })}
+              disabled={safePage >= totalPages || total === 0}
               label="Next"
             />
           </PaginationItem>

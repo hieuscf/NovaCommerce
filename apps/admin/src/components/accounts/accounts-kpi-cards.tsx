@@ -7,10 +7,10 @@ import {
 } from 'lucide-react';
 import { Card, CardContent } from '@novacommerce/ui/components/card';
 import { cn } from '@/lib/utils';
-import { accountKpis, type AccountKpi } from '@/lib/mock-data/accounts';
+import type { AccountKpiViewModel } from '@/lib/identity/get-accounts-page';
 
 const toneStyles: Record<
-  AccountKpi['tone'],
+  AccountKpiViewModel['tone'],
   { wrap: string; icon: string; change: string }
 > = {
   primary: {
@@ -47,10 +47,10 @@ const kpiIcons: Record<string, LucideIcon> = {
   blocked: Ban,
 };
 
-export function AccountsKpiCards() {
+export function AccountsKpiCards({ kpis }: { kpis: readonly AccountKpiViewModel[] }) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-      {accountKpis.map((kpi) => {
+      {kpis.map((kpi) => {
         const styles = toneStyles[kpi.tone];
         const Icon = kpiIcons[kpi.id] ?? Users;
 

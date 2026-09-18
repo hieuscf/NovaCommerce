@@ -96,6 +96,8 @@ export class Identity extends AggregateRoot<string> {
       this.status = this.status.lock();
       this.disabled = true;
       this.updatedAt = new Date();
+      this.revokeAllRefreshSessions();
+      this.addDomainEvent(new IdentityDisabledEvent(this.id, new Date(), {}));
       return Result.ok(undefined);
     } catch (error) {
       return Result.fail(error as IdentityDomainError);

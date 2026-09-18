@@ -26,6 +26,24 @@ describe('Identity aggregate', () => {
     expect(auth.getError().code).toBe('ACCOUNT_LOCKED');
   });
 
+  it('emits IdentityDisabled and revokes sessions when locked', () => {
+    const identity = Identity.register(
+      IdentityId.create('11111111-1111-1111-1111-111111111111'),
+      EmailAddress.create('user@example.com'),
+    ).getValue();
+    identity.activate();
+    identity.addRefreshSession(
+      RefreshSession.create('session-1', 'hash-1', new Date(Date.now() + 3600000)),
+    );
+
+    expect(identity.lock().isSuccess).toBe(true);
+    expect(identity.getStatus().value).toBe('LOCKED');
+    expect(identity.getRefreshSessions()[0]?.isRevoked()).toBe(true);
+    expect(identity.pullDomainEvents().some((event) => event.eventName === 'IdentityDisabled')).toBe(
+      true,
+    );
+  });
+
   it('rotates refresh session and revokes old token', () => {
     const identity = Identity.register(IdentityId.create('11111111-1111-1111-1111-111111111111'), EmailAddress.create('user@example.com')).getValue();
     identity.activate();

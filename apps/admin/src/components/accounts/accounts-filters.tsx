@@ -15,9 +15,15 @@ import {
 import {
   accountsHref,
   type AccountsQuery,
-  type AccountsRoleFilter,
   type AccountsStatusFilter,
 } from '@/lib/url/accounts-query';
+
+const STATUS_OPTIONS: { value: AccountsStatusFilter; label: string }[] = [
+  { value: 'all', label: 'All Status' },
+  { value: 'active', label: 'Active' },
+  { value: 'inactive', label: 'Inactive' },
+  { value: 'blocked', label: 'Blocked' },
+];
 
 export function AccountsFilters({ query }: { query: AccountsQuery }) {
   const router = useRouter();
@@ -43,7 +49,7 @@ export function AccountsFilters({ query }: { query: AccountsQuery }) {
           placeholder="Search by name, email, or user ID..."
           aria-label="Search accounts"
           startAdornment={<Search className="size-4 text-muted-foreground" aria-hidden="true" />}
-          className="h-10"
+          className="h-11"
           groupClassName="rounded-xl"
           onKeyDown={(event) => {
             if (event.key === 'Enter') {
@@ -54,41 +60,36 @@ export function AccountsFilters({ query }: { query: AccountsQuery }) {
         />
       </div>
 
-      <Select
-        value={query.role}
-        onValueChange={(value) => navigate({ role: value as AccountsRoleFilter })}
-      >
-        <SelectTrigger className="h-10 w-full lg:w-40" aria-label="Filter by role">
-          <SelectValue placeholder="All Roles" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All Roles</SelectItem>
-          <SelectItem value="customer">Customer</SelectItem>
-          <SelectItem value="admin">Admin</SelectItem>
-        </SelectContent>
-      </Select>
-
-      <Select
-        value={query.status}
-        onValueChange={(value) => navigate({ status: value as AccountsStatusFilter })}
-      >
-        <SelectTrigger className="h-10 w-full lg:w-40" aria-label="Filter by status">
-          <SelectValue placeholder="All Status" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All Status</SelectItem>
-          <SelectItem value="active">Active</SelectItem>
-          <SelectItem value="inactive">Inactive</SelectItem>
-          <SelectItem value="blocked">Blocked</SelectItem>
-        </SelectContent>
-      </Select>
+      <div className="relative w-full shrink-0 lg:w-44">
+        <span className="pointer-events-none absolute top-1.5 left-4 z-10 text-[10px] leading-none font-medium text-muted-foreground">
+          Status
+        </span>
+        <Select
+          value={query.status}
+          onValueChange={(value) => navigate({ status: value as AccountsStatusFilter })}
+        >
+          <SelectTrigger
+            className="h-11 w-full items-end pt-5 pb-1.5"
+            aria-label="Filter by status"
+          >
+            <SelectValue placeholder="All Status" />
+          </SelectTrigger>
+          <SelectContent position="popper">
+            {STATUS_OPTIONS.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
       <Button
         type="button"
         variant="outline"
         size="sm"
-        className="h-10 gap-1.5 rounded-xl"
-        onClick={() => navigate({ q: undefined, role: 'all', status: 'all' })}
+        className="h-11 gap-1.5 rounded-xl"
+        onClick={() => navigate({ q: undefined, status: 'all' })}
       >
         <RotateCcw className="size-3.5" aria-hidden="true" />
         Reset

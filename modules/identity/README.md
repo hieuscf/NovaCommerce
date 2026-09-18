@@ -55,6 +55,8 @@ Permission keys follow `resource:action` (`identity:role:create`) or `resource:f
 | POST | `/api/v1/auth/forgot-password` |
 | POST | `/api/v1/auth/reset-password` |
 | POST | `/api/v1/auth/oauth/callback` |
+| GET | `/api/v1/identities` |
+| PATCH | `/api/v1/identities/:identityId` |
 | GET | `/api/v1/roles` |
 | GET | `/api/v1/roles/:roleId/users` |
 | POST | `/api/v1/roles` |
@@ -69,6 +71,10 @@ Permission keys follow `resource:action` (`identity:role:create`) or `resource:f
 | DELETE | `/api/v1/users/:identityId/roles/:roleId` |
 
 NestJS controllers live in `apps/gateway/src/identity/`; domain/application/infrastructure remain in this module.
+
+`GET /api/v1/identities` lists login accounts for admin Account Management (`q`, `role=customer|admin`, `status=active|inactive|blocked`, `page`, `pageSize`) and requires `identity:account:view`. Identity owns the directory; User profiles are not joined.
+
+`PATCH /api/v1/identities/:identityId` with `{ locked: boolean }` locks or unlocks an account (`identity:account:edit`). Lock emits `IdentityDisabled` and revokes refresh sessions. Actors cannot lock or unlock themselves.
 
 ## Domain Events
 

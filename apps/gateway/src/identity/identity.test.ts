@@ -52,6 +52,7 @@ function createIdentityPrismaMock() {
         return null;
       }),
       findMany: vi.fn().mockResolvedValue([]),
+      count: vi.fn().mockResolvedValue(0),
       upsert: vi.fn(async ({ create }: { create: { id: string; email: string } }) => {
         identities.set(create.id, {
           id: create.id,
@@ -153,5 +154,17 @@ describe('Identity API', () => {
 
     expect(response.status).toBe(200);
     expect(response.body.data.message).toContain('If the account exists');
+  });
+
+  it('GET /api/v1/identities requires authentication', async () => {
+    const response = await request(app.getHttpServer()).get('/api/v1/identities');
+    expect(response.status).toBe(401);
+  });
+
+  it('PATCH /api/v1/identities/:identityId requires authentication', async () => {
+    const response = await request(app.getHttpServer())
+      .patch('/api/v1/identities/11111111-1111-1111-1111-111111111111')
+      .send({ locked: true });
+    expect(response.status).toBe(401);
   });
 });

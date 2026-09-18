@@ -10,6 +10,8 @@ import { ChangePasswordHandler } from '../../../../modules/identity/application/
 import { CreateRoleHandler } from '../../../../modules/identity/application/handlers/create-role.handler';
 import { DeleteRoleHandler } from '../../../../modules/identity/application/handlers/delete-role.handler';
 import { DuplicateRoleHandler } from '../../../../modules/identity/application/handlers/duplicate-role.handler';
+import { ListIdentitiesHandler } from '../../../../modules/identity/application/handlers/list-identities.handler';
+import { UpdateIdentityLockHandler } from '../../../../modules/identity/application/handlers/update-identity-lock.handler';
 import { ListRoleMembersHandler } from '../../../../modules/identity/application/handlers/list-role-members.handler';
 import { ListRolesHandler } from '../../../../modules/identity/application/handlers/list-roles.handler';
 import { LoginIdentityHandler } from '../../../../modules/identity/application/handlers/login-identity.handler';
@@ -40,6 +42,7 @@ import { JwtAccessTokenService } from '../../../../modules/identity/infrastructu
 import { PrismaAuditLogger } from '../../../../modules/identity/infrastructure/services/prisma-audit-logger';
 import { PrismaAuthorizationService } from '../../../../modules/identity/infrastructure/services/prisma-authorization-service';
 import { AuthController } from './controllers/auth.controller';
+import { IdentitiesController } from './controllers/identities.controller';
 import { RolesController } from './controllers/roles.controller';
 import { PrismaService } from '../infrastructure/database/prisma.service';
 
@@ -64,7 +67,7 @@ function parseDurationToSeconds(value: string, fallback: number): number {
 
 @Module({
   imports: [ConfigModule, AuthModule],
-  controllers: [AuthController, RolesController],
+  controllers: [AuthController, RolesController, IdentitiesController],
   providers: [
     {
       provide: IDENTITY_TOKENS.OUTBOX_STORE,
@@ -332,6 +335,28 @@ function parseDurationToSeconds(value: string, fallback: number): number {
         identityRepository: PrismaIdentityRepository,
       ) => new ListRolesHandler(roleRepository, identityRepository),
       inject: [IDENTITY_TOKENS.ROLE_REPOSITORY, IDENTITY_TOKENS.IDENTITY_REPOSITORY],
+    },
+    {
+      provide: ListIdentitiesHandler,
+      useFactory: (
+        identityRepository: PrismaIdentityRepository,
+        authorizationService: PrismaAuthorizationService,
+      ) => new ListIdentitiesHandler(identityRepository, authorizationService),
+      inject: [IDENTITY_TOKENS.IDENTITY_REPOSITORY, IDENTITY_TOKENS.AUTHORIZATION_SERVICE],
+    },
+    {
+      provide: UpdateIdentityLockHandler,
+      useFactory: (
+        identityRepository: PrismaIdentityRepository,
+        authorizationService: PrismaAuthorizationService,
+        auditLogger: PrismaAuditLogger,
+      ) =>
+        new UpdateIdentityLockHandler(identityRepository, authorizationService, auditLogger),
+      inject: [
+        IDENTITY_TOKENS.IDENTITY_REPOSITORY,
+        IDENTITY_TOKENS.AUTHORIZATION_SERVICE,
+        IDENTITY_TOKENS.AUDIT_LOGGER,
+      ],
     },
     {
       provide: ListRoleMembersHandler,

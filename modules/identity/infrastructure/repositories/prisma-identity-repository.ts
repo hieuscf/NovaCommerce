@@ -1,17 +1,22 @@
 import { randomUUID } from 'node:crypto';
 import type { DomainEvent, IOutboxStore, OutboxMessage } from '@novacommerce/building-blocks';
-import type { PrismaClient } from '@prisma/client';
+import type { IdentityStatus, Prisma, PrismaClient } from '@prisma/client';
 import { Identity } from '../../domain/aggregates/identity';
 import { Credential } from '../../domain/entities/credential';
 import { ExternalIdentity } from '../../domain/entities/external-identity';
 import { RefreshSession } from '../../domain/entities/refresh-session';
 import type {
   IIdentityRepository,
+  IdentityAccountSearchQuery,
+  IdentityAccountSearchResult,
   IdentityRoleMemberRecord,
 } from '../../domain/repositories/i-identity-repository';
+import { ADMIN_ROLE_NAMES } from '../../domain/entities/role';
 import { AccountStatus } from '../../domain/value-objects/account-status';
 import { EmailAddress } from '../../domain/value-objects/email-address';
 import { IdentityId } from '../../domain/value-objects/identity-id';
+
+const blockedStatuses: IdentityStatus[] = ['LOCKED', 'SUSPENDED'];
 
 export class PrismaIdentityRepository implements IIdentityRepository {
   constructor(
@@ -62,6 +67,100 @@ export class PrismaIdentityRepository implements IIdentityRepository {
     });
 
     return new Map(rows.map((row) => [row.roleId, row._count.identityId]));
+  }
+
+  async searchAccounts(query: IdentityAccountSearchQuery): Promise<IdentityAccountSearchResult> {
+    const where = this.toAccountWhere(query);
+    const skip = (query.page - 1) * query.pageSize;
+    const adminRoleFilter = {
+      roles: { some: { role: { name: { in: [...ADMIN_ROLE_NAMES] } } } },
+    };
+    const blockedFilter: Prisma.IdentityWhereInput = {
+      OR: [{ disabled: true }, { status: { in: blockedStatuses } }],
+    };
+
+    const [items, total, summaryTotal, admins, blocked] = await Promise.all([
+      this.prisma.identity.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: query.pageSize,
+        select: {
+          id: true,
+          email: true,
+          status: true,
+          disabled: true,
+          createdAt: true,
+          roles: { select: { role: { select: { name: true } } } },
+          refreshSessions: {
+            orderBy: { createdAt: 'desc' },
+            take: 1,
+            select: { createdAt: true },
+          },
+        },
+      }),
+      this.prisma.identity.count({ where }),
+      this.prisma.identity.count(),
+      this.prisma.identity.count({ where: adminRoleFilter }),
+      this.prisma.identity.count({ where: blockedFilter }),
+    ]);
+
+    return {
+      items: items.map((row) => ({
+        id: row.id,
+        email: row.email,
+        status: row.status,
+        disabled: row.disabled,
+        roleNames: row.roles.map((item) => item.role.name),
+        lastLoginAt: row.refreshSessions[0]?.createdAt ?? null,
+        createdAt: row.createdAt,
+      })),
+      total,
+      summary: {
+        total: summaryTotal,
+        admins,
+        customers: Math.max(0, summaryTotal - admins),
+        blocked,
+      },
+    };
+  }
+
+  private toAccountWhere(query: IdentityAccountSearchQuery): Prisma.IdentityWhereInput {
+    const clauses: Prisma.IdentityWhereInput[] = [];
+    const needle = query.q?.trim();
+    if (needle) {
+      const emailFilter: Prisma.IdentityWhereInput = {
+        email: { contains: needle, mode: 'insensitive' },
+      };
+      clauses.push(isUuid(needle) ? { OR: [emailFilter, { id: needle }] } : emailFilter);
+    }
+
+    if (query.role === 'admin') {
+      clauses.push({ roles: { some: { role: { name: { in: [...ADMIN_ROLE_NAMES] } } } } });
+    } else if (query.role === 'customer') {
+      clauses.push({ roles: { none: { role: { name: { in: [...ADMIN_ROLE_NAMES] } } } } });
+    }
+
+    if (query.status === 'active') {
+      clauses.push({ disabled: false, status: 'ACTIVE' satisfies IdentityStatus });
+    } else if (query.status === 'inactive') {
+      clauses.push({
+        disabled: false,
+        status: { in: ['INACTIVE', 'PENDING_VERIFICATION'] as IdentityStatus[] },
+      });
+    } else if (query.status === 'blocked') {
+      clauses.push({
+        OR: [{ disabled: true }, { status: { in: blockedStatuses } }],
+      });
+    }
+
+    if (clauses.length === 0) {
+      return {};
+    }
+    if (clauses.length === 1) {
+      return clauses[0] ?? {};
+    }
+    return { AND: clauses };
   }
 
   async save(identity: Identity): Promise<void> {
@@ -283,4 +382,10 @@ class PrismaOutboxStoreInTransaction implements IOutboxStore {
       })),
     });
   }
+}
+
+function isUuid(value: string): boolean {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+    value,
+  );
 }

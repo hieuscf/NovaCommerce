@@ -22,7 +22,7 @@ import { cn } from '@/lib/utils';
 export interface AdminNavChild {
   href: string;
   label: string;
-  match?: { role?: string; status?: string };
+  match?: { status?: string };
 }
 
 export interface AdminNavItem {
@@ -73,8 +73,6 @@ export const adminNavItems: AdminNavItem[] = [
     expandable: true,
     children: [
       { href: '/accounts', label: 'All Accounts' },
-      { href: '/accounts?role=customer', label: 'Customers', match: { role: 'customer' } },
-      { href: '/accounts?role=admin', label: 'Admins', match: { role: 'admin' } },
       { href: '/accounts/roles', label: 'Roles & Permissions' },
     ],
   },
@@ -109,10 +107,6 @@ function isChildActive(
 ) {
   const pathOnly = child.href.split('?')[0] ?? child.href;
 
-  if (child.match?.role) {
-    return pathname === '/accounts' && searchParams.get('role') === child.match.role;
-  }
-
   if (child.match?.status) {
     if (pathname === '/sellers') {
       return searchParams.get('status') === child.match.status;
@@ -124,7 +118,7 @@ function isChildActive(
   }
 
   if (pathOnly === '/accounts') {
-    return pathname === '/accounts' && !searchParams.get('role');
+    return pathname === '/accounts';
   }
 
   if (pathOnly === '/sellers/approvals') {

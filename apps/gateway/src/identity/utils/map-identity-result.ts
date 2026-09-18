@@ -17,6 +17,7 @@ export function mapIdentityResult<T>(result: Result<T, IdentityApplicationError>
     case 'IDENTITY_NOT_FOUND':
       throw new NotFoundException(error.message);
     case 'SYSTEM_ROLE_PROTECTED':
+    case 'CANNOT_MODIFY_OWN_ACCOUNT':
       throw new ForbiddenException(error.message);
     case 'INVALID_CREDENTIALS':
     case 'REFRESH_TOKEN_INVALID':

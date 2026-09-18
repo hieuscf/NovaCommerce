@@ -1,3 +1,5 @@
+'use client';
+
 import { Skeleton } from '@novacommerce/ui/components/skeleton';
 
 export default function AccountsLoading() {

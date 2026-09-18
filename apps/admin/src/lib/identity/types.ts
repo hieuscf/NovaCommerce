@@ -65,6 +65,51 @@ export interface LoginRequest {
   readonly password: string;
 }
 
+export interface IdentityAccountDto {
+  readonly id: string;
+  readonly email: string;
+  readonly displayName: string;
+  readonly status: string;
+  readonly disabled: boolean;
+  readonly roles: readonly string[];
+  readonly lastLoginAt: string | null;
+  readonly createdAt: string;
+}
+
+export interface IdentityAccountSummaryDto {
+  readonly total: number;
+  readonly customers: number;
+  readonly admins: number;
+  readonly blocked: number;
+}
+
+export interface IdentityAccountListDto {
+  readonly items: readonly IdentityAccountDto[];
+  readonly total: number;
+  readonly page: number;
+  readonly pageSize: number;
+  readonly summary: IdentityAccountSummaryDto;
+}
+
+export interface IdentityLockResultDto {
+  readonly id: string;
+  readonly status: string;
+  readonly disabled: boolean;
+}
+
+export interface ListIdentitiesQuery {
+  readonly q?: string;
+  readonly role?: 'customer' | 'admin';
+  readonly status?: 'active' | 'inactive' | 'blocked';
+  readonly page?: number;
+  readonly pageSize?: number;
+}
+
+export interface IIdentitiesClient {
+  listIdentities(query: ListIdentitiesQuery): Promise<IdentityAccountListDto>;
+  updateIdentityLock(identityId: string, locked: boolean): Promise<IdentityLockResultDto>;
+}
+
 export interface IRolesClient {
   listRoles(): Promise<RoleDto[]>;
   listPermissions(): Promise<PermissionDto[]>;

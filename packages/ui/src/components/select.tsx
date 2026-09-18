@@ -64,13 +64,20 @@ function SelectContent({
           'origin-(--radix-select-content-transform-origin)',
           'data-[state=open]:animate-popover-in data-[state=closed]:animate-popover-out',
           position === 'popper' &&
-            'w-full min-w-(--radix-select-trigger-width) data-[side=bottom]:translate-y-1 data-[side=top]:-translate-y-1',
+            'min-w-(--radix-select-trigger-width) data-[side=bottom]:translate-y-1 data-[side=top]:-translate-y-1',
           className,
         )}
         {...props}
       >
         <SelectScrollUpButton />
-        <SelectPrimitive.Viewport className="p-1.5">{children}</SelectPrimitive.Viewport>
+        <SelectPrimitive.Viewport
+          className={cn(
+            'p-1.5',
+            position === 'popper' && 'w-full min-w-(--radix-select-trigger-width)',
+          )}
+        >
+          {children}
+        </SelectPrimitive.Viewport>
         <SelectScrollDownButton />
       </SelectPrimitive.Content>
     </SelectPrimitive.Portal>

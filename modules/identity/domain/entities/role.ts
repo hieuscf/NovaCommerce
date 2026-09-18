@@ -10,6 +10,8 @@ const PROTECTED_ROLE_NAMES = new Set([
   'superadmin',
 ]);
 
+export const ADMIN_ROLE_NAMES = [...PROTECTED_ROLE_NAMES];
+
 export class Role extends BaseEntity<string> {
   private permissionKeys: PermissionKey[] = [];
 

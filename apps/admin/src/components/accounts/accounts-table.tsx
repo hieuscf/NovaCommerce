@@ -1,10 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { Ban, CheckCircle2, MoreHorizontal, XCircle } from 'lucide-react';
+import { Ban, CheckCircle2, XCircle } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@novacommerce/ui/components/avatar';
 import { Badge } from '@novacommerce/ui/components/badge';
-import { Button } from '@novacommerce/ui/components/button';
 import { Checkbox } from '@novacommerce/ui/components/checkbox';
 import {
   Table,
@@ -15,17 +14,16 @@ import {
   TableRow,
 } from '@novacommerce/ui/components/table';
 import {
-  roleLabel,
   statusLabel,
-  type AdminAccount,
-  type AccountRole,
+  type AccountRowViewModel,
   type AccountStatus,
-} from '@/lib/mock-data/accounts';
+} from '@/lib/identity/get-accounts-page';
+import { AccountsRowActions } from '@/components/accounts/accounts-row-actions';
 
-function RoleBadge({ role }: { role: AccountRole }) {
+function RoleBadge({ label, isAdmin }: { label: string; isAdmin: boolean }) {
   return (
-    <Badge variant={role === 'admin' ? 'secondary' : 'info'} className="rounded-full">
-      {roleLabel[role]}
+    <Badge variant={isAdmin ? 'secondary' : 'info'} className="rounded-full">
+      {label}
     </Badge>
   );
 }
@@ -71,7 +69,13 @@ function VerifiedBadge({ verified }: { verified: boolean }) {
   );
 }
 
-export function AccountsTable({ accounts }: { accounts: AdminAccount[] }) {
+export function AccountsTable({
+  accounts,
+  onAccountUpdated,
+}: {
+  accounts: readonly AccountRowViewModel[];
+  onAccountUpdated: () => void;
+}) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const allSelected = accounts.length > 0 && selected.size === accounts.length;
   const someSelected = selected.size > 0 && selected.size < accounts.length;
@@ -87,6 +91,17 @@ export function AccountsTable({ accounts }: { accounts: AdminAccount[] }) {
       else next.delete(id);
       return next;
     });
+  }
+
+  if (accounts.length === 0) {
+    return (
+      <div className="rounded-2xl border border-dashed border-border px-6 py-16 text-center">
+        <p className="text-sm font-semibold text-foreground">No accounts found</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Try another search or check Identity seeding.
+        </p>
+      </div>
+    );
   }
 
   return (
@@ -138,7 +153,7 @@ export function AccountsTable({ accounts }: { accounts: AdminAccount[] }) {
                 </div>
               </TableCell>
               <TableCell>
-                <RoleBadge role={account.role} />
+                <RoleBadge label={account.roleLabel} isAdmin={account.isAdmin} />
               </TableCell>
               <TableCell>
                 <StatusBadge status={account.status} />
@@ -153,14 +168,7 @@ export function AccountsTable({ accounts }: { accounts: AdminAccount[] }) {
                 {account.createdAt}
               </TableCell>
               <TableCell className="text-right">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon-sm"
-                  aria-label={`Actions for ${account.name}`}
-                >
-                  <MoreHorizontal className="size-4" />
-                </Button>
+                <AccountsRowActions account={account} onUpdated={onAccountUpdated} />
               </TableCell>
             </TableRow>
           );

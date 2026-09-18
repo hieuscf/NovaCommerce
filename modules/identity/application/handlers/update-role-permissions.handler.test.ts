@@ -45,6 +45,7 @@ describe('UpdateRolePermissionsHandler', () => {
       findByEmail: vi.fn(),
       findMembersByRoleId: vi.fn(),
       countMembersByRoleIds: vi.fn().mockResolvedValue(new Map([[role.id, 2]])),
+      searchAccounts: vi.fn(),
       save: vi.fn(),
     };
     const auditLogger: IAuditLogger = { log: vi.fn() };
@@ -94,6 +95,7 @@ describe('UpdateRolePermissionsHandler', () => {
         findByEmail: vi.fn(),
         findMembersByRoleId: vi.fn(),
         countMembersByRoleIds: vi.fn(),
+        searchAccounts: vi.fn(),
         save: vi.fn(),
       },
       createAuth(true),
