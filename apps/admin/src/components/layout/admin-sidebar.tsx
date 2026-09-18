@@ -48,7 +48,24 @@ export const adminNavItems: AdminNavItem[] = [
       { href: '/products/reviews', label: 'Reviews' },
     ],
   },
-  { href: '/orders', label: 'Orders', icon: ShoppingCart, expandable: true },
+  {
+    href: '/orders',
+    label: 'Orders',
+    icon: ShoppingCart,
+    expandable: true,
+    children: [
+      { href: '/orders', label: 'All Orders' },
+      { href: '/orders?status=pending', label: 'Pending', match: { status: 'pending' } },
+      {
+        href: '/orders?status=processing',
+        label: 'Processing',
+        match: { status: 'processing' },
+      },
+      { href: '/orders?status=shipped', label: 'Shipped', match: { status: 'shipped' } },
+      { href: '/orders?status=delivered', label: 'Delivered', match: { status: 'delivered' } },
+      { href: '/orders?status=cancelled', label: 'Cancelled', match: { status: 'cancelled' } },
+    ],
+  },
   {
     href: '/accounts',
     label: 'Accounts',
@@ -97,7 +114,13 @@ function isChildActive(
   }
 
   if (child.match?.status) {
-    return pathname === '/sellers' && searchParams.get('status') === child.match.status;
+    if (pathname === '/sellers') {
+      return searchParams.get('status') === child.match.status;
+    }
+    if (pathname === '/orders') {
+      return searchParams.get('status') === child.match.status;
+    }
+    return false;
   }
 
   if (pathOnly === '/accounts') {
@@ -114,6 +137,10 @@ function isChildActive(
       !searchParams.get('status') &&
       !pathname.startsWith('/sellers/')
     );
+  }
+
+  if (pathOnly === '/orders') {
+    return pathname === '/orders' && !searchParams.get('status');
   }
 
   if (pathOnly === '/products') {

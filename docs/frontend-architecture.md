@@ -140,13 +140,14 @@ apps/web/src/
 ```text
 apps/admin/src/
 ├── app/
-│   ├── (console)/       dashboard, products, accounts, sellers + admin shell
+│   ├── (console)/       dashboard, products, orders, accounts, sellers + admin shell
 │   ├── error.tsx
 │   ├── global-error.tsx
 │   └── not-found.tsx
 ├── components/
 │   ├── accounts/        Account Management (KPI, filters, table, pagination)
 │   ├── products/        Product Management (KPI, filters, table, pagination)
+│   ├── orders/          Order Management (KPI, filters, table, pagination)
 │   ├── sellers/         Seller Management + Verification & Approval drawer
 │   ├── dashboard/       Alloy dashboard widgets (KPI, charts, tables, actions)
 │   ├── layout/          AdminShell, sidebar, topbar
@@ -156,7 +157,7 @@ apps/admin/src/
     ├── api/
     ├── auth/
     ├── mock-data/       presentation fixtures until reporting Gateway adapters exist
-    ├── url/             shareable query parsers (products/accounts/sellers/approvals)
+    ├── url/             shareable query parsers (products/orders/accounts/sellers/approvals)
     └── env.ts
 ```
 
@@ -202,14 +203,15 @@ Reserved (do not create empty pages): `/categories`, `/search`, `/account/*`. Ac
 | `/` | `(console)` | Alloy operations dashboard — KPI cards, sales/order charts, recent orders, top products, category mix, quick actions. Presentation fixtures until reporting Gateway adapters exist. |
 | `/products` | `(console)` | Alloy Product Management — KPI cards, search/category/brand/status filters (`q`, `category`, `brand`, `status`, `page` in URL), products table with eye action → detail, pagination. Presentation fixtures until a Catalog admin Gateway adapter exists. |
 | `/products/[id]` | `(console)` | Alloy product detail — view/edit catalog fields, change status, lock product (esp. on policy violation), report history, related products. Unknown ids use `not-found`. Fixtures only. |
+| `/orders` | `(console)` | Alloy Order Management — KPI cards, search/status/payment/date-range filters (`q`, `status`, `payment`, `range`, `page` in URL), orders table, pagination. Presentation fixtures until an Order admin Gateway adapter exists. |
 | `/accounts` | `(console)` | Alloy Account Management — KPI cards, search/role/status filters (`q`, `role`, `status`, `page` in URL), accounts table, pagination. Presentation fixtures until an admin-users Gateway adapter exists. |
 | `/sellers` | `(console)` | Alloy Seller Management — five KPI cards, search/status/verification/sort filters (`q`, `status`, `verified`, `sort`, `page` in URL), sellers table, pagination. Presentation fixtures until Seller Gateway exists (Seller module deferred). |
 | `/sellers/approvals` | `(console)` | Alloy Seller Verification & Approval list — pending KPIs, filters, applications table. Click seller / View opens the review page. |
 | `/sellers/approvals/[id]` | `(console)` | Full seller application review — all web onboarding sections (business, shop, verification docs, terms), activity timeline, admin checklist (required before Approve), notes, Approve / Reject. Fixtures only. |
 
-Reserved (nav targets; do not create empty pages): `/products/categories`, `/products/brands`, `/products/attributes`, `/products/reviews`, `/catalog`, `/inventory`, `/orders`, `/accounts/roles`, `/promotions`, `/analytics`, `/content`, `/settings`, `/login`.
+Reserved (nav targets; do not create empty pages): `/products/categories`, `/products/brands`, `/products/attributes`, `/products/reviews`, `/orders/[id]`, `/catalog`, `/inventory`, `/accounts/roles`, `/promotions`, `/analytics`, `/content`, `/settings`, `/login`.
 
-URL filter examples: `/products?category=Electronics`, `/products?brand=Apple&status=active&page=2`, `/products?q=airpods`, `/accounts?role=customer`, `/accounts?status=blocked&page=2`, `/accounts?q=sarah`, `/sellers?status=pending`, `/sellers?verified=unverified&sort=sales_desc`, `/sellers/approvals?id=app_001`
+URL filter examples: `/products?category=Electronics`, `/products?brand=Apple&status=active&page=2`, `/products?q=airpods`, `/orders?status=pending`, `/orders?payment=paid&range=last_7_days&page=2`, `/accounts?role=customer`, `/accounts?status=blocked&page=2`, `/accounts?q=sarah`, `/sellers?status=pending`, `/sellers?verified=unverified&sort=sales_desc`, `/sellers/approvals?id=app_001`
 
 ### URL state
 
