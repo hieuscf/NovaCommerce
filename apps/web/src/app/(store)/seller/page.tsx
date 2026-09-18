@@ -1,6 +1,10 @@
 import type { Metadata } from 'next';
 import { SellerPage } from '@/components/seller/seller-page';
 import { getSellerPage, getSellerPageStatus } from '@/lib/seller/get-seller-page';
+import {
+  parseSellerProductsQuery,
+  parseSellerWorkspaceSection,
+} from '@/lib/url/seller-workspace-query';
 
 export const metadata: Metadata = {
   title: 'Seller Center',
@@ -15,5 +19,9 @@ type SellerRouteProps = {
 export default async function SellerRoutePage({ searchParams }: SellerRouteProps) {
   const params = await searchParams;
   const status = getSellerPageStatus(params);
-  return <SellerPage page={getSellerPage(status)} />;
+  const section = parseSellerWorkspaceSection(params);
+  const productsQuery = parseSellerProductsQuery(params);
+  return (
+    <SellerPage page={getSellerPage(status)} section={section} productsQuery={productsQuery} />
+  );
 }

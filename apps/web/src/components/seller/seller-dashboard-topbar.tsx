@@ -14,10 +14,19 @@ import {
 import { NovaCommerceLogo } from '@novacommerce/ui/components/nova-commerce-logo';
 import { useState } from 'react';
 import { sellerShopProfile } from '@/lib/mock-data/seller-dashboard';
+import type { SellerWorkspaceSection } from '@/lib/url/seller-workspace-query';
 import { SellerDashboardSidebar } from './seller-dashboard-sidebar';
 
-export function SellerDashboardTopbar() {
+export function SellerDashboardTopbar({
+  section = 'home',
+}: {
+  section?: SellerWorkspaceSection;
+}) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const searchPlaceholder =
+    section === 'products'
+      ? 'Tìm kiếm sản phẩm, đơn hàng, khách hàng...'
+      : 'Tìm kiếm đơn hàng, sản phẩm, khách hàng...';
 
   return (
     <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-3 border-b border-border/80 bg-white/95 px-4 backdrop-blur-md lg:px-6">
@@ -34,7 +43,10 @@ export function SellerDashboardTopbar() {
           <div className="border-b border-border px-4 py-3">
             <NovaCommerceLogo size={26} />
           </div>
-          <SellerDashboardSidebar onNavigate={() => setMenuOpen(false)} />
+          <SellerDashboardSidebar
+            section={section}
+            onNavigate={() => setMenuOpen(false)}
+          />
         </SheetContent>
       </Sheet>
 
@@ -45,7 +57,7 @@ export function SellerDashboardTopbar() {
       <div className="min-w-0 flex-1 lg:px-8">
         <Input
           type="search"
-          placeholder="Tìm kiếm đơn hàng, sản phẩm, khách hàng..."
+          placeholder={searchPlaceholder}
           aria-label="Tìm kiếm seller center"
           startAdornment={<Search className="size-4 text-muted-foreground" aria-hidden="true" />}
           className="h-10"

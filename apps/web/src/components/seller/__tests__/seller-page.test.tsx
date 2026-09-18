@@ -5,6 +5,12 @@ import { SellerPage } from '../seller-page';
 import { SellerRegisterForm } from '../seller-register-form';
 import { getSellerPage } from '@/lib/seller/get-seller-page';
 
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
+  usePathname: () => '/seller',
+  useSearchParams: () => new URLSearchParams('demo=registered&section=products'),
+}));
+
 beforeAll(() => {
   if (!URL.createObjectURL) {
     URL.createObjectURL = vi.fn(() => 'blob:preview');
@@ -79,6 +85,23 @@ describe('SellerPage', () => {
     expect(screen.getByText('Doanh thu 7 ngày gần đây')).toBeInTheDocument();
     expect(screen.getByRole('navigation', { name: 'Seller navigation' })).toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'Become a Seller' })).not.toBeInTheDocument();
+  });
+
+  it('renders the registered products management section', () => {
+    render(
+      <SellerPage
+        page={getSellerPage('registered')}
+        section="products"
+        productsQuery={{ tab: 'all', category: 'all', page: 1 }}
+      />,
+    );
+
+    expect(screen.getByRole('heading', { name: 'Quản lý sản phẩm' })).toBeInTheDocument();
+    expect(screen.getByText('Tổng sản phẩm')).toBeInTheDocument();
+    expect(screen.getAllByText('Tai nghe Bluetooth Pro 5').length).toBeGreaterThan(0);
+    expect(screen.getByText('Gợi ý SEO & Tối ưu sản phẩm')).toBeInTheDocument();
+    expect(screen.getAllByRole('link', { name: /Thêm sản phẩm mới/i }).length).toBeGreaterThan(0);
+    expect(screen.queryByRole('heading', { name: /Xin chào, HappyShop/i })).not.toBeInTheDocument();
   });
 });
 

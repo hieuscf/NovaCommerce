@@ -149,7 +149,7 @@ export const sellerFeatureCards: SellerFeatureCard[] = [
     id: 'products',
     title: 'Quản lý sản phẩm',
     description: 'Thêm, sửa, xóa sản phẩm',
-    href: '/seller?demo=registered#products',
+    href: '/seller?demo=registered&section=products',
     tone: 'products',
   },
   {
@@ -175,18 +175,86 @@ export const sellerFeatureCards: SellerFeatureCard[] = [
   },
 ];
 
-export const sellerNavItems = [
-  { href: '/seller?demo=registered', label: 'Trang chủ', icon: 'home', expandable: false },
-  { href: '/seller?demo=registered#products', label: 'Sản phẩm', icon: 'products', expandable: true },
-  { href: '/seller?demo=registered#orders', label: 'Đơn hàng', icon: 'orders', expandable: true },
-  { href: '/seller?demo=registered#customers', label: 'Khách hàng', icon: 'customers', expandable: false },
+export interface SellerNavChild {
+  href: string;
+  label: string;
+  section?: 'home' | 'products';
+}
+
+export interface SellerNavItem {
+  href: string;
+  label: string;
+  icon: 'home' | 'products' | 'orders' | 'customers' | 'promotions' | 'finance' | 'reports' | 'settings';
+  expandable?: boolean;
+  section?: 'home' | 'products';
+  children?: readonly SellerNavChild[];
+}
+
+export const sellerNavItems: readonly SellerNavItem[] = [
+  {
+    href: '/seller?demo=registered',
+    label: 'Trang chủ',
+    icon: 'home',
+    section: 'home',
+  },
+  {
+    href: '/seller?demo=registered&section=products',
+    label: 'Sản phẩm',
+    icon: 'products',
+    expandable: true,
+    section: 'products',
+    children: [
+      {
+        href: '/seller?demo=registered&section=products',
+        label: 'Tất cả sản phẩm',
+        section: 'products',
+      },
+      {
+        href: '/seller?demo=registered&section=products#add',
+        label: 'Thêm sản phẩm mới',
+      },
+      {
+        href: '/seller?demo=registered&section=products#inventory',
+        label: 'Quản lý tồn kho & giá',
+      },
+      {
+        href: '/seller?demo=registered&section=products#seo',
+        label: 'SEO & Điểm sản phẩm',
+      },
+    ],
+  },
+  {
+    href: '/seller?demo=registered#orders',
+    label: 'Đơn hàng',
+    icon: 'orders',
+    expandable: true,
+  },
+  {
+    href: '/seller?demo=registered#customers',
+    label: 'Khách hàng',
+    icon: 'customers',
+  },
   {
     href: '/seller?demo=registered#promotions',
     label: 'Khuyến mãi',
     icon: 'promotions',
-    expandable: false,
   },
-  { href: '/seller?demo=registered#finance', label: 'Tài chính', icon: 'finance', expandable: true },
-  { href: '/seller?demo=registered#reports', label: 'Báo cáo', icon: 'reports', expandable: true },
-  { href: '/seller?demo=registered#settings', label: 'Cài đặt', icon: 'settings', expandable: true },
-] as const;
+  {
+    href: '/seller?demo=registered#finance',
+    label: 'Tài chính',
+    icon: 'finance',
+    expandable: true,
+  },
+  {
+    href: '/seller?demo=registered#reports',
+    label: 'Báo cáo',
+    icon: 'reports',
+    expandable: true,
+  },
+  {
+    href: '/seller?demo=registered#settings',
+    label: 'Cài đặt',
+    icon: 'settings',
+    expandable: true,
+  },
+];
